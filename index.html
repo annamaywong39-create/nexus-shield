@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Nexus Shield — Crypto Guardian</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+
+<div class="header">
+  <div class="navbar">
+    <div class="logo-area">
+      <div class="logo"><i class="fas fa-shield-alt"></i> <span data-i18n="site_name">NEXUS SHIELD</span></div>
+      <div class="subhead" data-i18n="subhead">CRYPTO GUARDIAN</div>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link active" data-i18n="nav_home">HOME</a>
+      <a href="about.html" class="nav-link" data-i18n="nav_about">ABOUT</a>
+    </div>
+    <div class="stats-badge"><i class="fas fa-database"></i> <span id="reportCount">0</span> <span data-i18n="reports_secured">reports secured</span></div>
+  </div>
+  <div style="text-align: center; font-size: 0.7rem; color: #0ff; padding: 0.2rem; background: rgba(0,0,0,0.3);">
+    🌐 <span data-i18n="current_language_label">Current language:</span> <strong id="currentLangDisplay">English</strong>
+  </div>
+  <div class="ticker-wrap">
+    <div class="ticker" id="cryptoTicker"></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="hero-text">
+    <span class="neon-text" data-i18n="hero_text">⚡ THE POWER IS IN YOUR HAND ⚡</span>
+  </div>
+  <div class="form-card glass-panel">
+    <h3><i class="fas fa-shield-alt"></i> <span data-i18n="portal_title">RECOVERY INTELLIGENCE PORTAL</span></h3>
+    <form id="recoveryForm">
+      <div class="input-group">
+        <label data-i18n="label_your_name"><i class="fas fa-user"></i> Your Full Name</label>
+        <input type="text" id="victimName" data-i18n-placeholder="placeholder_your_name" autocomplete="off">
+      </div>
+
+      <div class="input-group">
+        <label data-i18n="label_victim_wallet"><i class="fas fa-user-secret"></i> Victim Wallet Address</label>
+        <input type="text" id="victimWallet" data-i18n-placeholder="placeholder_victim" autocomplete="off">
+        <div id="chainDisplay" class="chain-badge"></div>
+        <select id="chainOverride" style="display: none; margin-top: 0.5rem;">
+          <option value="ethereum" data-i18n="option_ethereum">Ethereum (ETH)</option>
+          <option value="bnb" data-i18n="option_bnb">BNB Chain (BSC)</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label data-i18n="label_scammer_wallet"><i class="fas fa-skull-crosswalk"></i> Scammer Wallet Address</label>
+        <input type="text" id="scammerWallet" data-i18n-placeholder="placeholder_scammer">
+      </div>
+
+      <div class="input-group">
+        <label data-i18n="label_amount_lost"><i class="fas fa-dollar-sign"></i> Total Amount Lost</label>
+        <div style="display: flex; gap: 1rem;">
+          <input type="number" id="amountLost" step="any" placeholder="Amount" style="flex: 2;">
+          <select id="currencyLost" style="flex: 1;">
+            <option value="BTC">BTC</option><option value="ETH">ETH</option><option value="BNB">BNB</option>
+            <option value="USDT">USDT</option><option value="USD">USD</option><option value="SOL">SOL</option>
+            <option value="XRP">XRP</option><option value="ADA">ADA</option><option value="DOGE">DOGE</option>
+            <option value="MATIC">MATIC</option><option value="DOT">DOT</option><option value="AVAX">AVAX</option>
+            <option value="LTC">LTC</option><option value="LINK">LINK</option><option value="UNI">UNI</option>
+            <option value="ATOM">ATOM</option><option value="FIL">FIL</option><option value="NEAR">NEAR</option>
+            <option value="ALGO">ALGO</option><option value="VET">VET</option><option value="ICP">ICP</option>
+            <option value="ETC">ETC</option><option value="XLM">XLM</option><option value="BCH">BCH</option>
+            <option value="EOS">EOS</option><option value="XTZ">XTZ</option><option value="THETA">THETA</option>
+            <option value="FTM">FTM</option><option value="SAND">SAND</option><option value="MANA">MANA</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group" id="usdtNetworkGroup" style="display: none;">
+        <label data-i18n="label_usdt_network"><i class="fas fa-network-wired"></i> USDT Network (Blockchain)</label>
+        <select id="usdtNetwork">
+          <option value="tron" data-i18n="network_tron">TRC-20 (Tron)</option>
+          <option value="ethereum" data-i18n="network_erc20">ERC-20 (Ethereum)</option>
+          <option value="bnb" data-i18n="network_bep20">BEP-20 (BNB Chain)</option>
+          <option value="solana" data-i18n="network_spl">SPL (Solana)</option>
+        </select>
+        <div class="chain-badge" style="color: #ffaa66;" data-i18n="usdt_warning">⚠️ Selecting the wrong network will cause permanent loss of funds. Verify on the blockchain explorer.</div>
+      </div>
+
+      <div class="input-group">
+        <label data-i18n="label_recovery_wallet"><i class="fas fa-hand-holding-usd"></i> New Wallet for Recovered Funds</label>
+        <input type="text" id="recoveryWallet" data-i18n-placeholder="placeholder_recovery">
+      </div>
+
+      <div class="input-group">
+        <label data-i18n="label_tx_hash"><i class="fas fa-link"></i> Transaction Hash(es) <i class="fas fa-plus-circle add-hash-btn" id="addHashBtn"></i></label>
+        <div id="hashFieldsContainer">
+          <div class="hash-row">
+            <input type="text" class="txHashInput" data-i18n-placeholder="placeholder_tx_hash">
+            <button type="button" class="remove-hash"><i class="fas fa-trash-alt"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label data-i18n="label_website"><i class="fas fa-globe"></i> Website / Scam URL (optional)</label>
+        <input type="text" id="websiteUrl" data-i18n-placeholder="placeholder_website">
+      </div>
+
+      <button type="button" id="scanRecoverBtn" class="btn-neon"><i class="fas fa-radar"></i> <span data-i18n="scan_button">SCAN & RECOVER</span></button>
+    </form>
+    <div id="warningMsg" class="warning-msg" style="display: none;"></div>
+    <div id="formError" class="error-msg"></div>
+  </div>
+
+  <!-- Track Progress Section -->
+  <div class="glass-panel" style="margin-top: 2rem; padding: 1.5rem;">
+    <h3><i class="fas fa-search"></i> <span data-i18n="status_title">Track Your Recovery Progress</span></h3>
+    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+      <input type="text" id="statusReportId" placeholder="Enter your Report ID (shown after submission)" style="flex: 2;">
+      <button id="checkStatusBtn" class="btn-outline-cyber"><span data-i18n="check_status_btn">TRACK PROGRESS</span></button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <i class="fas fa-microchip"></i> <span data-i18n="footer_text">NEXUS SHIELD — bridging victims to on‑chain justice</span>
+</footer>
+
+<div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: #0a111fcc; backdrop-filter: blur(8px); border-radius: 2rem; padding: 0.3rem 0.8rem; border: 1px solid #0ff;">
+  <select id="languageSwitcher" style="background: transparent; border: none; color: #0ff; font-size: 0.8rem;">
+    <option value="en">English</option>
+    <option value="zh">中文</option>
+    <option value="es">Español</option>
+    <option value="fr">Français</option>
+    <option value="de">Deutsch</option>
+    <option value="ja">日本語</option>
+  </select>
+</div>
+
+<!-- Modals (same as before, omitted for brevity – keep your existing modals) -->
+<!-- ... (keep your existing modal divs: warningConfirmModal, progressModal, modalContract, modalPayment) ... -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="translations.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

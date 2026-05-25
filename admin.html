@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Nexus Shield</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* Force horizontal scroll on admin table */
+    .admin-table-wrapper {
+      overflow-x: auto;
+      width: 100%;
+      -webkit-overflow-scrolling: touch;
+    }
+    .admin-table {
+      min-width: 1300px;  /* ensure all columns visible when scrolled */
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(12,20,30,0.8);
+      border-radius: 1rem;
+    }
+    .admin-table th, .admin-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid #2c3f5f;
+      white-space: nowrap;
+    }
+    .admin-table th {
+      background: #0a111f;
+      color: #0ff;
+      position: sticky;
+      top: 0;
+    }
+    .status-select {
+      background: #07111e;
+      color: white;
+      border: 1px solid #0ff;
+      border-radius: 0.5rem;
+      padding: 0.3rem;
+    }
+    .update-btn {
+      background: #00c6ff;
+      border: none;
+      color: black;
+      padding: 0.2rem 0.8rem;
+      border-radius: 1rem;
+      cursor: pointer;
+    }
+    .filters {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .export-btn {
+      background: #2a9eff;
+      margin-left: auto;
+    }
+    @media (max-width: 768px) {
+      .admin-table th, .admin-table td {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<div class="header">
+  <div class="navbar">
+    <div class="logo-area"><div class="logo">NEXUS SHIELD</div><div class="subhead">ADMIN DASHBOARD</div></div>
+    <div class="nav-links"><a href="index.html" class="nav-link">HOME</a><a href="about.html" class="nav-link">ABOUT</a></div>
+    <div><button id="logoutBtn" class="btn-outline-cyber" style="padding: 0.3rem 1rem;">LOGOUT</button></div>
+  </div>
+</div>
+<div class="container">
+  <div class="glass-panel" style="padding: 1.5rem;">
+    <h2><i class="fas fa-chart-line"></i> Recovery Reports</h2>
+    <div class="filters">
+      <select id="filterStatus">
+        <option value="">All status</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="investigating">Investigating</option>
+        <option value="recovering1">Recovering Phase 1</option>
+        <option value="recovering2">Recovering Phase 2</option>
+        <option value="recovered">Recovered</option>
+        <option value="failed">Failed</option>
+      </select>
+      <input type="text" id="filterWallet" placeholder="Filter by scammer wallet" style="width: 250px;">
+      <button id="applyFiltersBtn" class="btn-outline-cyber">Apply Filters</button>
+      <button id="exportCsvBtn" class="export-btn btn-neon">Export CSV</button>
+    </div>
+    <div class="admin-table-wrapper">
+      <table class="admin-table" id="reportsTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Victim Name</th>
+            <th>Scammer Wallet</th>
+            <th>Amount</th>
+            <th>Chain</th>
+            <th>Submitted</th>
+            <th>Status</th>
+            <th>Action</th>
+            <th>Report ID</th>
+          </tr>
+        </thead>
+        <tbody id="reportsTableBody"><tr><td colspan="9">Loading...</td</tr</tbody>
+      8]
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="admin.js"></script>
+</body>
+</html>
