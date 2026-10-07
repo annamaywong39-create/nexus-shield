@@ -2,148 +2,1660 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Nexus Shield — Crypto Guardian</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>html,body{background-color:#040812;color:#f8fafc;margin:0;}</style>
+  <title>Nexus Shield — Crypto Asset Recovery & Blockchain Forensics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48x48.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
 </head>
 <body>
-<canvas id="bgCanvas"></canvas>
+<canvas id="crypto3dCanvas" aria-hidden="true"></canvas>
+<div id="cosmicVeil" class="cosmic-gaussian-veil" aria-hidden="true"></div>
 
-<div class="header">
+<!-- Header Navigation -->
+<header class="header">
   <div class="navbar">
-    <div class="logo-area">
-      <div class="logo"><i class="fas fa-shield-alt"></i> <span data-i18n="site_name">NEXUS SHIELD</span></div>
-      <div class="subhead" data-i18n="subhead">CRYPTO GUARDIAN</div>
+    <a href="index.html" class="logo-area">
+      <img src="assets/images/logo-header-dark.png" alt="Nexus Shield Emblem" class="brand-logo-img" width="40" height="40">
+      <div class="logo-text-col">
+        <div class="logo-title">
+          <span>NEXUS SHIELD</span>
+        </div>
+        <div class="logo-sub">CRYPTO ASSET RECOVERY &amp; FORENSICS</div>
+      </div>
+    </a>
+
+    <!-- Clean Public Navbar with Dedicated Tabs -->
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link active" data-i18n="nav_home"><i class="fas fa-shield-halved"></i> Report Loss</a>
+      <a href="methodology.html" class="nav-link"><i class="fas fa-network-wired"></i> Methodology</a>
+      <a href="cases.html" class="nav-link"><i class="fas fa-folder-open"></i> Case Studies</a>
+      <a href="intelligence.html" class="nav-link"><i class="fas fa-passport"></i> Sanctions &amp; Risk</a>
+      <a href="about.html" class="nav-link" data-i18n="nav_about"><i class="fas fa-route"></i> How We Work</a>
+      <a href="partners.html" class="nav-link" data-i18n="nav_partners"><i class="fas fa-handshake"></i> Partners</a>
+      <a href="mailto:support@nexusshield.org" class="nav-link"><i class="fas fa-envelope"></i> Support</a>
+      <a href="index.html#statusReportId" class="nav-link mobile-only-track"><i class="fas fa-magnifying-glass"></i> Track Case Status</a>
+      <button type="button" class="nav-link mobile-only-spin" id="mobileSpinTrigger"><i class="fas fa-rotate"></i> 360° Orbit</button>
+    </nav>
+
+    <div class="header-actions">
+      <!-- Integrated Language Selector -->
+      <select id="languageSwitcher" class="lang-selector-select" title="Change Language">
+        <option value="en">English (US)</option>
+        <option value="zh">中文 (简体)</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+        <option value="ja">日本語</option>
+      </select>
+
+      <a href="#statusReportId" class="nav-track-btn" onclick="document.getElementById('statusReportId').focus()">
+        <i class="fas fa-magnifying-glass"></i> Track Case
+      </a>
+      <button type="button" id="mobileNavToggle" class="mobile-nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
     </div>
-    <div class="nav-links">
-      <a href="index.html" class="nav-link active" data-i18n="nav_home">HOME</a>
-      <a href="about.html" class="nav-link" data-i18n="nav_about">ABOUT</a>
+  </div>
+</header>
+
+<main class="container">
+  <!-- Top Hero Header: Direct, Focused, Immediate -->
+  <section class="hero-header-top" style="text-align: center; max-width: 960px; margin: 0 auto 1.75rem; padding-top: 0.5rem;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(0, 245, 155, 0.12); border: 1px solid rgba(0, 245, 155, 0.35); border-radius: 20px; padding: 0.3rem 0.95rem; font-size: 0.78rem; color: #00F59B; font-weight: 700; margin-bottom: 0.85rem; font-family: var(--font-mono); letter-spacing: 0.5px;">
+      <i class="fas fa-satellite-dish"></i> LIVE ON-CHAIN FORENSIC TRIAGE &bull; FAST-TRACK SCANNER
     </div>
-    <div class="stats-badge"><i class="fas fa-database"></i> <span id="reportCount">0</span> <span data-i18n="reports_secured">reports secured</span></div>
-  </div>
-  <div style="text-align: center; font-size: 0.7rem; color: #0ff; padding: 0.2rem; background: rgba(0,0,0,0.3);">
-    🌐 <span data-i18n="current_language_label">Current language:</span> <strong id="currentLangDisplay">English</strong>
-  </div>
-  <div class="ticker-wrap">
-    <div class="ticker" id="cryptoTicker"></div>
-  </div>
-</div>
+    <h1 class="hero-main-title" style="margin-bottom: 0.65rem; font-size: clamp(2rem, 5vw, 2.85rem); line-height: 1.15;">
+      Recover stolen or lost crypto. <span class="gradient-text">Trace the chain.</span>
+    </h1>
+    <p class="hero-subtext" style="font-size: 1.02rem; color: #cbd5e1; line-height: 1.6; margin: 0 auto; max-width: 800px;">
+      If you sent cryptocurrency to an investment scam, fake broker, or phishing platform, paste your transaction hash into the <strong>Automated Blockchain Inspector</strong> below. Our cryptographic forensics team decodes the trail, identifies destination exchanges, and submits emergency freezing requests before funds cash out.
+    </p>
+  </section>
 
-<div class="container">
-  <div class="hero-text">
-    <span class="neon-text" data-i18n="hero_text">⚡ THE POWER IS IN YOUR HAND ⚡</span>
-  </div>
-  <div class="form-card glass-panel">
-    <h3><i class="fas fa-shield-alt"></i> <span data-i18n="portal_title">RECOVERY INTELLIGENCE PORTAL</span></h3>
-    <form id="recoveryForm">
-      <div class="input-group">
-        <label data-i18n="label_your_name"><i class="fas fa-user"></i> Your Full Name</label>
-        <input type="text" id="victimName" data-i18n-placeholder="placeholder_your_name" autocomplete="off">
-      </div>
 
-      <div class="input-group">
-        <label data-i18n="label_victim_wallet"><i class="fas fa-user-secret"></i> Victim Wallet Address</label>
-        <input type="text" id="victimWallet" data-i18n-placeholder="placeholder_victim" autocomplete="off">
-        <div id="chainDisplay" class="chain-badge"></div>
-        <select id="chainOverride" style="display: none; margin-top: 0.5rem;">
-          <option value="ethereum" data-i18n="option_ethereum">Ethereum (ETH)</option>
-          <option value="bnb" data-i18n="option_bnb">BNB Chain (BSC)</option>
-        </select>
-      </div>
-
-      <div class="input-group">
-        <label data-i18n="label_scammer_wallet"><i class="fas fa-skull-crosswalk"></i> Scammer Wallet Address</label>
-        <input type="text" id="scammerWallet" data-i18n-placeholder="placeholder_scammer">
-      </div>
-
-      <div class="input-group">
-        <label data-i18n="label_amount_lost"><i class="fas fa-dollar-sign"></i> Total Amount Lost</label>
-        <div style="display: flex; gap: 1rem;">
-          <input type="number" id="amountLost" step="any" placeholder="Amount" style="flex: 2;">
-          <select id="currencyLost" style="flex: 1;">
-            <option value="BTC">BTC</option><option value="ETH">ETH</option><option value="BNB">BNB</option>
-            <option value="USDT">USDT</option><option value="USD">USD</option><option value="SOL">SOL</option>
-            <option value="XRP">XRP</option><option value="ADA">ADA</option><option value="DOGE">DOGE</option>
-            <option value="MATIC">MATIC</option><option value="DOT">DOT</option><option value="AVAX">AVAX</option>
-            <option value="LTC">LTC</option><option value="LINK">LINK</option><option value="UNI">UNI</option>
-            <option value="ATOM">ATOM</option><option value="FIL">FIL</option><option value="NEAR">NEAR</option>
-            <option value="ALGO">ALGO</option><option value="VET">VET</option><option value="ICP">ICP</option>
-            <option value="ETC">ETC</option><option value="XLM">XLM</option><option value="BCH">BCH</option>
-            <option value="EOS">EOS</option><option value="XTZ">XTZ</option><option value="THETA">THETA</option>
-            <option value="FTM">FTM</option><option value="SAND">SAND</option><option value="MANA">MANA</option>
-          </select>
+  <!-- Two-Column Workbench Layout -->
+  <div class="workbench-grid">
+    <!-- Left Column: Primary Evidence Intake Portal -->
+    <section class="portal-card">
+      <!-- Card Header -->
+      <div class="card-header-row">
+        <div class="card-title-group">
+          <h2><i class="fas fa-satellite-dish" style="color: var(--accent-cyan);"></i> <span data-i18n="portal_title">Automated Blockchain Inspector &amp; Case Intake</span></h2>
+          <div class="card-subtitle">Paste your transaction hash into the fast-track scanner below to inspect ledger hops, identify destination exchanges, and submit for recovery.</div>
         </div>
       </div>
 
-      <div class="input-group" id="usdtNetworkGroup" style="display: none;">
-        <label data-i18n="label_usdt_network"><i class="fas fa-network-wired"></i> USDT Network (Blockchain)</label>
-        <select id="usdtNetwork">
-          <option value="tron" data-i18n="network_tron">TRC-20 (Tron)</option>
-          <option value="ethereum" data-i18n="network_erc20">ERC-20 (Ethereum)</option>
-          <option value="bnb" data-i18n="network_bep20">BEP-20 (BNB Chain)</option>
-          <option value="solana" data-i18n="network_spl">SPL (Solana)</option>
-        </select>
-        <div class="chain-badge" style="color: #ffaa66;" data-i18n="usdt_warning">⚠️ Selecting the wrong network will cause permanent loss of funds. Verify on the blockchain explorer.</div>
+      <!-- INTAKE METHOD SWITCHER TABS -->
+      <div class="intake-mode-switcher">
+        <button type="button" class="intake-tab-btn active" id="tabAutoBtn">
+          <i class="fas fa-satellite-dish"></i>
+          <div class="tab-btn-text">
+            <span class="tab-btn-title">Automatic TxID Scanner</span>
+            <span class="tab-btn-sub">Paste hashes &bull; Auto-detect on-chain trail</span>
+          </div>
+          <span class="tab-badge">Fast-Track</span>
+        </button>
+        <button type="button" class="intake-tab-btn" id="tabManualBtn">
+          <i class="fas fa-file-pen"></i>
+          <div class="tab-btn-text">
+            <span class="tab-btn-title">Manual Case Intake</span>
+            <span class="tab-btn-sub">Self-input addresses, amounts &amp; platform</span>
+          </div>
+          <span class="tab-badge" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: #cbd5e1;">Comprehensive</span>
+        </button>
       </div>
 
-      <div class="input-group">
-        <label data-i18n="label_recovery_wallet"><i class="fas fa-hand-holding-usd"></i> New Wallet for Recovered Funds</label>
-        <input type="text" id="recoveryWallet" data-i18n-placeholder="placeholder_recovery">
-      </div>
+      <form id="recoveryForm" novalidate>
+        <!-- ========================================================
+             METHOD 1: AUTOMATIC TXID SCANNER (WITH MULTI-TRANSACTION +)
+             ======================================================== -->
+        <div id="autoIntakeSection">
+          <div class="smart-intake-hero-box">
+            <div class="smart-intake-badge">
+              <i class="fas fa-bolt"></i> AUTOMATED BLOCKCHAIN INSPECTOR
+            </div>
+            <h3>Input Your Transaction Hash (TxID)</h3>
+            <p>
+              Paste the transaction hash from your wallet. If your funds were drained across multiple transfers, click <strong>+ Add Another Transaction</strong> to trace all movements in one unified forensic case.
+            </p>
 
-      <div class="input-group">
-        <label data-i18n="label_tx_hash"><i class="fas fa-link"></i> Transaction Hash(es) <i class="fas fa-plus-circle add-hash-btn" id="addHashBtn"></i></label>
-        <div id="hashFieldsContainer">
-          <div class="hash-row">
-            <input type="text" class="txHashInput" data-i18n-placeholder="placeholder_tx_hash">
-            <button type="button" class="remove-hash"><i class="fas fa-trash-alt"></i></button>
+            <!-- Dynamic Multi-Transaction Hash Container -->
+            <div id="multiTxContainer" class="multi-tx-container">
+              <div class="tx-input-row" data-tx-index="1">
+                <span class="tx-index-chip">Tx #1</span>
+                <div class="smart-tx-field-wrapper" style="flex: 1;">
+                  <i class="fas fa-magnifying-glass smart-input-icon"></i>
+                  <input type="text" class="smart-tx-input auto-tx-hash-input" id="smartTxInput_1" placeholder="Paste 64-character TxID or 0x... hash here" autocomplete="off">
+                </div>
+              </div>
+            </div>
+
+            <!-- Controls: Add Another Tx -->
+            <div class="multi-tx-controls">
+              <button type="button" id="addTxHashBtn" class="btn-add-tx">
+                <i class="fas fa-plus-circle"></i> Add Another Transaction
+              </button>
+            </div>
+
+            <!-- TxID Finder Guide Toggle for Non-Technical Users -->
+            <div class="tx-helper-toggle-wrap" style="margin-top: 0.75rem;">
+              <button type="button" id="toggleTxHelpBtn" class="btn-tx-help" style="background: none; border: none; color: #38bdf8; font-size: 0.78rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0; text-decoration: underline;">
+                <i class="fas fa-circle-question"></i> Where do I find my Transaction Hash (TxID)?
+              </button>
+              <div id="txHelpContent" style="display: none; margin-top: 0.5rem; background: rgba(15, 23, 42, 0.95); border: 1px solid #1e293b; border-radius: 8px; padding: 0.85rem 1rem; font-size: 0.77rem; color: #cbd5e1; line-height: 1.55; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                <div style="font-weight: 700; color: #ffffff; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <i class="fas fa-receipt" style="color: #00F59B;"></i> How to locate your 64-character Transaction Hash / TxID:
+                </div>
+                <div style="margin-bottom: 0.35rem;">• <strong>MetaMask / Coinbase Wallet:</strong> Open the app &rarr; tap the sent transaction &rarr; tap <em>"View on Explorer"</em> (or <em>"Transaction Details"</em>) &rarr; copy the Transaction Hash (starts with <code>0x...</code>).</div>
+                <div style="margin-bottom: 0.35rem;">• <strong>Trust Wallet:</strong> Tap the transfer in your history &rarr; tap <em>"More Details"</em> &rarr; copy the <strong>Hash</strong>.</div>
+                <div style="margin-bottom: 0.35rem;">• <strong>Exchanges (Binance, OKX, Coinbase, Kraken):</strong> Go to <em>Wallet &rarr; Spot &rarr; Withdrawal History</em> &rarr; tap the transfer &rarr; copy the <strong>TxID</strong>.</div>
+                <div style="color: #fde68a; font-size: 0.73rem; margin-top: 0.35rem;">
+                  <i class="fas fa-lightbulb"></i> <em>Note: A transaction hash is 64 characters long and identifies that specific transfer, distinct from your wallet address.</em>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 1rem;">
+              <button type="button" id="smartInspectBtn" class="btn-primary" style="width: 100%; padding: 0.95rem; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.55rem;">
+                <i class="fas fa-satellite-dish"></i> Inspect &amp; Decode On-Chain
+              </button>
+            </div>
+
+            <!-- Quick Samples for Testing -->
+            <div class="smart-samples-row">
+              <span class="smart-sample-label">Recent Cases:</span>
+              <button type="button" class="sample-chip" data-type="usdt">45,000 USDT (Binance)</button>
+              <button type="button" class="sample-chip" data-type="btc">1.85 BTC (Bitcoin Peeling)</button>
+              <button type="button" class="sample-chip" data-type="tron">28,400 USDT (OKX TRON)</button>
+              <button type="button" class="sample-chip" data-type="sol">120 SOL (Solana Raydium)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================
+             METHOD 2: MANUAL INTAKE (SELF-INPUT ADDRESSES & AMOUNTS)
+             ======================================================== -->
+        <div id="manualIntakeSection" style="display: none;">
+          <div class="smart-intake-hero-box" style="border-color: rgba(45, 159, 255, 0.35); background: linear-gradient(135deg, rgba(13, 21, 39, 0.95), rgba(5, 0, 255, 0.05));">
+            <div class="smart-intake-badge" style="color: var(--primary-light); background: rgba(45, 159, 255, 0.1); border-color: rgba(45, 159, 255, 0.25);">
+              <i class="fas fa-file-lines"></i> MANUAL FORENSIC INTAKE
+            </div>
+            <h3>Self-Input Wallet Movements</h3>
+            <p>
+              Enter your compromised wallet address, destination scammer address, currency, and documented loss. You can record multiple wallet transfers below.
+            </p>
+
+            <div class="input-group" style="margin-bottom: 1rem;">
+              <label for="websiteUrl">
+                <span>Scam Website, Fake Exchange, or App URL (Optional)</span>
+                <span class="label-tip">Helps correlate domain clusters &amp; server hosts</span>
+              </label>
+              <input type="text" id="websiteUrl" placeholder="e.g. fake-trading-platform.com" autocomplete="off">
+            </div>
+
+            <!-- Dynamic Multi-Wallet Movements Container -->
+            <div id="walletEntriesContainer">
+              <!-- Populated by JavaScript with Movement #1 -->
+            </div>
+
+            <div class="multi-wallet-actions">
+              <button type="button" id="addWalletEntryBtn" class="btn-add-wallet">
+                <i class="fas fa-circle-plus"></i> Add Another Compromised / Target Wallet Pair
+              </button>
+              <div class="aggregated-loss-chip">
+                <span>Documented Loss:</span>
+                <strong id="totalAggregatedLossDisplay">$0.00</strong>
+                <span id="totalWalletsCountDisplay" class="wallet-count-note">(1 movement)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        
+
+
+        <!-- ========================================================
+             VERIFIED TRANSACTION CONFIRMATION & TEASER INTELLIGENCE CARD
+             ======================================================== -->
+        <div id="verifiedTxCard" class="verified-tx-card" style="display: none;">
+          <div class="verified-tx-header">
+            <div class="verified-status-tag">
+              <i class="fas fa-circle-check"></i> <span id="verifiedStatusText">Transaction Confirmed On-Chain</span>
+            </div>
+            <div class="verified-timestamp" id="verifiedTimestamp">
+              <i class="fas fa-clock"></i> <span id="verifiedTimeAgo">Just now</span>
+            </div>
+          </div>
+
+          <!-- HIGH-URGENCY FORENSIC ALERT & ASSET LIQUIDATION RISK GAUGE -->
+          <div class="urgency-freeze-alert">
+            <div class="urgency-alert-icon">
+              <i class="fas fa-triangle-exclamation"></i>
+            </div>
+            <div class="urgency-alert-content">
+              <div class="urgency-alert-title">
+                <span>CRITICAL INTELLIGENCE: Stolen Assets Located in Unfrozen Exchange Deposit Sub-Account</span>
+              </div>
+              <div class="urgency-alert-desc">
+                Forensic crawlers have identified the scammer's destination exchange account. <strong>Real KYC Identity (Full Legal Name, Government ID &amp; Linked Off-Ramp Bank Account)</strong> is on file with compliance. A time-sensitive window is active to request an emergency administrative hold before funds are withdrawn into offshore fiat banks.
+              </div>
+            </div>
+          </div>
+
+          <div class="liquidation-meter-row">
+            <div style="font-size: 0.76rem; font-weight: 700; color: #f87171; display: flex; align-items: center; gap: 0.4rem;">
+              <i class="fas fa-fire-flame-curved"></i> Cash-Out Liquidation Risk: <strong>94% (CRITICAL)</strong>
+            </div>
+            <div class="risk-meter-bar-container">
+              <div class="risk-meter-fill"></div>
+            </div>
+            <div style="font-size: 0.74rem; color: #fcd34d; font-family: var(--font-mono); font-weight: 600;">
+              <i class="fas fa-hourglass-half"></i> Active Freeze Window: <strong>18h 42m</strong> remaining
+            </div>
+          </div>
+
+          <!-- DETECTED HOLDING PLATFORM & CUSTODIAL CLUSTER -->
+          <div class="verified-platform-banner">
+            <div class="platform-detect-icon" id="verifiedPlatformIcon">
+              <i class="fas fa-building-columns"></i>
+            </div>
+            <div class="platform-detect-info">
+              <div class="platform-detect-title">Detected Holding Platform / Custodial Cluster</div>
+              <div class="platform-detect-name" id="verifiedPlatformName">Centralized Exchange (Binance) — KYC Deposit Sub-Account</div>
+              <div class="platform-detect-desc" id="verifiedPlatformDesc">The funds were swept into a custodial exchange cluster. KYC identity (legal name, verified passport/ID, and bank details) is on file with Binance LE Compliance.</div>
+            </div>
+            <div class="platform-feasibility-badge" id="verifiedFeasibilityBadge">
+              <span class="feasibility-dot"></span> <span id="verifiedFeasibilityText">High Freeze Feasibility</span>
+            </div>
+          </div>
+
+          <div class="verified-tx-summary-grid">
+            <div class="verified-summary-col">
+              <span class="v-label">Documented Stolen Amount</span>
+              <div class="v-val-large" id="verifiedAmountDisplay">$45,000.00 USD</div>
+              <span class="v-sub" id="verifiedAssetDisplay">45,000.00 USDT (Ethereum ERC-20)</span>
+            </div>
+            <div class="verified-summary-col">
+              <span class="v-label">Sender (Your Compromised Wallet)</span>
+              <div class="v-val-mono" id="verifiedSenderDisplay">0x38b2...47A9</div>
+              <span class="v-sub" style="color: #93c5fd;"><i class="fas fa-arrow-up-from-bracket"></i> Origin of drained funds</span>
+            </div>
+            <div class="verified-summary-col">
+              <span class="v-label">Target (Scammer / Holding Address)</span>
+              <div class="v-val-mono" id="verifiedScammerDisplay" style="color: #fb7185;">0x71C9...19B7</div>
+              <span class="v-sub" id="verifiedDestinationType" style="color: #fde68a;"><i class="fas fa-triangle-exclamation"></i> Identified exchange deposit hop</span>
+            </div>
+          </div>
+
+          <!-- TEASER / REDACTED ACTIONABLE INTELLIGENCE BOX -->
+          <div class="redacted-locked-box" id="redactedIntelligenceBox">
+            <div class="redacted-header-row">
+              <span class="redacted-title" id="redactedTitleText">
+                <i class="fas fa-shield-halved"></i> 5-SECTION FORENSIC INTELLIGENCE DOSSIER &amp; SUBPOENA PACKET
+              </span>
+              <span id="redactedLockStatusBadge" style="font-size: 0.72rem; color: #fb7185; font-weight: 700; background: rgba(244,63,94,0.12); padding: 0.2rem 0.55rem; border-radius: 4px; border: 1px solid rgba(244,63,94,0.3);">
+                <i class="fas fa-lock"></i> ENCRYPTED PREVIEW
+              </span>
+            </div>
+
+            <!-- COMPACT SCROLLABLE TEASER (SCROLLABLE BUT HEAVILY BLURRED / NOT SEEABLE) -->
+            <div class="compact-scrollable-teaser" id="compactScrollableTeaser">
+              <div class="redacted-content" id="redactedContentText">
+              <!-- SECTION 1 -->
+              <div class="dossier-sec-block">
+                <div class="dossier-sec-heading">
+                  <i class="fas fa-file-lines"></i> Section 1: Executive Incident &amp; Loss Reconstruction
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.6rem; font-size: 0.78rem;">
+                  <div>• <strong>Documented Incident Value:</strong> <span id="sec1AmountDisplay" style="color: #fff;">$45,000.00 USD</span></div>
+                  <div>• <strong>Blockchain / Standard:</strong> <span id="sec1ChainDisplay" style="color: #93c5fd;">Ethereum (ERC-20 USDT)</span></div>
+                  <div>• <strong>Block Confirmation Height:</strong> <span id="sec1BlockDisplay" style="color: #cbd5e1;">20,841,902 (42 Confirmations)</span></div>
+                  <div>• <strong>Complainant Origin Address:</strong> <span id="sec1SenderDisplay" style="color: #93c5fd; word-break: break-all;">0x38b2...47A9</span></div>
+                </div>
+              </div>
+
+              <!-- SECTION 2 -->
+              <div class="dossier-sec-block">
+                <div class="dossier-sec-heading">
+                  <i class="fas fa-scale-balanced"></i> Section 2: Public Explorer Layer vs. Nexus Shield Deep Forensic Findings
+                </div>
+                <table class="forensic-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 25%;">Forensic Data Point</th>
+                      <th style="width: 35%;">Public Explorer (Free Online)</th>
+                      <th style="width: 40%; color: var(--accent-cyan);">Nexus Shield Proprietary Deep Forensics</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Destination Attribution</strong></td>
+                      <td>Random alphanumeric string (<code>0x71c9...</code>)</td>
+                      <td style="color: #a7f3d0;"><strong id="tableEntityDisplay">Centralized Exchange (Binance)</strong> — KYC Deposit Sub-Account</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Hot Wallet Sweeping</strong></td>
+                      <td>Undetected (shows as unclassified hop)</td>
+                      <td style="color: #a7f3d0;"><strong>Internal Sweeper TxID Identified:</strong> funds consolidated to exchange main hot wallet</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Scammer Identity Status</strong></td>
+                      <td>Anonymous / Pseudo-anonymous</td>
+                      <td style="color: #a7f3d0;"><strong>Verified KYC Identity On File</strong> (Legal name, passport, bank off-ramp records)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Legal Freeze Mechanism</strong></td>
+                      <td>None (blockchains are immutable)</td>
+                      <td style="color: #a7f3d0;"><strong>18 U.S.C. § 2703 Subpoena Evidence Packet</strong> ready for police &amp; exchange compliance</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- SECTION 3 -->
+              <div class="dossier-sec-block">
+                <div class="dossier-sec-heading">
+                  <i class="fas fa-network-wired"></i> Section 3: Proprietary Custodial Cluster Attribution &amp; Flow of Funds
+                </div>
+                <div style="font-size: 0.78rem; line-height: 1.6;">
+                  <div>• <strong>Identified Custodial Entity:</strong> <span id="unmaskedExchangeName" style="color: #fff; font-weight: 700;">Binance Holdings Ltd. (LE Case Dispatch #BN-2026-9042)</span></div>
+                  <div>• <strong>Internal Deposit Sub-Account:</strong> <span id="unmaskedSubAccount" style="color: #fb7185; font-weight: 700;">BN-DEP-0x71c9-SUB42 (KYC ID, Verified Phone &amp; Bank Profile Linked)</span></div>
+                  <div>• <strong>Hot Wallet Sweep Transaction:</strong> <span id="unmaskedSweepTx" style="color: #93c5fd; word-break: break-all;">0x8f3c7e492b1a0d84c7e6514f7b2a9e3d8c1b5a9f2e7d4c8a1b6e9f3d2c7a1b5e</span></div>
+                  <div>• <strong>Forensic Risk Score:</strong> <span style="color: #fb7185; font-weight: 800;">96 / 100 (CRITICAL RISK)</span> — Active Fraud Deposit Gateway</div>
+                  <div>• <strong>Current Custody Status:</strong> <span style="color: #34d399; font-weight: 700;">Liquid in Custodial Cluster — Urgent Hold Window Active</span></div>
+                </div>
+              </div>
+
+              <!-- SECTION 4 -->
+              <div class="dossier-sec-block">
+                <div class="dossier-sec-heading">
+                  <i class="fas fa-gavel"></i> Section 4: Statutory Law Enforcement Subpoena &amp; Exchange Hold Packet
+                </div>
+                <p style="font-size: 0.74rem; color: #cbd5e1; margin-bottom: 0.4rem;">
+                  Formatted for submission to the FBI Internet Crime Complaint Center (IC3.gov), local Cybercrime Division, and Binance / OKX Law Enforcement Compliance:
+                </p>
+                <div class="subpoena-notice-box" id="subpoenaNoticeLetter">
+================================================================================
+FORMAL STATUTORY EVIDENCE DIRECTIVE — EMERGENCY ASSET FREEZE REQUEST
+PURSUANT TO 18 U.S.C. § 2703(f) &amp; FATF RECOMMENDATION 16 (TRAVEL RULE)
+================================================================================
+TO: Compliance &amp; Legal Affairs Division (Binance / OKX / Coinbase / Kraken)
+RE: Urgent Cryptographic Freeze of Stolen Funds | Case Ref ID: [PENDING SUBPOENA]
+
+STATEMENT OF SWORN FACTS:
+1. Forensic node tracing has mathematically established that on 2026-09-27, 
+   the complainant suffered an unauthorized crypto asset drain.
+2. The stolen assets were deposited directly into your custodial sub-account:
+   Target Sub-Account: BN-DEP-0x71c9-SUB42
+   Sweep Transaction: 0x8f3c7e492b1a0d84c7e6514f7b2a9e3d8c1b5a9f2e7d4c8a1b6e9f3d2c7a1b5e
+3. Under 18 U.S.C. § 2703(f), you are formally requested to PRESERVE and PLACE AN
+   ADMINISTRATIVE FREEZE on all cryptocurrency, fiat balances, and KYC identity records
+   (Legal Name, Passport/National ID, IP logs, linked bank accounts) associated with this account.
+4. Failure to freeze identified proceeds of fraud after constructive notice may subject
+   intermediary custodians to third-party civil liability and forfeiture proceedings under 18 U.S.C. § 981.
+================================================================================</div>
+              </div>
+
+              <!-- SECTION 5 -->
+              <div class="dossier-sec-block" style="margin-bottom: 0;">
+                <div class="dossier-sec-heading">
+                  <i class="fas fa-route"></i> Section 5: Tactical Restitution Pathway &amp; Digital Integrity Seal
+                </div>
+                <div style="font-size: 0.76rem; color: #cbd5e1; line-height: 1.55;">
+                  <div>• <strong>Emergency Freeze Window:</strong> 24–48 hours prior to scammer fiat bank off-ramp liquidation.</div>
+                  <div>• <strong>Designated Safe Restitution Wallet:</strong> Clean, uncompromised wallet verified via on-chain contract auditor.</div>
+                  <div class="examiner-seal-stamp">
+                    <div>
+                      <span style="color: var(--text-muted); text-transform: uppercase; font-size: 0.65rem;">Forensic Chain of Custody Stamp:</span>
+                      <div class="mono" style="color: var(--accent-cyan); font-size: 0.7rem;">SHA-256: 8f4c9a2e6b1d0a84c7e6514f7b2a9e3d8c1b5a9f2e7d4c8a1b6e9f3d2c7a1b5e</div>
+                    </div>
+                    <div style="text-align: right;">
+                      <span style="color: var(--accent-green); font-weight: 700;"><i class="fas fa-certificate"></i> Digital Examiner Certified</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TRIGGER BAR TO OPEN POPUP MODAL -->
+          <div class="redacted-trigger-bar" id="redactedTriggerBar">
+            <div class="redacted-trigger-text">
+              <i class="fas fa-shield-halved" style="color: var(--accent-cyan);"></i>
+              <span>5-Section deep dossier, internal sweep hashes &amp; statutory subpoena locked.</span>
+            </div>
+            <button type="button" id="openDossierModalBtn" class="btn-view-more">
+              <i class="fas fa-eye"></i> View More / Unlock Dossier
+            </button>
+          </div>
+        </div>
+
+          <!-- WAITING FOR ADMIN APPROVAL CARD (Shown when user submits payment proof) -->
+          <div class="waiting-approval-card" id="waitingApprovalCard" style="display: none;">
+            <div class="waiting-header-row">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-clock fa-spin" style="color: #f59e0b; font-size: 1.1rem;"></i>
+                <strong style="color: #fff; font-size: 0.95rem;">Payment Submitted — Awaiting Senior Forensic Desk Verification</strong>
+              </div>
+              <div class="waiting-officer-badge">
+                <i class="fas fa-user-shield"></i> Reviewer: Lead Compliance Officer (NX-ANALYST-01)
+              </div>
+            </div>
+            <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 0.8rem;">
+              Your payment receipt and transaction hash have been routed to the Senior Forensic Desk for on-chain block confirmation.
+              Once verified by the compliance administrator, the full 5-section dossier and court-ready PDF will unlock automatically below.
+            </p>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.35); padding: 0.65rem 0.9rem; border-radius: var(--radius-sm); font-size: 0.78rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <span style="color: #94a3b8;">Payment Reference:</span> <strong class="mono" id="waitingPaymentRef" style="color: var(--accent-cyan);">PAY-849201</strong>
+              </div>
+              <div>
+                <span style="color: #94a3b8;">Status:</span> <span class="status-pill status-investigating" id="waitingStatusText">PENDING ADMIN AUDIT</span>
+              </div>
+              <button type="button" id="simulateAdminApproveBtn" class="btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.74rem; background: rgba(0, 245, 155, 0.15); border-color: rgba(0, 245, 155, 0.4); color: var(--accent-green);">
+                <i class="fas fa-check-double"></i> Test Mode: Simulate Instant Admin Approval
+              </button>
+            </div>
+          </div>
+
+          <!-- POST-UNLOCK ACTIONS ROW (Appears after $10/tx payment confirmed) -->
+          <div class="post-unlock-actions-row" id="postUnlockActionsRow" style="display: none;">
+            <div style="width: 100%; padding: 0.75rem 1rem; background: rgba(0, 245, 155, 0.1); border: 1px solid rgba(0, 245, 155, 0.35); border-radius: var(--radius-sm); color: var(--accent-green); font-size: 0.84rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="fas fa-circle-check"></i> FULL 5-SECTION FORENSIC DOSSIER UNLOCKED &amp; VERIFIED BY SENIOR EXAMINER
+            </div>
+            <button type="button" id="downloadPdfDossierBtn" class="btn-download-pdf">
+              <i class="fas fa-file-pdf"></i> Download Official Forensic Dossier (PDF / Print)
+            </button>
+            <button type="button" id="downloadTxtDossierBtn" class="btn-secondary" style="background: rgba(45,159,255,0.15); border-color: rgba(45,159,255,0.4); color: #93c5fd; padding: 0.85rem 1.3rem;">
+              <i class="fas fa-file-lines"></i> Export Dossier (.TXT)
+            </button>
+            <button type="button" id="continueToRecoveryBtn" class="btn-continue-recovery">
+              <i class="fas fa-arrow-down"></i> Continue with Asset Recovery Hold Dispatch
+            </button>
+          </div>
+
+          <div class="verified-confirm-bar" style="margin-top: 1.2rem;">
+            <i class="fas fa-circle-check" style="color: var(--accent-cyan); font-size: 1.1rem;"></i>
+            <span><strong>Please confirm:</strong> Are these transaction details correct? Provide your safe restitution wallet and contact details below to dispatch recovery.</span>
+          </div>
+        </div>
+
+        <!-- ========================================================
+             CONTACT DETAILS & SAFE RESTITUTION WALLET
+             ======================================================== -->
+        <div class="form-section-title" id="contactSectionTitle">
+          <i class="fas fa-user-shield"></i> Complainant Information &amp; Safe Restitution Wallet
+        </div>
+
+        <div class="form-row">
+          <div class="input-group">
+            <label for="victimName">
+              <span data-i18n="label_your_name">Full Name</span>
+              <span class="label-tip">For official case records</span>
+            </label>
+            <input type="text" id="victimName" placeholder="Enter your full name" autocomplete="name" required>
+          </div>
+
+          <div class="input-group">
+            <label for="victimEmail">
+              <span>Email Address</span>
+              <span class="label-tip">Where reports &amp; freeze notices are sent</span>
+            </label>
+            <input type="email" id="victimEmail" class="input-mono" placeholder="your.name@example.com" autocomplete="email" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="input-group">
+            <label for="victimPhone">
+              <span>Phone / WhatsApp Number</span>
+              <span class="label-tip">For direct updates from your investigator</span>
+            </label>
+            <input type="tel" id="victimPhone" class="input-mono" placeholder="+1 (555) 000-0000" autocomplete="tel" required>
+          </div>
+
+          <div class="input-group">
+            <label for="recoveryWallet">
+              <span data-i18n="label_recovery_wallet">Safe Recovery Wallet (Clean &amp; Uncompromised)</span>
+              <span class="label-tip">Where recovered funds will be returned</span>
+            </label>
+            <input type="text" id="recoveryWallet" class="input-mono" placeholder="Your clean wallet address (0x... or bc1... or T...)" autocomplete="off" required>
+            <!-- Real-Time Address Safety Status Badge -->
+            <div id="recoveryWalletSafetyBadge" class="restitution-safety-badge" style="display: none;"></div>
+
+            <!-- Optional Checkbox for Non-Technical Users Who Don't Have a Clean Secondary Wallet Yet -->
+            <label class="checkbox-label" style="display: flex; align-items: flex-start; gap: 0.55rem; margin-top: 0.55rem; font-size: 0.78rem; color: #cbd5e1; cursor: pointer; user-select: none;">
+              <input type="checkbox" id="noSecondaryWalletCheck" style="margin-top: 0.15rem; cursor: pointer; accent-color: #0500FF;">
+              <span>I do not have a safe secondary wallet yet &mdash; assist me with clean wallet generation during forensic triage.</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Urgent Containment Action: Revoke.cash for Phishing Links / Malicious Approvals -->
+      <div class="urgent-containment-box" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(185, 28, 28, 0.06)); border: 1px solid rgba(239, 68, 68, 0.45); border-radius: var(--radius-sm); padding: 0.95rem 1.15rem; margin-bottom: 1.25rem; display: flex; gap: 0.95rem; align-items: flex-start; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.12);">
+        <div style="color: #ef4444; font-size: 1.35rem; flex-shrink: 0; margin-top: 0.1rem;">
+          <i class="fas fa-triangle-exclamation"></i>
+        </div>
+        <div style="flex: 1;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <strong style="color: #ffffff; font-size: 0.9rem; letter-spacing: 0.02em;">
+              🚨 URGENT: Did You Click a Phishing Link or Sign an Unknown Smart Contract?
+            </strong>
+            <span style="background: #ef4444; color: #fff; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">Critical First Step</span>
+          </div>
+          <p style="font-size: 0.82rem; line-height: 1.5; color: #fecdd3; margin: 0 0 0.75rem 0;">
+            If you connected your wallet to a phishing portal, fake airdrop, or suspicious DEX, malicious smart contracts may still retain <strong>active spending approvals</strong> to drain any remaining or newly deposited tokens. Revoke these permissions immediately to stop ongoing loss.
+          </p>
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="https://revoke.cash" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.45rem; background: #dc2626; color: #ffffff; text-decoration: none; padding: 0.45rem 0.95rem; border-radius: 6px; font-size: 0.8rem; font-weight: 700; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4); transition: transform 0.15s ease;">
+              <i class="fas fa-shield-virus"></i> Revoke Approvals on Revoke.cash <i class="fas fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i>
+            </a>
+            <span style="font-size: 0.76rem; color: #fda4af;">
+              Inspect &amp; cancel active allowances across Ethereum, BNB Chain, Polygon, Arbitrum, Base, &amp; more.
+            </span>
+          </div>
+
+          <!-- Revoke.cash Safety Guarantee Note -->
+          <div style="margin-top: 0.65rem; padding: 0.55rem 0.85rem; background: rgba(0, 0, 0, 0.3); border-radius: 6px; border-left: 3px solid #00F59B; font-size: 0.75rem; color: #cbd5e1; line-height: 1.45;">
+            <strong style="color: #00F59B;"><i class="fas fa-shield-halved"></i> Why Revoke.cash is Safe:</strong> 
+            Revoke.cash is the verified, open-source security tool recommended across the cryptocurrency industry. Unlike phishing websites, it will <strong>NEVER ask for your 12-word seed phrase, passwords, or transfer permissions</strong>—it only disconnects permissions you previously granted to attackers.
           </div>
         </div>
       </div>
 
-      <div class="input-group">
-        <label data-i18n="label_website"><i class="fas fa-globe"></i> Website / Scam URL (optional)</label>
-        <input type="text" id="websiteUrl" data-i18n-placeholder="placeholder_website">
+        <!-- The 2-Second Laundering Window Callout (Global Ledger Velocity Principle) -->
+      <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.28); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1rem; display: flex; gap: 0.85rem; align-items: flex-start;">
+        <div style="color: var(--accent-rose); font-size: 1.2rem; flex-shrink: 0; margin-top: 0.1rem;">
+          <i class="fas fa-stopwatch-20"></i>
+        </div>
+        <div style="font-size: 0.78rem; line-height: 1.45; color: #fecdd3;">
+          <strong style="color: #fff; display: block; margin-bottom: 0.15rem; font-size: 0.82rem;">
+            The Rapid Laundering Window: 84.6% of stolen assets move before public disclosure
+          </strong>
+          Global blockchain forensics indicates that illicit actors rapidly split stolen funds across peel-chains, mixers, and bridges within hours of theft. Submitting your transaction hashes immediately allows NexusShield's investigative team to trace the hops and deliver emergency freeze notices to exchange compliance desks before off-ramps are reached.
+        </div>
       </div>
 
-      <button type="button" id="scanRecoverBtn" class="btn-neon"><i class="fas fa-radar"></i> <span data-i18n="scan_button">SCAN & RECOVER</span></button>
-    </form>
-    <div id="warningMsg" class="warning-msg" style="display: none;"></div>
-    <div id="formError" class="error-msg"></div>
+        <!-- Primary Submission Action -->
+        <div style="margin-top: 1.8rem;">
+          <button type="button" id="scanRecoverBtn" class="btn-primary" style="width: 100%; font-size: 1.05rem; padding: 1.1rem; box-shadow: 0 4px 20px rgba(5, 0, 255, 0.4);">
+            <i class="fas fa-paper-plane"></i> <span data-i18n="scan_button">Confirm Details &amp; Dispatch Case Investigation</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Feedback Alerts -->
+      <div id="warningMsg" class="warning-msg" style="display: none;"></div>
+      <div id="formError" class="error-msg" style="display: none;"></div>
+    </section>
+
+    <!-- Right Column: Clean & Uncluttered Sidebar -->
+    <aside class="sidebar-col">
+      <!-- Quick Case Progress Lookup -->
+      <div class="intel-card">
+        <h3><i class="fas fa-magnifying-glass"></i> <span data-i18n="status_title">Track Case Investigation</span></h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+          Check active on-chain tracing, exchange compliance notices, and case restitution status by entering your Case Reference ID:
+        </p>
+        <div class="tracking-widget">
+          <div class="tracking-input-row">
+            <input type="text" id="statusReportId" class="input-mono" placeholder="Enter Case ID (e.g. NX-849201 or 849201)">
+            <button id="checkStatusBtn" class="btn-secondary" style="width: 100%;">
+              <i class="fas fa-magnifying-glass"></i> <span data-i18n="check_status_btn">Track Case Status</span>
+            </button>
+          </div>
+          <div id="recentCasesContainer" style="display: none; margin-top: 0.65rem; font-size: 0.76rem; color: var(--text-muted);">
+            <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem; color: #94a3b8;">
+              <i class="fas fa-history" style="color: var(--accent-cyan); margin-right: 0.25rem;"></i> Recent Case Queries:
+            </div>
+            <div id="recentCasesPills" style="display: flex; flex-wrap: wrap; gap: 0.4rem;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4-Vector Algorithmic Threat Exposure Index Teaser -->
+      <div class="intel-card" style="background: linear-gradient(135deg, rgba(13, 21, 39, 0.9), rgba(7, 12, 24, 0.95)); border: 1px solid rgba(0, 245, 155, 0.28);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <h3 style="margin: 0; font-size: 0.9rem; color: #fff; display: flex; align-items: center; gap: 0.45rem;">
+            <i class="fas fa-gauge-high" style="color: var(--accent-green);"></i> Threat Exposure Index (0–100)
+          </h3>
+          <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-green); background: rgba(0,245,155,0.15); padding: 2px 6px; border-radius: 4px; font-weight: 700;">GL-ALIGNED</span>
+        </div>
+        <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.75rem;">
+          Every submitted wallet address is algorithmically scored across 4 vectors: Entity Risk, Source Ingress, Peel Chains, and OFAC/EU Sanctions Taint.
+        </p>
+        <div style="height: 6px; border-radius: 3px; background: linear-gradient(90deg, #00f59b 0%, #f59e0b 50%, #f43f5e 100%); margin-bottom: 0.75rem;"></div>
+        <a href="intelligence.html" style="font-size: 0.76rem; color: var(--accent-cyan); text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600;">
+          Explore Sanctions Screening &amp; Threat Scoring System &rarr;
+        </a>
+      </div>
+
+      <!-- Live 24/7 Forensic Triage & Response Status -->
+      <div class="intel-card">
+        <h3><i class="fas fa-headset" style="color: var(--primary-light);"></i> Recovery Desk Direct Contact</h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+          Once your report is received, a dedicated investigator analyzes your transaction hops and contacts you directly via email and phone.
+        </p>
+        <div style="margin: 0.65rem 0;">
+          <a href="mailto:support@nexusshield.org" style="color: var(--accent-cyan); text-decoration: none; font-size: 0.84rem; display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 600;">
+            <i class="fas fa-envelope"></i> support@nexusshield.org
+          </a>
+        </div>
+        <div style="margin-top: 0.85rem; padding: 0.75rem 0.9rem; background: rgba(16, 185, 129, 0.08); border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.25); font-size: 0.8rem; color: #a7f3d0;">
+          <i class="fas fa-circle-check" style="margin-right: 0.35rem;"></i> Active Hold Outreach: Binance, OKX, Bybit, Coinbase, Kraken
+        </div>
+      </div>
+
+      <!-- Emergency Phishing / Approval Revocation Card -->
+      <div class="intel-card" style="background: rgba(239, 68, 68, 0.06); border-color: rgba(239, 68, 68, 0.35);">
+        <h3 style="color: #f87171; font-size: 0.88rem; display: flex; align-items: center; gap: 0.45rem;">
+          <i class="fas fa-plug-circle-xmark"></i> Compromised Wallet? Revoke Approvals
+        </h3>
+        <p style="font-size: 0.8rem; color: #fecdd3; line-height: 1.45; margin-bottom: 0.75rem;">
+          If you entered seed phrases or signed an Approval / Permit on a phishing site, drainers can pull any newly deposited tokens automatically.
+        </p>
+        <a href="https://revoke.cash" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.4rem; color: #ffffff; background: #dc2626; padding: 0.4rem 0.8rem; border-radius: 5px; font-size: 0.76rem; font-weight: 700; text-decoration: none; box-shadow: 0 2px 6px rgba(220, 38, 38, 0.35);">
+          <i class="fas fa-shield-virus"></i> Revoke Approvals (Revoke.cash) <i class="fas fa-arrow-up-right-from-square" style="font-size: 0.65rem;"></i>
+        </a>
+      </div>
+
+      <!-- Anti-Scam Advisory Card -->
+      <div class="intel-card" style="background: rgba(245, 158, 11, 0.04); border-color: rgba(245, 158, 11, 0.2);">
+        <h3 style="color: var(--accent-amber);"><i class="fas fa-triangle-exclamation"></i> Security Reminder</h3>
+        <p style="font-size: 0.83rem; color: #fde68a; line-height: 1.5;">
+          Never pay anyone on Telegram, WhatsApp, or Instagram promising to "hack back" stolen cryptocurrency. Confirmed blockchain transactions cannot be reversed without exchange holds or legal restitution.
+        </p>
+      </div>
+    </aside>
   </div>
 
-  <!-- Track Progress Section -->
-  <div class="glass-panel" style="margin-top: 2rem; padding: 1.5rem;">
-    <h3><i class="fas fa-search"></i> <span data-i18n="status_title">Track Your Recovery Progress</span></h3>
-    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-      <input type="text" id="statusReportId" placeholder="Enter your Report ID (shown after submission)" style="flex: 2;">
-      <button id="checkStatusBtn" class="btn-outline-cyber"><span data-i18n="check_status_btn">TRACK PROGRESS</span></button>
+  
+
+  <!-- Supported Assets & Trust Pillars Section -->
+  <section class="hero-banner" style="margin-top: 3.5rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 2.5rem;">
+    <div class="hero-text-col">
+      <div style="font-size: 0.78rem; font-weight: 700; color: #00F59B; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.35rem;">
+        MULTI-CHAIN FORENSIC READINESS
+      </div>
+      <h2 style="font-size: 1.85rem; font-weight: 800; color: #ffffff; margin: 0 0 0.75rem 0;">
+        Deep Tracing Across <span class="gradient-text">Major Blockchains</span>
+      </h2>
+      <p class="hero-subtext" style="margin-bottom: 1.5rem;">
+        NexusShield’s node crawlers monitor transactions across all primary Layer-1 and Layer-2 networks, tracking peeled outputs and decentralized swaps to their final off-ramp destination.
+      </p>
+
+      <!-- Supported Blockchains & Tokens with Original Brand Colors -->
+      <div class="supported-tokens-strip">
+        <span class="tokens-label">SUPPORTED ASSETS &amp; CHAINS:</span>
+        <div class="tokens-list">
+          <span class="token-pill"><svg width="18" height="18" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#F7931A"/><path d="M22.5 14.1c.3-2-1.2-3.1-3.3-3.8l.7-2.7-1.7-.4-.6 2.6c-.4-.1-.9-.2-1.4-.3l.7-2.6-1.6-.4-.7 2.7c-.4-.1-.7-.2-1.1-.3l-2.3-.6-.4 1.8s1.2.3 1.2.3c.7.2.8.7.8 1.1l-.8 3.2c0 0 .1 0 .2.1h-.2l-1.1 4.6c-.1.2-.3.6-.8.5 0 0-1.2-.3-1.2-.3l-.8 1.9 2.2.5c.4.1.8.2 1.2.3l-.7 2.8 1.7.4.7-2.7c.5.1.9.2 1.4.3l-.7 2.7 1.7.4.7-2.8c2.9.5 5.1.3 6-2.3.8-2-.1-3.2-1.5-3.9 1-.3 1.8-1 2-2.4zm-3.6 5.3c-.5 2.1-4 1-5.1.7l.9-3.7c1.1.3 4.8.8 4.2 3zm.5-5.4c-.5 1.9-3.4.9-4.3.7l.8-3.4c1 .2 4.1.7 3.5 2.7z" fill="#FFF"/></svg> Bitcoin</span>
+          <span class="token-pill"><svg width="18" height="18" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#627EEA"/><g fill="#FFF"><path d="M16 4l-.2.8v15.6l.2.2 7.3-4.3L16 4z" fill-opacity=".7"/><path d="M16 4L8.7 16.3 16 20.6V4z"/><path d="M16 22v6l.2.3 7.1-10L16 22z" fill-opacity=".7"/><path d="M16 28.3v-6.3L8.7 18.3 16 28.3z"/></g></svg> Ethereum</span>
+          <span class="token-pill"><svg width="18" height="18" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#26A17B"/><path d="M17.9 15.6v-.1c-.1 0-.7.1-1.9.1-1 0-1.7 0-1.9-.1v.1c-3.4-.2-5.9-.9-5.9-1.8s2.5-1.6 5.9-1.8v2.8c.2 0 .9.1 1.9.1 1.1 0 1.8-.1 1.9-.1v-2.8c3.4.2 5.9.9 5.9 1.8s-2.5 1.6-5.9 1.8zm0-4.4V8.5h4.6V6H9.5v2.5h4.6v2.7C9.8 11.4 6.5 12.5 6.5 13.8c0 1.5 4.3 2.7 10 2.7s10-1.2 10-2.7c0-1.3-3.3-2.4-8.6-2.6zm0 5.4c-.1 0-.7.1-1.9.1-1.1 0-1.8-.1-1.9-.1-3.3-.2-5.7-.9-5.7-1.6v3.7c0 .9 2.5 1.7 6 1.8v6.7h3.3V19c3.4-.2 5.9-.9 5.9-1.8v-3.7c-.1.7-2.4 1.4-5.7 1.6z" fill="#FFF"/></svg> Tether USDT</span>
+          <span class="token-pill"><svg width="18" height="18" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#0E0E10"/><defs><linearGradient id="solHeroG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00FFA3"/><stop offset="100%" stop-color="#DC1FFF"/></linearGradient></defs><path d="M8 21.6c.1-.1.3-.2.5-.2h13.1c.3 0 .5.1.7.3l2 2c.2.2.2.5 0 .7-.1.1-.3.2-.5.2H10.7c-.3 0-.5-.1-.7-.3l-2-2c-.2-.2-.2-.5 0-.7zm0-6.4c.1-.1.3-.2.5-.2h13.1c.3 0 .5.1.7.3l2 2c.2.2.2.5 0 .7-.1.1-.3.2-.5.2H10.7c-.3 0-.5-.1-.7-.3l-2-2c-.2-.2-.2-.5 0-.7zm5.2-6.4c-.1-.1-.3-.2-.5-.2H21.8c.3 0 .5.1.7.3l2 2c.2.2.2.5 0 .7-.1.1-.3.2-.5.2H10.7c-.3 0-.5-.1-.7-.3l-2-2c-.2-.2-.2-.5 0-.7l5.2-1.3z" fill="url(#solHeroG)"/></svg> Solana</span>
+          <span class="token-pill"><svg width="18" height="18" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#F3BA2F"/><path d="M16 6.5l4.3 4.3-2.2 2.2L16 10.9l-2.1 2.1-2.2-2.2L16 6.5zm-5.4 5.4l2.2 2.2-4.3 4.3-2.2-2.2 4.3-4.3zm10.8 0l4.3 4.3-2.2 2.2-4.3-4.3 2.2-2.2zM16 13.1l2.9 2.9-2.9 2.9-2.9-2.9 2.9-2.9zm-7.5 5.3l2.2 2.2-2.2 2.2-2.2-2.2 2.2-2.2zm15 0l2.2 2.2-2.2 2.2-2.2-2.2 2.2-2.2zM16 19.3l2.1 2.1-2.1 2.1-2.1-2.1 2.1-2.1zm-5.4 3.2l2.2 2.2-4.3 4.3-2.2-2.2 4.3-4.3zm10.8 0l4.3 4.3-2.2 2.2-4.3-4.3 2.2-2.2zM16 23.3l4.3 4.3L16 32l-4.3-4.4 4.3-4.3z" fill="#FFF"/></svg> BNB Chain</span>
+          <span class="token-pill"><svg width="18" height="18" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#EF0027"/><path d="M7 8.5l17.2 4.2-8.3 11.8L7 8.5zm1.8 1.5l6.5 9.2 5.9-8.4-12.4-.8zm13.9 1.4L10 18.2l5.1 4.5 7.6-11.3z" fill="#FFF"/></svg> TRON</span>
+          <span class="token-pill"><svg width="18" height="18" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#23292F"/><path d="M23.8 8.5h2.4L18.4 16l7.8 7.5h-2.4l-6.6-6.4-6.6 6.4H8.2L16 16 8.2 8.5h2.4l6.6 6.4 6.6-6.4z" fill="#FFF"/></svg> Ripple XRP</span>
+          <span class="token-pill"><svg width="18" height="18" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#0033AD"/><circle cx="16" cy="16" r="2.8" fill="#FFF"/><circle cx="16" cy="9" r="1.3" fill="#FFF"/><circle cx="16" cy="23" r="1.3" fill="#FFF"/><circle cx="9" cy="16" r="1.3" fill="#FFF"/><circle cx="23" cy="16" r="1.3" fill="#FFF"/></svg> Cardano</span>
+          <span class="token-pill"><svg width="18" height="18" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#C2A633"/><path d="M12 9h4.8c4.5 0 7.2 2.7 7.2 7s-2.7 7-7.2 7H12V9zm3.5 11.5h1.3c2.6 0 4.1-1.7 4.1-4.5s-1.5-4.5-4.1-4.5h-1.3v9zm-1.8-5h6.5v1.8h-6.5v-1.8z" fill="#FFF"/></svg> Dogecoin</span>
+          <span class="token-pill"><svg width="18" height="18" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#345D9D"/><path d="M13.2 19.8l1.4-5.2-2.4.9.5-1.9 2.4-.9 1.9-7h3.3l-1.6 6.1 2.8-1-.5 1.9-2.8 1-1.1 4.3h6.3l-.7 2.6h-10.2l.7-2.7.7.2z" fill="#FFF"/></svg> Litecoin</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Trust Card (Right Column) -->
+    <div class="hero-trust-card">
+      <div class="trust-card-header">
+        <h3>How We Assist Victims</h3>
+      </div>
+      <div class="trust-features-list">
+        <div class="trust-feature-item">
+          <div class="trust-feature-icon"><i class="fas fa-magnifying-glass-chart"></i></div>
+          <div class="trust-feature-text">
+            <strong>Rapid On-Chain Tracing &amp; Verification</strong>
+            <p>Comprehensive forensic analysis of your transaction hashes, inspection of smart contracts, and identification of illicit destination addresses.</p>
+          </div>
+        </div>
+        <div class="trust-feature-item">
+          <div class="trust-feature-icon"><i class="fas fa-building-shield"></i></div>
+          <div class="trust-feature-text">
+            <strong>Emergency Exchange Freezes</strong>
+            <p>Direct outreach to compliance teams at Binance, OKX, Bybit, Coinbase, and Kraken before funds are cashed out through fiat off-ramps.</p>
+          </div>
+        </div>
+        <div class="trust-feature-item">
+          <div class="trust-feature-icon"><i class="fas fa-handshake"></i></div>
+          <div class="trust-feature-text">
+            <strong>Success-Based Contingency</strong>
+            <p>Standard 10% contingency fee applies strictly after recovered funds are returned to your safe wallet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       HOW OUR DIGITAL ASSET INVESTIGATIONS WORK
+       A STRUCTURED, DEFENSIBLE METHODOLOGY (IMAGE-1 ALIGNED)
+       ======================================================== -->
+  <section class="methodology-hero-container">
+    <div class="methodology-kicker">HOW OUR DIGITAL ASSET INVESTIGATIONS WORK</div>
+    <h2 class="methodology-heading">A Structured, Defensible Methodology</h2>
+    <p class="methodology-subheading">
+      Our investigations follow a structured forensic process designed to trace digital assets and support recovery efforts across jurisdictions.
+    </p>
+
+    <!-- Horizontal / Responsive Timeline Track -->
+    <div class="methodology-track">
+      <div class="methodology-axis-line"></div>
+
+      <!-- Step 1: Case Assessment -->
+      <div class="method-node node-top-icon">
+        <div class="node-content-top">
+          <div class="node-icon-circle"><i class="fas fa-expand"></i></div>
+          <div class="node-stem-line"></div>
+        </div>
+        <div class="node-number-badge">1</div>
+        <div class="node-content-bottom">
+          <div class="node-stem-line"></div>
+          <div class="node-text-block">
+            <div class="node-text-title">Case Assessment</div>
+            <div class="node-text-desc">Review wallet activity and scam structure.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Blockchain Tracing -->
+      <div class="method-node node-bottom-icon">
+        <div class="node-content-top">
+          <div class="node-text-block">
+            <div class="node-text-title">Blockchain Tracing</div>
+            <div class="node-text-desc">Advanced cross-chain forensic analysis.</div>
+          </div>
+          <div class="node-stem-line"></div>
+        </div>
+        <div class="node-number-badge">2</div>
+        <div class="node-content-bottom">
+          <div class="node-stem-line"></div>
+          <div class="node-icon-circle"><i class="fas fa-file-waveform"></i></div>
+        </div>
+      </div>
+
+      <!-- Step 3: Legal Coordination -->
+      <div class="method-node node-top-icon">
+        <div class="node-content-top">
+          <div class="node-icon-circle"><i class="fas fa-landmark"></i></div>
+          <div class="node-stem-line"></div>
+        </div>
+        <div class="node-number-badge">3</div>
+        <div class="node-content-bottom">
+          <div class="node-stem-line"></div>
+          <div class="node-text-block">
+            <div class="node-text-title">Legal Coordination</div>
+            <div class="node-text-desc">Work with exchanges and law enforcement.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Asset Freezing -->
+      <div class="method-node node-bottom-icon">
+        <div class="node-content-top">
+          <div class="node-text-block">
+            <div class="node-text-title">Asset Freezing</div>
+            <div class="node-text-desc">Prevent further movement of stolen funds.</div>
+          </div>
+          <div class="node-stem-line"></div>
+        </div>
+        <div class="node-number-badge">4</div>
+        <div class="node-content-bottom">
+          <div class="node-stem-line"></div>
+          <div class="node-icon-circle"><i class="fas fa-ban"></i></div>
+        </div>
+      </div>
+
+      <!-- Step 5: Recovery Support (Active Prominent Card with Orbit) -->
+      <div class="node-prominent">
+        <div class="prominent-orbit-ring">
+          <div class="prominent-orbit-dot-1"></div>
+          <div class="prominent-orbit-dot-2"></div>
+        </div>
+        <div class="prominent-white-circle">
+          <i class="far fa-message prominent-icon"></i>
+          <div class="prominent-title">Recovery Support</div>
+          <div class="prominent-desc">Advanced cross-chain forensic analysis.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Subpage Jump Links -->
+    <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
+      <a href="methodology.html" style="font-size: 0.8rem; color: #7dd3fc; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(45, 159, 255, 0.1); padding: 0.4rem 0.9rem; border-radius: 20px; border: 1px solid rgba(45, 159, 255, 0.25);">
+        <i class="fas fa-book-open"></i> Explore Detailed Methodology &rarr;
+      </a>
+      <a href="cases.html" style="font-size: 0.8rem; color: #a7f3d0; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(0, 245, 155, 0.1); padding: 0.4rem 0.9rem; border-radius: 20px; border: 1px solid rgba(0, 245, 155, 0.25);">
+        <i class="fas fa-folder-open"></i> Inspect Real Case Studies &rarr;
+      </a>
+      <a href="intelligence.html" style="font-size: 0.8rem; color: #fde68a; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(245, 158, 11, 0.1); padding: 0.4rem 0.9rem; border-radius: 20px; border: 1px solid rgba(245, 158, 11, 0.25);">
+        <i class="fas fa-passport"></i> Sanctions Screening &amp; Risk Scoring &rarr;
+      </a>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       COMPACT 3-STAGE ASSET RECOVERY SUMMARY
+       ======================================================== -->
+  <section id="recoveryProcessSection" class="recovery-compact-strip">
+    <div class="compact-strip-header">
+      <span class="badge-mini"><i class="fas fa-shield-halved"></i> RECOVERY PROTOCOL</span>
+      <h3>3-Stage Asset Recovery &amp; Account Freezing</h3>
+      <p>Our rapid-response workflow for tracing illicit flows, freezing exchange deposit accounts, and returning funds.</p>
+    </div>
+
+    <div class="compact-steps-grid">
+      <div class="compact-step-item">
+        <div class="compact-step-num">STAGE 01</div>
+        <div class="compact-step-title"><i class="fas fa-route" style="color: var(--primary-light);"></i> Trace Digital Steps</div>
+        <p>Multi-hop blockchain mapping across bridges and peeling chains to locate target wallets.</p>
+      </div>
+
+      <div class="compact-step-item featured">
+        <div class="compact-step-num">STAGE 02</div>
+        <div class="compact-step-title" style="color: #93c5fd;"><i class="fas fa-snowflake" style="color: var(--primary-light);"></i> Freeze Target Accounts</div>
+        <p>Emergency compliance notices served to central exchanges (Binance, OKX, Bybit, Coinbase) before cashout.</p>
+      </div>
+
+      <div class="compact-step-item">
+        <div class="compact-step-num">STAGE 03</div>
+        <div class="compact-step-title" style="color: #a7f3d0;"><i class="fas fa-arrow-rotate-left" style="color: var(--accent-emerald);"></i> Safe Restitution</div>
+        <p>Direct return of secured funds into your verified, uncompromised recovery wallet.</p>
+      </div>
+    </div>
+
+    <div class="compact-strip-footer">
+      <a href="about.html" class="btn-secondary" style="font-size: 0.84rem; padding: 0.6rem 1.25rem;">
+        <i class="fas fa-book-open"></i> View Full Methodology, Bureau Gateways (FBI IC3, FTC) &amp; Anti-Scam Guide →
+      </a>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       LIVE FORENSIC CASE STUDIES & EVIDENTIARY PROOF
+       ======================================================== -->
+  <section class="live-proof-section" style="margin-top: 2.8rem; margin-bottom: 2rem;">
+    <div style="text-align: center; max-width: 720px; margin: 0 auto 1.8rem;">
+      <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0.8rem; background: rgba(0, 245, 155, 0.12); border: 1px solid rgba(0, 245, 155, 0.3); border-radius: 20px; font-size: 0.74rem; font-weight: 700; color: var(--accent-green); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.6rem;">
+        <i class="fas fa-certificate"></i> Verified Live Production Proof
+      </div>
+      <h2 style="font-size: 1.55rem; font-weight: 800; color: #fff; margin: 0 0 0.5rem;">
+        Not a Mockup. Real On-Chain Case Evidentiary Trails.
+      </h2>
+      <p style="font-size: 0.86rem; color: var(--text-muted); margin: 0;">
+        Click any verified case study below to inspect live multi-hop peel chains, 4-vector threat scores, and exchange legal hold statuses in real-time.
+      </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem;">
+      <!-- Case 01 -->
+      <div class="case-study-card" style="background: linear-gradient(135deg, rgba(13, 21, 39, 0.9), rgba(8, 14, 28, 0.95)); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 1.3rem; position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-family: var(--font-mono); font-size: 0.74rem; color: #94a3b8; font-weight: 700;">CASE #NX-849201</span>
+          <span style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: var(--accent-rose); font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase;">
+            <i class="fas fa-snowflake"></i> OKX Freeze Active
+          </span>
+        </div>
+        <div style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 0.25rem;">
+          $84,500 <span style="font-size: 0.85rem; color: #38bdf8; font-weight: 600;">USDT (TRC-20)</span>
+        </div>
+        <div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.85rem; line-height: 1.45;">
+          Fake broker investment scam. 4 peel-chain hops clustered to OKX deposit memo #884910. Compliance hold confirmed.
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.72rem;">
+          <span style="color: var(--accent-rose); font-weight: 700;">Threat Score: 92/100</span>
+          <button type="button" class="btn-sample-track" onclick="loadSampleCase('NX-849201')" style="background: rgba(0, 245, 155, 0.12); border: 1px solid rgba(0, 245, 155, 0.3); color: var(--accent-green); padding: 0.35rem 0.75rem; border-radius: 4px; font-weight: 700; cursor: pointer;">
+            Inspect Case &rarr;
+          </button>
+        </div>
+      </div>
+
+      <!-- Case 02 -->
+      <div class="case-study-card" style="background: linear-gradient(135deg, rgba(13, 21, 39, 0.9), rgba(8, 14, 28, 0.95)); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-md); padding: 1.3rem; position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-family: var(--font-mono); font-size: 0.74rem; color: #94a3b8; font-weight: 700;">CASE #NX-773104</span>
+          <span style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); color: var(--accent-amber); font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase;">
+            <i class="fas fa-magnifying-glass"></i> Binance Tagged
+          </span>
+        </div>
+        <div style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 0.25rem;">
+          2.45 BTC <span style="font-size: 0.85rem; color: #fde68a; font-weight: 600;">($158,200 USD)</span>
+        </div>
+        <div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.85rem; line-height: 1.45;">
+          Phishing approval drainer. Clustered through 6 SegWit UTXOs to Binance Hot Wallet #14. MLAT legal packet delivered.
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.72rem;">
+          <span style="color: var(--accent-amber); font-weight: 700;">Threat Score: 88/100</span>
+          <button type="button" class="btn-sample-track" onclick="loadSampleCase('NX-773104')" style="background: rgba(0, 245, 155, 0.12); border: 1px solid rgba(0, 245, 155, 0.3); color: var(--accent-green); padding: 0.35rem 0.75rem; border-radius: 4px; font-weight: 700; cursor: pointer;">
+            Inspect Case &rarr;
+          </button>
+        </div>
+      </div>
+
+      <!-- Case 03 -->
+      <div class="case-study-card" style="background: linear-gradient(135deg, rgba(13, 21, 39, 0.9), rgba(8, 14, 28, 0.95)); border: 1px solid rgba(0, 245, 155, 0.35); border-radius: var(--radius-md); padding: 1.3rem; position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-family: var(--font-mono); font-size: 0.74rem; color: #94a3b8; font-weight: 700;">CASE #NX-912048</span>
+          <span style="background: rgba(0, 245, 155, 0.15); border: 1px solid rgba(0, 245, 155, 0.35); color: var(--accent-green); font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase;">
+            <i class="fas fa-check-circle"></i> Restitution Disbursed
+          </span>
+        </div>
+        <div style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 0.25rem;">
+          320 SOL <span style="font-size: 0.85rem; color: #a7f3d0; font-weight: 600;">($48,000 USD)</span>
+        </div>
+        <div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.85rem; line-height: 1.45;">
+          Telegram presale impersonation. Bybit security compliance freeze executed; 318.5 SOL successfully returned to victim wallet.
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.72rem;">
+          <span style="color: var(--accent-green); font-weight: 700;">Status: Recovered (14/100)</span>
+          <button type="button" class="btn-sample-track" onclick="loadSampleCase('NX-912048')" style="background: rgba(0, 245, 155, 0.12); border: 1px solid rgba(0, 245, 155, 0.3); color: var(--accent-green); padding: 0.35rem 0.75rem; border-radius: 4px; font-weight: 700; cursor: pointer;">
+            Inspect Case &rarr;
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Exchange Compliance & Law Enforcement Trust Bar (Moved to Page Bottom) -->
+  <div class="compliance-trust-bar" style="margin-top: 2.2rem; margin-bottom: 1.2rem;">
+    <span class="compliance-label">Investigation &amp; freezing protocols aligned with:</span>
+    <div class="compliance-badges-row">
+      <a href="partners.html" class="partner-badge" style="text-decoration: none; color: inherit;"><i class="fas fa-network-wired" style="color: #ff5000;"></i> Chainalysis Reactor</a>
+      <a href="partners.html" class="partner-badge" style="text-decoration: none; color: inherit;"><i class="fas fa-diagram-project" style="color: #00f59b;"></i> TRM Labs</a>
+      <a href="partners.html" class="partner-badge" style="text-decoration: none; color: inherit;"><i class="fas fa-shield-halved" style="color: #F3BA2F;"></i> Binance Compliance</a>
+      <a href="partners.html" class="partner-badge" style="text-decoration: none; color: inherit;"><i class="fas fa-cube"></i> OKX Security</a>
+      <a href="partners.html" class="partner-badge" style="text-decoration: none; color: inherit;"><i class="fas fa-building-columns" style="color: #0052FF;"></i> Coinbase Legal</a>
+      <a href="partners.html" class="partner-badge" style="text-decoration: none; color: inherit;"><i class="fas fa-scale-balanced" style="color: #60a5fa;"></i> FBI IC3 Protocols</a>
+      <a href="partners.html" class="partner-badge" style="text-decoration: none; color: var(--accent-cyan); font-weight: 600;"><i class="fas fa-arrow-right"></i> All Partners</a>
+    </div>
+  </div>
+</main>
+
+<!-- ========================================================
+     MODALS
+     ======================================================== -->
+
+<!-- 1. Review & Confirmation Modal -->
+<div id="warningConfirmModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header-strip">
+      <div>
+        <div class="modal-classification-badge">CONFIDENTIAL CASE REVIEW</div>
+        <h3><i class="fas fa-file-circle-check" style="color: var(--primary-light);"></i> <span data-i18n="modal_confirm_title">Review Your Case Details</span></h3>
+      </div>
+      <button class="modal-close-icon" onclick="hideConfirmModal()"><i class="fas fa-xmark"></i></button>
+    </div>
+
+    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;" data-i18n="modal_confirm_desc">
+      Please verify your wallet addresses and transaction information before submitting. All information is confidential.
+    </p>
+
+    <div class="modal-summary-box">
+      <div class="summary-row">
+        <span class="summary-label" data-i18n="label_your_name">Complainant:</span>
+        <span class="summary-value" id="confirmVictimName">-</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Contact Email:</span>
+        <span class="summary-value" id="confirmVictimEmail">-</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Contact Phone:</span>
+        <span class="summary-value" id="confirmVictimPhone">-</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Victim Wallet:</span>
+        <span class="summary-value mono" id="confirmVictimWallet">-</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Target Scammer Wallet:</span>
+        <span class="summary-value mono" id="confirmScammerWallet">-</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Documented Loss:</span>
+        <span class="summary-value" id="confirmAmount">-</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Restitution Wallet:</span>
+        <span class="summary-value mono" id="confirmRecoveryWallet">-</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Transaction Hashes:</span>
+        <span class="summary-value" id="confirmTxCount">-</span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 0.85rem; justify-content: flex-end; margin-top: 1.5rem;">
+      <button id="confirmCancelBtn" class="btn-secondary"><span data-i18n="btn_edit">Edit Details</span></button>
+      <button id="confirmContinueBtn" class="btn-primary">
+        <i class="fas fa-check"></i> <span data-i18n="btn_confirm">Confirm &amp; Submit Case</span>
+      </button>
     </div>
   </div>
 </div>
 
-<footer>
-  <i class="fas fa-microchip"></i> <span data-i18n="footer_text">NEXUS SHIELD — bridging victims to on‑chain justice</span>
-</footer>
+<!-- 2. Case Successfully Cataloged Modal -->
+<div id="caseSuccessModal" class="modal-overlay">
+  <div class="modal-card modal-lg">
+    <div class="modal-header-strip">
+      <div>
+        <div class="modal-classification-badge" style="color: var(--accent-emerald); background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);">CASE REGISTERED &amp; ACTIVE</div>
+        <h3 style="color: var(--accent-emerald);"><i class="fas fa-circle-check"></i> <span data-i18n="modal_success_title">Case Submitted Successfully</span></h3>
+      </div>
+      <button class="modal-close-icon" onclick="hideSuccessModal()"><i class="fas fa-xmark"></i></button>
+    </div>
 
-<div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: #0a111fcc; backdrop-filter: blur(8px); border-radius: 2rem; padding: 0.3rem 0.8rem; border: 1px solid #0ff;">
-  <select id="languageSwitcher" style="background: transparent; border: none; color: #0ff; font-size: 0.8rem;">
-    <option value="en">English</option>
-    <option value="zh">中文</option>
-    <option value="es">Español</option>
-    <option value="fr">Français</option>
-    <option value="de">Deutsch</option>
-    <option value="ja">日本語</option>
-  </select>
+    <!-- Live Email Dispatch Notification Banner -->
+    <div id="emailDispatchNotice" class="email-dispatch-card">
+      <div class="email-dispatch-icon"><i class="fas fa-paper-plane"></i></div>
+      <div style="flex: 1;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
+          <strong style="color: #6ee7b7; font-size: 0.9rem;"><i class="fas fa-envelope-circle-check"></i> Confirmation Email Dispatched</strong>
+          <span class="email-live-badge"><i class="fas fa-circle"></i> Sent via Recovery Queue</span>
+        </div>
+        <p style="font-size: 0.83rem; color: #cbd5e1; margin-top: 0.25rem; line-height: 1.4;">
+          An official initiation receipt, assigned investigator details, and recovery protocol have been sent to: <strong id="dispatchedToEmail" class="mono" style="color: #fff;">-</strong>
+        </p>
+        <!-- Email Inbox & Spam Folder Awareness Note -->
+        <div style="margin-top: 0.6rem; padding: 0.5rem 0.75rem; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; font-size: 0.76rem; color: #fde68a; line-height: 1.45;">
+          <i class="fas fa-inbox"></i> <strong>Delivery Note:</strong> If you do not see the confirmation email within 60 seconds, check your <strong>Promotions</strong> or <strong>Spam</strong> folder and mark it as <em>"Not Spam"</em> so you don't miss urgent updates from your investigator.
+        </div>
+        <div style="display: flex; gap: 0.6rem; margin-top: 0.65rem; flex-wrap: wrap;">
+          <a id="openMailClientBtn" href="#" class="btn-secondary" style="font-size: 0.78rem; padding: 0.38rem 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="fas fa-envelope-open-text"></i> Open in Mail App
+          </a>
+          <button type="button" id="viewEmailPreviewBtn" class="btn-secondary" style="font-size: 0.78rem; padding: 0.38rem 0.85rem; background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.3); color: #93c5fd;">
+            <i class="fas fa-eye"></i> View Email Copy
+          </button>
+          <button type="button" id="downloadInitiationLetterBtn" class="btn-secondary" style="font-size: 0.78rem; padding: 0.38rem 0.85rem;">
+            <i class="fas fa-file-signature"></i> Download Confirmation (.txt)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden / Expandable In-Modal Email Preview -->
+    <div id="inlineEmailPreview" style="display: none; background: #0b1120; border: 1px solid rgba(59,130,246,0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.25rem; font-size: 0.84rem; color: #e2e8f0;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+        <span style="font-weight: 600; color: var(--accent-cyan);"><i class="fas fa-envelope"></i> Formal Dispatch Preview</span>
+        <button type="button" onclick="document.getElementById('inlineEmailPreview').style.display='none'" style="background: none; border: none; color: var(--text-muted); cursor: pointer;"><i class="fas fa-xmark"></i></button>
+      </div>
+      <div id="emailPreviewContent" class="mono" style="white-space: pre-wrap; font-size: 0.78rem; line-height: 1.6; max-height: 220px; overflow-y: auto; background: #030712; padding: 0.75rem; border-radius: 4px;"></div>
+    </div>
+
+    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.75rem;" data-i18n="modal_success_desc">
+      Your incident report has been registered. Save your Case Reference ID below:
+    </p>
+
+    <div class="report-id-badge">
+      <span id="newReportIdText" class="mono">NS-2026-PENDING</span>
+      <button id="copyReportIdBtn" class="copy-btn"><i class="fas fa-copy"></i> Copy ID</button>
+    </div>
+
+    <div id="successReportSummary" style="font-size: 0.84rem; color: var(--text-secondary); background: var(--bg-card-subtle); padding: 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin: 0.85rem 0;"></div>
+
+    <!-- Staged Recovery Activation & Resource Commitment Model -->
+    <div class="activation-section-box">
+      <div class="activation-header">
+        <div class="activation-title">
+          <i class="fas fa-bolt" style="color: var(--accent-amber);"></i> Investigation Options &amp; Resource Allocation
+        </div>
+        <span class="activation-sub">Initial evaluation is 100% free. Choose how you would like our team to proceed:</span>
+      </div>
+
+      <div class="activation-cards-grid">
+        <!-- Option 1: Standard $39 Case Activation (100% Credited) -->
+        <div class="activation-card active-card">
+          <div class="card-badge">RECOMMENDED FOR ACTIVE TRACING</div>
+          <div class="act-plan-title">Dedicated Priority Tracing</div>
+          <div class="act-price">$39 <span class="act-period">/ Node Query Fee</span></div>
+          <div class="act-credit-tag"><i class="fas fa-arrow-turn-down"></i> 100% Credited Toward Contingency Fee</div>
+          <p class="act-desc">Assigned dedicated forensic analyst, multi-hop peeling-chain tracing across node APIs, and emergency CEX freeze requests.</p>
+          <ul class="act-perks">
+            <li><i class="fas fa-check"></i> Exchange deposit freeze hold notice dispatched</li>
+            <li><i class="fas fa-check"></i> Direct investigator email &amp; phone liaison</li>
+            <li><i class="fas fa-check"></i> 100% credited against your final recovery fee</li>
+          </ul>
+          <button type="button" class="btn-primary" id="activateStagedCaseBtn" style="width: 100%; font-size: 0.86rem; padding: 0.65rem;">
+            <i class="fas fa-shield-halved"></i> Activate Priority Tracing ($39 Credited)
+          </button>
+        </div>
+
+        <!-- Option 2: 10% Pure Contingency -->
+        <div class="activation-card">
+          <div class="act-plan-title">Standard Contingency Queue</div>
+          <div class="act-price">10% <span class="act-period">Contingency Fee</span></div>
+          <div class="act-credit-tag" style="background: rgba(16, 185, 129, 0.12); color: #6ee7b7;"><i class="fas fa-circle-check"></i> Payable Only Upon Restitution</div>
+          <p class="act-desc">Zero out-of-pocket legal fee. Our compensation is strictly deducted from funds safely recovered and returned to your wallet.</p>
+          <ul class="act-perks">
+            <li><i class="fas fa-check"></i> Zero fee if funds cannot be secured</li>
+            <li><i class="fas fa-check"></i> Direct return to clean recovery wallet</li>
+            <li><i class="fas fa-check"></i> Standard batch processing queue</li>
+          </ul>
+          <button type="button" class="btn-secondary" id="confirmContingencyBtn" style="width: 100%; font-size: 0.86rem; padding: 0.65rem;">
+            <i class="fas fa-handshake"></i> Maintain Standard Contingency
+          </button>
+        </div>
+      </div>
+
+      <div class="contingency-guarantee-note">
+        <i class="fas fa-shield-heart" style="color: var(--accent-emerald);"></i> <strong>Recovery Guarantee:</strong> Nexus Shield standard case intake and initial transaction checks are conducted under full contingency terms. The nominal $39 activation directly covers server node compute and investigator phone outreach, and is fully subtracted from the contingency fee when your assets are returned.
+      </div>
+    </div>
+
+    <div class="action-checklist">
+      <h4><i class="fas fa-list-check" style="color: var(--primary-light);"></i> Critical Next Steps for Victims</h4>
+      <ul>
+        <li><i class="fas fa-ban" style="color: var(--accent-rose);"></i> <strong>Revoke Compromised Allowances:</strong> Use <a href="https://revoke.cash" target="_blank" rel="noopener noreferrer" style="color: var(--primary-light);">revoke.cash</a> to revoke active token approvals on your old wallet.</li>
+        <li><i class="fas fa-file-shield" style="color: var(--accent-emerald);"></i> <strong>File Official Police Complaint:</strong> Download your Evidence Dossier below and submit to <a href="https://ic3.gov" target="_blank" rel="noopener noreferrer" style="color: var(--primary-light);">IC3.gov</a> or your local cybercrime division.</li>
+        <li><i class="fas fa-shield-xmark" style="color: var(--accent-amber);"></i> <strong>Anti-Scam Alert:</strong> Beware of Telegram/WhatsApp impostors offering to "hack back" your funds for advance crypto fees. Legitimate recovery happens solely through exchange freezing and legal restitution.</li>
+      </ul>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
+      <div style="display: flex; gap: 0.85rem; flex-wrap: wrap;">
+        <button id="downloadDossierBtn" class="btn-primary" style="flex: 1.2;">
+          <i class="fas fa-file-arrow-down"></i> <span data-i18n="btn_download_dossier">Download Case Dossier (.txt)</span>
+        </button>
+        <button type="button" id="printCaseCardSuccessBtn" class="btn-secondary" style="flex: 1; background: rgba(0,245,155,0.12); border-color: rgba(0,245,155,0.35); color: #a7f3d0;">
+          <i class="fas fa-id-card"></i> Print / Download Case Card
+        </button>
+      </div>
+      <div style="display: flex; gap: 0.85rem;">
+        <button id="trackThisReportBtn" class="btn-secondary" style="flex: 1;">
+          <i class="fas fa-magnifying-glass"></i> <span data-i18n="btn_track_now">Track Case Status</span>
+        </button>
+        <button id="successModalCloseBtn" class="btn-secondary" style="flex: 1;">
+          <span data-i18n="btn_close">Close</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- Modals (same as before, omitted for brevity – keep your existing modals) -->
-<!-- ... (keep your existing modal divs: warningConfirmModal, progressModal, modalContract, modalPayment) ... -->
+<!-- 3. Progress Tracking Modal -->
+<div id="progressModal" class="modal-overlay">
+  <div class="modal-card modal-lg">
+    <div class="modal-header-strip">
+      <div>
+        <div class="modal-classification-badge">INVESTIGATION AUDIT</div>
+        <h3><i class="fas fa-magnifying-glass" style="color: var(--primary-light);"></i> <span data-i18n="progress_title">Case Investigation Tracker</span></h3>
+      </div>
+      <button class="modal-close-icon" onclick="hideProgressModal()"><i class="fas fa-xmark"></i></button>
+    </div>
 
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0 1.25rem; flex-wrap: wrap; gap: 0.75rem; background: var(--bg-card-subtle); padding: 0.85rem 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+      <div>
+        <span style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Case Reference ID:</span>
+        <strong id="popupReportRef" class="mono" style="color: var(--accent-cyan); margin-left: 0.4rem; font-size: 0.92rem;">-</strong>
+      </div>
+      <div>
+        <span id="popupStatus" class="status-pill status-pending">Case Intake</span>
+      </div>
+    </div>
+
+    <!-- Pinned Client Alert Banner (when active) -->
+    <div id="pinnedTrackerAlertBanner" class="client-pinned-alert-banner severity-urgent" style="display: none;">
+      <div style="font-size: 1.25rem; margin-top: 0.1rem;" id="pinnedAlertIcon"><i class="fas fa-triangle-exclamation"></i></div>
+      <div style="flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+          <strong id="pinnedAlertTag" style="font-size: 0.85rem; letter-spacing: 0.04em;">CASE ADVISORY</strong>
+          <span style="font-size: 0.72rem; color: var(--text-muted);" id="pinnedAlertTime">Active Notice</span>
+        </div>
+        <p id="pinnedAlertMsg" style="font-size: 0.84rem; margin: 0.35rem 0 0.5rem; line-height: 1.45;"></p>
+        <div id="pinnedAlertAddressRow" style="display: none; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 0.45rem 0.75rem; border-radius: 6px; font-size: 0.78rem;">
+          <code id="pinnedAlertAddrCode" class="mono" style="color: #38bdf8; word-break: break-all;">-</code>
+          <button type="button" id="copyPinnedAlertAddrBtn" class="copy-btn" style="padding: 0.2rem 0.6rem; font-size: 0.72rem; margin-left: 0.5rem;">
+            <i class="fas fa-copy"></i> Copy
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div id="progressBarFill" class="progress-bar-fill"></div>
+    </div>
+    <div id="progressMessage" style="font-size: 0.85rem; color: #93c5fd; margin-bottom: 1.5rem; text-align: center; font-weight: 500;">
+      Report received into intake queue; on-chain parsing scheduled.
+    </div>
+
+    <!-- 5-Step Milestone Timeline -->
+    <div class="progress-steps">
+      <div class="progress-step active" id="step-intake">
+        <div class="step-circle">1</div>
+        <span data-i18n="timeline_step1">Case Intake</span>
+      </div>
+      <div class="progress-step" id="step-cluster">
+        <div class="step-circle">2</div>
+        <span data-i18n="timeline_step2">Chain Tracing</span>
+      </div>
+      <div class="progress-step" id="step-exchange">
+        <div class="step-circle">3</div>
+        <span data-i18n="timeline_step3">Exchange Hold</span>
+      </div>
+      <div class="progress-step" id="step-dossier">
+        <div class="step-circle">4</div>
+        <span data-i18n="timeline_step4">Restitution</span>
+      </div>
+      <div class="progress-step" id="step-resolution">
+        <div class="step-circle">5</div>
+        <span data-i18n="timeline_step5">Completed</span>
+      </div>
+    </div>
+
+    <!-- Case Details Grid -->
+    <div class="modal-summary-box">
+      <div class="summary-row">
+        <span class="summary-label" data-i18n="amount_label_popup">Documented Loss:</span>
+        <span class="summary-value" id="popupAmount">-</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label" data-i18n="submitted_label_popup">Intake Date:</span>
+        <span class="summary-value" id="popupDate">-</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label" data-i18n="blockchain_label_popup">Target Blockchain:</span>
+        <span class="summary-value" id="popupChain">-</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Target Scammer Address:</span>
+        <span class="summary-value mono" id="popupScammerWallet">-</span>
+      </div>
+      <div class="summary-row" style="background: rgba(239, 68, 68, 0.08); padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.25); margin-top: 0.4rem;">
+        <span class="summary-label" style="color: #fca5a5;"><i class="fas fa-gauge-high"></i> Threat Exposure Index:</span>
+        <span class="summary-value" id="popupThreatIndex" style="color: #f87171; font-weight: 800; font-family: var(--font-mono);">
+          88/100 (CRITICAL ILLICIT TAINT)
+        </span>
+      </div>
+      <div class="summary-row" style="background: rgba(0, 245, 155, 0.05); padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid rgba(0, 245, 155, 0.18); margin-top: 0.4rem;">
+        <span class="summary-label" style="color: #a7f3d0;"><i class="fas fa-passport"></i> Sanctions &amp; Watchlist:</span>
+        <span class="summary-value" id="popupSanctionsStatus" style="color: #6ee7b7; font-size: 0.78rem;">
+          Screened: OFAC SDN &bull; EU Council &bull; 48.2k Blacklists
+        </span>
+      </div>
+      <div class="summary-row" style="background: rgba(45, 159, 255, 0.05); padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid rgba(45, 159, 255, 0.15); margin-top: 0.5rem;">
+        <span class="summary-label" style="color: #93c5fd;"><i class="fas fa-microscope"></i> Case Evidence &amp; Tracing:</span>
+        <span class="summary-value"><a href="mailto:investigations@nexusshield.org" style="color: var(--accent-cyan); text-decoration: none; font-weight: 600;"><i class="fas fa-envelope"></i> investigations@nexusshield.org</a></span>
+      </div>
+      <div class="summary-row" style="background: rgba(16, 185, 129, 0.05); padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.15); margin-top: 0.35rem;">
+        <span class="summary-label" style="color: #a7f3d0;"><i class="fas fa-vault"></i> Asset Restitution Desk:</span>
+        <span class="summary-value"><a href="mailto:recovery@nexusshield.org" style="color: var(--accent-emerald); text-decoration: none; font-weight: 600;"><i class="fas fa-envelope"></i> recovery@nexusshield.org</a></span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 0.85rem; justify-content: flex-end; margin-top: 1.5rem; flex-wrap: wrap;">
+      <button type="button" id="printCaseCardProgressBtn" class="btn-secondary" style="background: rgba(0,245,155,0.12); border-color: rgba(0,245,155,0.35); color: #a7f3d0;">
+        <i class="fas fa-id-card"></i> Print Official Case Card
+      </button>
+      <button id="downloadProgressDossierBtn" class="btn-primary">
+        <i class="fas fa-file-arrow-down"></i> <span data-i18n="btn_download_dossier">Download Case Dossier (.txt)</span>
+      </button>
+      <button id="closeProgressBtn" class="btn-secondary"><span data-i18n="btn_close">Close</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- 4. Client Case Advisory Popup Modal (Managed by Admin) -->
+<div id="clientCaseAlertModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header-strip">
+      <div>
+        <div id="clientAlertTagBadge" class="alert-tag-badge severity-urgent">
+          <i class="fas fa-bell"></i> <span id="clientAlertTagText">URGENT ACTION REQUIRED</span>
+        </div>
+        <h3 id="clientAlertModalTitle" style="color: #fff;"><i class="fas fa-triangle-exclamation" style="color: var(--accent-amber);"></i> Case Advisory Notice</h3>
+      </div>
+      <button class="modal-close-icon" onclick="hideClientAlertModal()"><i class="fas fa-xmark"></i></button>
+    </div>
+
+    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+      Notice for Case Reference ID: <strong id="clientAlertCaseRef" class="mono" style="color: var(--accent-cyan);">-</strong>
+    </div>
+
+    <!-- Email Notification Delivery Notice -->
+    <div id="clientAlertEmailNotice" style="display: none; align-items: center; gap: 0.6rem; background: rgba(45, 159, 255, 0.08); border: 1px solid rgba(45, 159, 255, 0.25); padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.78rem; color: #93c5fd;">
+      <i class="fas fa-envelope-circle-check" style="color: var(--accent-cyan); font-size: 1.05rem;"></i>
+      <span>Official dispatch sent to your assigned email: <strong id="clientAlertEmailTarget" style="color: #fff; font-family: var(--font-mono);">-</strong></span>
+    </div>
+
+    <div id="clientAlertMessageContent" style="font-size: 0.92rem; color: #f1f5f9; line-height: 1.6; background: rgba(255, 255, 255, 0.03); padding: 1.1rem 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 1.2rem; white-space: pre-wrap;"></div>
+
+    <!-- Highlighted Copyable Address Box -->
+    <div id="clientAlertAddressBox" class="copyable-address-box" style="display: none;">
+      <div style="flex: 1; min-width: 220px;">
+        <span class="copyable-address-label"><i class="fas fa-wallet"></i> Relevant Address / Identifier:</span>
+        <div id="clientAlertAddressValue" class="copyable-address-value">-</div>
+      </div>
+      <button type="button" id="copyClientAlertAddressBtn" class="copy-address-btn">
+        <i class="fas fa-copy"></i> Copy Address
+      </button>
+    </div>
+
+    <div style="display: flex; gap: 0.85rem; justify-content: flex-end; margin-top: 1.5rem;">
+      <button type="button" onclick="hideClientAlertModal()" class="btn-primary" style="width: 100%;">
+        <i class="fas fa-check"></i> Acknowledge &amp; View Case Timeline
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 5. Printable Official Case Card Modal -->
+<div id="officialCaseCardModal" class="modal-overlay">
+  <div class="case-card-modal-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;" class="no-print">
+      <div style="display: flex; align-items: center; gap: 0.5rem; color: #fff; font-size: 1.1rem; font-weight: 700;">
+        <i class="fas fa-id-card" style="color: var(--accent-cyan);"></i> Official Digital Case Card
+      </div>
+      <button class="modal-close-icon" onclick="hideCaseCardModal()"><i class="fas fa-xmark"></i></button>
+    </div>
+
+    <!-- Printable Card Container -->
+    <div class="case-card-printable-area">
+      <div class="official-case-card" id="printableCaseCardInner">
+        <div class="case-card-header">
+          <div class="case-card-brand">
+            <img src="assets/images/logo-header-dark.png" alt="Nexus Shield Emblem" style="width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(45, 159, 255, 0.5));">
+            <div>
+              <div style="font-weight: 800; font-size: 1.1rem; color: #fff; letter-spacing: 0.04em;">NEXUS SHIELD</div>
+              <div style="font-size: 0.68rem; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.08em; font-family: var(--font-mono);">Forensic Evidence Registration Card</div>
+            </div>
+          </div>
+          <div class="case-card-qr-box">
+            <img id="caseCardQrImg" class="case-card-qr-img" src="" alt="Case Tracking QR Code">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.2rem;">
+          <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em;">Case Reference ID</div>
+          <div class="case-card-id-highlight" id="cardCaseId">NX-000000</div>
+          <div style="font-size: 0.75rem; color: #cbd5e1;">Scan QR or enter ID at <code>nexusshield.org</code> to track live milestones.</div>
+        </div>
+
+        <div class="case-card-grid">
+          <div>
+            <div class="case-card-field-title">Complainant Name</div>
+            <div class="case-card-field-val" id="cardVictimName">-</div>
+          </div>
+          <div>
+            <div class="case-card-field-title">Documented Loss</div>
+            <div class="case-card-field-val" id="cardAmountLost" style="color: #60a5fa;">-</div>
+          </div>
+          <div>
+            <div class="case-card-field-title">Blockchain Network</div>
+            <div class="case-card-field-val" id="cardChain">-</div>
+          </div>
+          <div>
+            <div class="case-card-field-title">Registration Date</div>
+            <div class="case-card-field-val" id="cardDate" style="font-size: 0.82rem;">-</div>
+          </div>
+          <div style="grid-column: span 2;">
+            <div class="case-card-field-title">Designated Safe Restitution Wallet</div>
+            <div class="case-card-field-val mono" id="cardRecoveryWallet" style="font-size: 0.78rem; color: #a7f3d0;">-</div>
+          </div>
+        </div>
+
+        <div class="case-card-footer">
+          <div>
+            <i class="fas fa-shield-halved" style="color: var(--accent-cyan); margin-right: 0.3rem;"></i>
+            <strong>Emergency Intake Queue:</strong> 24/7 Forensic Triage
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 0.72rem;">
+            SEAL: FORENSIC-AUDIT-VERIFIED
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card Action Buttons -->
+    <div style="display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 1.4rem;" class="no-print">
+      <button type="button" class="btn-primary" onclick="window.print()">
+        <i class="fas fa-print"></i> Print Card / Save as PDF
+      </button>
+      <button type="button" class="btn-secondary" onclick="hideCaseCardModal()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 6. Deep Forensic Intelligence & Subpoena Packet Locked Modal -->
+<div id="dossierLockedModal" class="pay-modal-backdrop" style="display: none;">
+  <div class="pay-modal-card dossier-locked-modal-card">
+    <div class="pay-modal-header">
+      <div style="display: flex; align-items: center; gap: 0.65rem;">
+        <div class="modal-lock-icon-wrap">
+          <i class="fas fa-shield-halved"></i>
+        </div>
+        <div>
+          <div class="modal-lock-badge"><i class="fas fa-lock"></i> CLASSIFIED FORENSIC PACKET</div>
+          <h3 class="dossier-modal-title">Deep Forensic Intelligence &amp; Subpoena Packet Locked</h3>
+        </div>
+      </div>
+      <button type="button" class="pay-modal-close" id="closeDossierModalBtn"><i class="fas fa-xmark"></i></button>
+    </div>
+
+    <div class="pay-modal-body">
+      <p class="dossier-modal-lead">
+        The public on-chain layer is visible above. Unlock the complete, unredacted 5-section dossier below to view internal exchange sweep hashes, KYC sub-account IDs, formal statutory subpoena directive, and printable official PDF.
+      </p>
+
+      <div class="dossier-modal-options-grid">
+        <!-- Option 1: Fast-Track Subpoena & Instant PDF ($10/tx) -->
+        <div class="dossier-option-card dossier-option-pay">
+          <div>
+            <div class="dossier-opt-header">
+              <span class="badge-fasttrack"><i class="fas fa-bolt"></i> FAST-TRACK SUBPOENA</span>
+              <span class="dossier-opt-price" id="modalDossierFeeBadge">$10 USD ($10/tx)</span>
+            </div>
+            <h4 class="dossier-opt-title">Pay $10 to Unlock Full Forensic Dossier &amp; Freeze Subpoena</h4>
+            <p class="dossier-opt-desc">
+              Instantly unmasks the exact exchange deposit UID, internal hot-wallet sweep hashes, scammer KYC bank records, and the formal <strong>18 U.S.C. § 2703 Subpoena Evidence Packet</strong> ready to download/print as an official PDF for police and exchange compliance.
+            </p>
+            <ul class="dossier-opt-list">
+              <li><i class="fas fa-check"></i> Unmasked KYC Sub-Account &amp; Off-Ramp Bank Records</li>
+              <li><i class="fas fa-check"></i> Internal Custodial Hot-Wallet Sweep Hashes</li>
+              <li><i class="fas fa-check"></i> Statutory 18 U.S.C. § 2703 Subpoena Directive</li>
+              <li><i class="fas fa-check"></i> 1-Click Printable / Downloadable Official PDF Dossier</li>
+            </ul>
+          </div>
+          <button type="button" id="modalGoToPayBtn" class="btn-dossier-pay">
+            <i class="fas fa-file-shield"></i> Pay $10 &amp; Unlock Full Forensic PDF
+          </button>
+        </div>
+
+        <!-- Option 2: Continue Full Recovery Investigation (No $0) -->
+        <div class="dossier-option-card dossier-option-recovery">
+          <div>
+            <div class="dossier-opt-header">
+              <span class="badge-recovery"><i class="fas fa-scale-balanced"></i> SENIOR DESK TRACING</span>
+              <span class="dossier-opt-price" style="color: #93c5fd;">Standard Priority</span>
+            </div>
+            <h4 class="dossier-opt-title">Continue with Recovery Submission</h4>
+            <p class="dossier-opt-desc">
+              Skip the instant PDF report for now. Proceed directly to register your case with our senior forensic investigation team. We will trace your blockchain trail, monitor unspent outputs, and handle exchange compliance outreach in the queue.
+            </p>
+            <ul class="dossier-opt-list">
+              <li><i class="fas fa-check"></i> Senior Forensic Examiner Case Assignment</li>
+              <li><i class="fas fa-check"></i> Continuous Multi-Hop Node Monitoring</li>
+              <li><i class="fas fa-check"></i> Direct Exchange Law Enforcement Dispatch Queue</li>
+              <li><i class="fas fa-check"></i> Restitution Wallet Safe Return Verification</li>
+            </ul>
+          </div>
+          <button type="button" id="modalGoToRecoveryBtn" class="btn-dossier-continue">
+            <i class="fas fa-arrow-right"></i> Continue with Recovery Submission
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 7. Official Forensic Evidence PDF Unlock Modal ($10/Tx) -->
+<div id="forensicPaymentModal" class="pay-modal-backdrop" style="display: none;">
+  <div class="pay-modal-card">
+    <div class="pay-modal-header">
+      <h3><i class="fas fa-file-shield" style="color: var(--accent-cyan);"></i> Unlock Official Forensic PDF Dossier</h3>
+      <button type="button" class="pay-modal-close" id="closePaymentModalBtn"><i class="fas fa-xmark"></i></button>
+    </div>
+
+    <div class="pay-modal-body">
+      <!-- STEP 1: PAYMENT METHOD & DEPOSIT ADDRESS -->
+      <div id="paymentModalStep1">
+        <div class="pay-summary-box">
+          <div>
+            <div style="font-size: 0.72rem; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em;">Forensic Audit Fee ($10 / Transaction)</div>
+            <div style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-top: 0.2rem;">
+              Documented Movements: <strong id="modalTxCountDisplay">1 Transaction</strong>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.72rem; text-transform: uppercase; color: #94a3b8;">Total Unlock Fee:</div>
+            <div class="pay-summary-total" id="modalTotalFeeDisplay">$10.00 USD</div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.8rem; line-height: 1.45;">
+          Select your preferred cryptocurrency deposit network to unlock the unredacted evidence, statutory subpoena packet, and printable official PDF:
+        </div>
+
+        <div class="crypto-tabs-row" id="cryptoTabsRow">
+          <button type="button" class="crypto-tab-chip active" data-crypto="usdt_trc20">
+            <i class="fas fa-circle-dollar-to-slot" style="color: #26A17B;"></i> USDT (TRC-20)
+          </button>
+          <button type="button" class="crypto-tab-chip" data-crypto="usdt_erc20">
+            <i class="fab fa-ethereum" style="color: #627EEA;"></i> USDT (ERC-20)
+          </button>
+          <button type="button" class="crypto-tab-chip" data-crypto="btc">
+            <i class="fab fa-bitcoin" style="color: #F7931A;"></i> BTC
+          </button>
+          <button type="button" class="crypto-tab-chip" data-crypto="sol">
+            <i class="fas fa-bolt" style="color: #14F195;"></i> SOL
+          </button>
+        </div>
+
+        <div class="crypto-pay-display">
+          <div style="font-size: 0.74rem; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em;" id="cryptoLabel">Send exact amount via TRON network:</div>
+          <div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0.3rem 0;" id="cryptoAmountDue">10.00 USDT</div>
+          
+          <div class="crypto-addr-mono" id="cryptoDepositAddress">TYk6t1rX9mQ4vW8tY2mB5vC8xL3kM7jP9q</div>
+
+          <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.5rem;">
+            <button type="button" class="btn-secondary" id="copyCryptoAddrBtn" style="padding: 0.45rem 1rem; font-size: 0.78rem;">
+              <i class="fas fa-copy"></i> Copy Address
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+          <button type="button" id="goToProofStepBtn" class="btn-confirm-simulated-pay">
+            <i class="fas fa-receipt"></i> I Have Paid — Submit Payment Receipt &amp; TxID
+          </button>
+          <div style="text-align: center; font-size: 0.72rem; color: #94a3b8;">
+            <i class="fas fa-shield-halved"></i> Sent from your private wallet or exchange. Proof verification audited by Compliance Desk.
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: PROOF & RECEIPT SUBMISSION -->
+      <div id="paymentModalStep2" style="display: none;">
+        <div style="font-weight: 800; font-size: 1rem; color: #fff; margin-bottom: 0.25rem;">
+          <i class="fas fa-file-circle-check" style="color: var(--accent-cyan);"></i> Submit Payment Proof for Admin Verification
+        </div>
+        <p style="font-size: 0.78rem; color: #cbd5e1; margin-bottom: 1rem; line-height: 1.45;">
+          Please provide the transaction hash of your fee transfer and upload a receipt or screenshot. A Senior Forensic Officer will verify the on-chain deposit before releasing the full unredacted dossier.
+        </p>
+
+        <div style="margin-bottom: 0.75rem;">
+          <label for="proofTxHashInput" style="display: block; font-size: 0.74rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 0.25rem;">
+            Payment Transaction Hash (TxID) <span style="color: #ef4444;">*</span>
+          </label>
+          <input type="text" id="proofTxHashInput" placeholder="Paste the 64-char transaction hash of your payment" class="smart-tx-input" style="font-size: 0.82rem; padding: 0.65rem 0.85rem;" required>
+        </div>
+
+        <div style="margin-bottom: 0.75rem;">
+          <label for="proofSenderWalletInput" style="display: block; font-size: 0.74rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 0.25rem;">
+            Your Sender Wallet Address <span style="color: #ef4444;">*</span>
+          </label>
+          <input type="text" id="proofSenderWalletInput" placeholder="The address you sent the transfer from (0x... or T... or bc1...)" class="smart-tx-input" style="font-size: 0.82rem; padding: 0.65rem 0.85rem;" required>
+        </div>
+
+        <div style="margin-bottom: 1.1rem;">
+          <label style="display: block; font-size: 0.74rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 0.25rem;">
+            Upload Transfer Receipt / Screenshot <span style="color: #ef4444;">*</span>
+          </label>
+          <div class="proof-upload-box" id="proofReceiptDropzone">
+            <i class="fas fa-cloud-arrow-up" style="font-size: 1.8rem; color: var(--accent-cyan); margin-bottom: 0.35rem;"></i>
+            <div style="font-size: 0.82rem; font-weight: 700; color: #fff;">Click to Upload or Drag &amp; Drop Transfer Receipt</div>
+            <div style="font-size: 0.72rem; color: #94a3b8;">PNG, JPG, WEBP, or PDF (Screenshot of exchange withdrawal or wallet sent screen)</div>
+            <input type="file" id="proofReceiptFileInput" accept="image/*,application/pdf" style="display: none;">
+            <img id="proofReceiptPreviewImg" class="receipt-preview-thumb" alt="Receipt Preview" style="display: none;">
+            <div id="proofReceiptFileName" style="font-size: 0.76rem; color: var(--accent-green); font-weight: 600; margin-top: 0.4rem; display: none;"></div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.6rem;">
+          <button type="button" id="submitPaymentProofBtn" class="btn-confirm-simulated-pay" style="flex: 2;">
+            <i class="fas fa-paper-plane"></i> Submit Proof for Admin Audit
+          </button>
+          <button type="button" id="backToPaymentStep1Btn" class="btn-secondary" style="flex: 1; font-size: 0.82rem;">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer with Discreet Compliance / Admin Gateway -->
+<footer>
+  <div style="max-width: 1360px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <img src="assets/icons/favicon-32x32.png" alt="Nexus Shield" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem; display: inline-block;">
+      <span data-i18n="footer_text">NEXUS SHIELD — Crypto Asset Recovery &amp; Blockchain Forensics | Emergency Exchange Freezes &amp; Restitution</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 1.5rem; font-size: 0.8rem; flex-wrap: wrap;">
+      <a href="mailto:support@nexusshield.org" style="color: var(--accent-cyan); font-weight: 600;"><i class="fas fa-envelope"></i> support@nexusshield.org</a>
+      <a href="index.html">Report Loss</a>
+      <a href="about.html">How We Work</a>
+      <a href="partners.html">Partners &amp; Alliances</a>
+      <a href="chainexplorer.html">ChainExplorer</a>
+      <a href="https://ic3.gov" target="_blank" rel="noopener noreferrer">IC3 Referral</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="translations.js"></script>
-<script src="script.js"></script>
+<script src="js/translations.js"></script>
+<script src="js/script.js"></script>
+<script src="js/blockchain-bg.js" defer></script>
+
+<!-- Global Staff Shortcut: Ctrl+Shift+A opens Discreet Staff Portal -->
+<script>
+  window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+      e.preventDefault();
+      window.location.href = 'desk-internal-sec.html';
+    }
+  });
+</script>
 </body>
 </html>

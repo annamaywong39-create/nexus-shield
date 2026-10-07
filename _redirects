@@ -1,0 +1,3 @@
+# Cloudflare Pages Clean Aliases
+/staff      /admin     302
+/portal     /admin     302

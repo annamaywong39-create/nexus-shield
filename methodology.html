@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>html,body{background-color:#040812;color:#f8fafc;margin:0;}</style>
+  <title>A Structured, Defensible Methodology — Nexus Shield Forensics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48x48.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+</head>
+<body>
+<canvas id="crypto3dCanvas" aria-hidden="true"></canvas>
+<div id="cosmicVeil" class="cosmic-gaussian-veil" aria-hidden="true"></div>
+
+<!-- Header Navigation -->
+<header class="header">
+  <div class="navbar">
+    <a href="index.html" class="logo-area">
+      <img src="assets/images/logo-header-dark.png" alt="Nexus Shield Emblem" class="brand-logo-img" width="40" height="40">
+      <div class="logo-text-col">
+        <div class="logo-title">
+          <span>NEXUS SHIELD</span>
+        </div>
+        <div class="logo-sub">CRYPTO ASSET RECOVERY &amp; FORENSICS</div>
+      </div>
+    </a>
+
+    <!-- Clean Public Navbar with Expanded Tabs -->
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link"><i class="fas fa-shield-halved"></i> Report Loss</a>
+      <a href="methodology.html" class="nav-link active"><i class="fas fa-network-wired"></i> Methodology</a>
+      <a href="cases.html" class="nav-link"><i class="fas fa-folder-open"></i> Case Studies</a>
+      <a href="intelligence.html" class="nav-link"><i class="fas fa-passport"></i> Sanctions &amp; Risk</a>
+      <a href="about.html" class="nav-link"><i class="fas fa-route"></i> How We Work</a>
+      <a href="partners.html" class="nav-link"><i class="fas fa-handshake"></i> Partners</a>
+      <a href="mailto:support@nexusshield.org" class="nav-link"><i class="fas fa-envelope"></i> Support</a>
+      <a href="index.html#statusReportId" class="nav-link mobile-only-track"><i class="fas fa-magnifying-glass"></i> Track Case Status</a>
+      <button type="button" class="nav-link mobile-only-spin" id="mobileSpinTrigger"><i class="fas fa-rotate"></i> 360° Orbit</button>
+    </nav>
+
+    <div class="header-actions">
+      <!-- Integrated Language Selector -->
+      <select id="languageSwitcher" class="lang-selector-select" title="Change Language">
+        <option value="en" selected>🇺🇸 English (US)</option>
+        <option value="es">🇪🇸 Español</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="pt">🇧🇷 Português</option>
+        <option value="ru">🇷🇺 Русский</option>
+        <option value="zh">🇨🇳 简体中文</option>
+        <option value="ja">🇯🇵 日本語</option>
+        <option value="ar">🇸🇦 العربية</option>
+      </select>
+
+      <a href="index.html#statusReportId" class="nav-track-btn">
+        <i class="fas fa-magnifying-glass"></i> Track Case
+      </a>
+      <button type="button" id="mobileNavToggle" class="mobile-nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="max-width: 1160px; padding-top: 1.5rem;">
+
+  <!-- ========================================================
+       HOW OUR DIGITAL ASSET INVESTIGATIONS WORK
+       A STRUCTURED, DEFENSIBLE METHODOLOGY (IMAGE-1 ALIGNED)
+       ======================================================== -->
+  <section class="methodology-hero-container">
+    <div class="methodology-kicker">HOW OUR DIGITAL ASSET INVESTIGATIONS WORK</div>
+    <h1 class="methodology-heading">A Structured, Defensible Methodology</h1>
+    <p class="methodology-subheading">
+      Our investigations follow a structured forensic process designed to trace digital assets and support recovery efforts across jurisdictions.
+    </p>
+
+    <!-- Horizontal / Responsive Timeline Track -->
+    <div class="methodology-track">
+      <div class="methodology-axis-line"></div>
+
+      <!-- Step 1: Case Assessment -->
+      <div class="method-node node-top-icon">
+        <div class="node-content-top">
+          <div class="node-icon-circle"><i class="fas fa-expand"></i></div>
+          <div class="node-stem-line"></div>
+        </div>
+        <div class="node-number-badge">1</div>
+        <div class="node-content-bottom">
+          <div class="node-stem-line"></div>
+          <div class="node-text-block">
+            <div class="node-text-title">Case Assessment</div>
+            <div class="node-text-desc">Review wallet activity and scam structure.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Blockchain Tracing -->
+      <div class="method-node node-bottom-icon">
+        <div class="node-content-top">
+          <div class="node-text-block">
+            <div class="node-text-title">Blockchain Tracing</div>
+            <div class="node-text-desc">Advanced cross-chain forensic analysis.</div>
+          </div>
+          <div class="node-stem-line"></div>
+        </div>
+        <div class="node-number-badge">2</div>
+        <div class="node-content-bottom">
+          <div class="node-stem-line"></div>
+          <div class="node-icon-circle"><i class="fas fa-file-waveform"></i></div>
+        </div>
+      </div>
+
+      <!-- Step 3: Legal Coordination -->
+      <div class="method-node node-top-icon">
+        <div class="node-content-top">
+          <div class="node-icon-circle"><i class="fas fa-landmark"></i></div>
+          <div class="node-stem-line"></div>
+        </div>
+        <div class="node-number-badge">3</div>
+        <div class="node-content-bottom">
+          <div class="node-stem-line"></div>
+          <div class="node-text-block">
+            <div class="node-text-title">Legal Coordination</div>
+            <div class="node-text-desc">Work with exchanges and law enforcement.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Asset Freezing -->
+      <div class="method-node node-bottom-icon">
+        <div class="node-content-top">
+          <div class="node-text-block">
+            <div class="node-text-title">Asset Freezing</div>
+            <div class="node-text-desc">Prevent further movement of stolen funds.</div>
+          </div>
+          <div class="node-stem-line"></div>
+        </div>
+        <div class="node-number-badge">4</div>
+        <div class="node-content-bottom">
+          <div class="node-stem-line"></div>
+          <div class="node-icon-circle"><i class="fas fa-ban"></i></div>
+        </div>
+      </div>
+
+      <!-- Step 5: Recovery Support (Active Prominent Card with Orbit) -->
+      <div class="node-prominent">
+        <div class="prominent-orbit-ring">
+          <div class="prominent-orbit-dot-1"></div>
+          <div class="prominent-orbit-dot-2"></div>
+        </div>
+        <div class="prominent-white-circle">
+          <i class="far fa-message prominent-icon"></i>
+          <div class="prominent-title">Recovery Support</div>
+          <div class="prominent-desc">Advanced cross-chain forensic analysis.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Deep Dive on the 5 Stages -->
+  <section class="portal-card" style="padding: 2.5rem; margin-bottom: 2.5rem;">
+    <h2 style="font-size: 1.5rem; color: #fff; margin-bottom: 0.5rem;">The Five Pillars of Defensible Evidence</h2>
+    <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem;">
+      In courtrooms, regulatory hearings, and law enforcement bureaus, evidence must satisfy the <strong>Daubert Standard</strong> of scientific reliability. NexusShield's investigative methodology produces verifiable digital chain-of-custody documentation that prosecutors and exchanges accept.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 1.5rem;">
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 1.5rem;">
+        <div style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--accent-green); font-weight: 700; margin-bottom: 0.4rem;">STAGE 01 &bull; ASSESSMENT</div>
+        <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.5rem;">Initial Case Assessment &amp; Ingress</h3>
+        <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55;">
+          We evaluate the incident structure: fake brokers, wallet drainer smart contracts, WhatsApp/Telegram impersonation, or unauthorized access. We establish the initial time of loss and extract raw transaction hashes directly from blockchain mempools.
+        </p>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 1.5rem;">
+        <div style="font-size: 0.78rem; font-family: var(--font-mono); color: #93c5fd; font-weight: 700; margin-bottom: 0.4rem;">STAGE 02 &bull; TRACING</div>
+        <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.5rem;">Multi-Hop Blockchain Mapping</h3>
+        <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55;">
+          Scammers split funds through "peel chains" and cross-chain liquidity bridges (Arbitrum, Polygon, Avalanche). Our forensic clustering algorithms map the fragmented path, isolating the consolidated addresses where the scammer holds the stolen assets.
+        </p>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 1.5rem;">
+        <div style="font-size: 0.78rem; font-family: var(--font-mono); color: #c084fc; font-weight: 700; margin-bottom: 0.4rem;">STAGE 03 &bull; COORDINATION</div>
+        <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.5rem;">VASP &amp; Law Enforcement Liaison</h3>
+        <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55;">
+          A blockchain wallet address has no value without a real-world legal hook. We pinpoint the exact destination Centralized Exchange (Binance, OKX, Bybit, Coinbase) and prepare formal freeze requests under KYC and Anti-Money Laundering (AML) treaties.
+        </p>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 1.5rem;">
+        <div style="font-size: 0.78rem; font-family: var(--font-mono); color: #fde68a; font-weight: 700; margin-bottom: 0.4rem;">STAGE 04 &bull; INTERCEPTION</div>
+        <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.5rem;">Emergency Exchange Freezes</h3>
+        <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55;">
+          We file administrative hold packets with exchange financial crime desks. The scammer's destination account is frozen before they can liquidate funds into fiat currency or transfer off-platform.
+        </p>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(0, 245, 155, 0.3); border-radius: var(--radius-md); padding: 1.5rem;">
+        <div style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--accent-green); font-weight: 700; margin-bottom: 0.4rem;">STAGE 05 &bull; RESTITUTION</div>
+        <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.5rem;">Restitution Support &amp; Recovery</h3>
+        <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55;">
+          We assist your legal counsel or law enforcement agency with court orders, subpoenas, and Mutual Legal Assistance Treaties (MLAT) to release the frozen funds back into your verified, clean restitution wallet.
+        </p>
+      </div>
+
+      <div style="background: rgba(45, 159, 255, 0.08); border: 1px solid rgba(45, 159, 255, 0.25); border-radius: var(--radius-md); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center;">
+        <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.5rem;">Ready to Begin an Investigation?</h3>
+        <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 1.2rem;">
+          Our emergency triage desk reviews submitted cases 24/7 with zero upfront consultation fee.
+        </p>
+        <a href="index.html" class="btn-primary" style="text-align: center; text-decoration: none;">
+          <i class="fas fa-file-pen"></i> Submit Case Intake &rarr;
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-bottom" style="text-align: center; font-size: 0.8rem; color: var(--text-muted); padding: 2rem 1rem;">
+    &copy; 2026 Nexus Shield Forensics. All rights reserved. &bull; <a href="mailto:support@nexusshield.org" style="color: var(--accent-cyan); text-decoration: none;">support@nexusshield.org</a> &bull; <a href="index.html" style="color: #94a3b8; text-decoration: none;">Report Case</a>
+  </div>
+</footer>
+
+<script src="js/translations.js"></script>
+<script src="js/script.js"></script>
+<script src="js/blockchain-bg.js" defer></script>
+
+<!-- Global Staff Shortcut: Ctrl+Shift+A opens Discreet Staff Portal -->
+<script>
+  window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+      e.preventDefault();
+      window.location.href = 'desk-internal-sec.html';
+    }
+  });
+</script>
+</body>
+</html>
