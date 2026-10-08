@@ -263,7 +263,7 @@ async function handleSendConfirmation(request, env) {
 
           <!-- Gentle Anti-Scam Security Advisory -->
           <div style="border-top: 1px solid #1e293b; padding-top: 18px; font-size: 12px; color: #64748b; line-height: 1.6;">
-            <strong style="color: #94a3b8;">A caring reminder for your protection:</strong> Nexus Shield investigators will <strong style="color: #cbd5e1;">NEVER</strong> contact you on Telegram, WhatsApp, or Instagram asking for your 12-word seed phrase, private keys, or demanding "advance release taxes." Authentic communication takes place solely through <code>support@nexusshield.org</code> and our official domain <code>nexusshield.org</code>.
+            <strong style="color: #94a3b8;">A caring reminder for your protection:</strong> Nexus Shield investigators will <strong style="color: #cbd5e1;">NEVER</strong> contact you on Telegram, WhatsApp, or Instagram asking for your 12-word seed phrase, private keys, or demanding "advance release taxes." Authentic communication takes place solely through <code>support@nexusshield.org</code>, our official X account <a href="https://x.com/NEXUSSHIELDhq" style="color: #38bdf8; text-decoration: underline;" target="_blank">@NEXUSSHIELDhq</a>, and our official domain <code>nexusshield.org</code>.
           </div>
 
         </td>
@@ -273,7 +273,7 @@ async function handleSendConfirmation(request, env) {
       <tr>
         <td style="padding: 20px 32px; background-color: #060a16; border-top: 1px solid #1e293b; font-size: 11.5px; color: #475569; text-align: center; line-height: 1.6;">
           &copy; ${new Date().getFullYear()} Nexus Shield Forensics Taskforce. All rights reserved.<br>
-          Official Portal: <a href="https://nexusshield.org" style="color: #64748b; text-decoration: none;">nexusshield.org</a> &bull; Support Desk: <a href="mailto:support@nexusshield.org" style="color: #64748b; text-decoration: none;">support@nexusshield.org</a><br>
+          Official Portal: <a href="https://nexusshield.org" style="color: #64748b; text-decoration: none;">nexusshield.org</a> &bull; Support Desk: <a href="mailto:support@nexusshield.org" style="color: #64748b; text-decoration: none;">support@nexusshield.org</a> &bull; Official X: <a href="https://x.com/NEXUSSHIELDhq" style="color: #64748b; text-decoration: none;" target="_blank">@NEXUSSHIELDhq</a><br>
           <span style="font-size: 10.5px; color: #334155;">Non-Custodial Asset Recovery &bull; Chain Intelligence &bull; Global Sanctions Compliance</span>
         </td>
       </tr>
