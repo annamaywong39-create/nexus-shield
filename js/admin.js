@@ -274,6 +274,7 @@ function checkAuthStatus() {
     initTreasuryWalletConfig();
     initSecurityRegistryConfig();
     initTableScrollEnhancements();
+    initAdminWorkspaceViews();
   } else {
     if (loginSection) loginSection.style.display = 'block';
     if (dashboardSection) dashboardSection.style.display = 'none';
@@ -597,6 +598,20 @@ function updateKpis(reports) {
   if (tabRecovered) tabRecovered.innerText = recoveredCount;
   if (tabHighValue) tabHighValue.innerText = highValueCount;
   if (tabOverdue) tabOverdue.innerText = overdueCount;
+
+  // Update Metrics Workspace Cards
+  const mStage1 = document.getElementById('metricsStage1Count');
+  const mStage3 = document.getElementById('metricsStage3Count');
+  const mStage4 = document.getElementById('metricsStage4Count');
+  const mStage5 = document.getElementById('metricsStage5Count');
+
+  if (mStage1) mStage1.innerText = `${pendingCount + tracingCount} Cases`;
+  const stage3Only = reports.filter(r => r.status === 'investigating').length;
+  if (mStage3) mStage3.innerText = `${stage3Only} Cases`;
+  if (mStage4) mStage4.innerText = `${cexCount} Cases`;
+  if (mStage5) mStage5.innerText = `${recoveredCount} Cases`;
+
+  if (typeof updateWorkspaceViewBadges === 'function') updateWorkspaceViewBadges();
 }
 
 function applyFilters() {
@@ -1942,6 +1957,8 @@ function renderPaymentVerificationsTable() {
       </tr>
     `;
   }).join("");
+
+  if (typeof updateWorkspaceViewBadges === 'function') updateWorkspaceViewBadges();
 }
 
 window.approvePaymentVerification = function(paymentId) {
@@ -2213,3 +2230,184 @@ function initTableScrollEnhancements() {
 }
 
 
+
+
+// ==================== WORKSPACE SECTION ROUTER & VIEW SWITCHER ====================
+function initAdminWorkspaceViews() {
+  const viewBtns = document.querySelectorAll('.admin-view-btn');
+  const sections = {
+    cases: document.getElementById('casesTerminalSection'),
+    payments: document.getElementById('paymentsSection'),
+    security: document.getElementById('securityChannelsSection'),
+    wallets: document.getElementById('treasuryWalletsSection'),
+    metrics: document.getElementById('metricsWorkspaceWrapper')
+  };
+
+  const navLinks = {
+    cases: document.getElementById('navLinkCases'),
+    payments: document.getElementById('navLinkPayments'),
+    security: document.getElementById('navLinkSecurity'),
+    wallets: document.getElementById('navLinkTreasury'),
+    metrics: document.getElementById('navLinkKpis')
+  };
+
+  window.switchAdminView = function(viewName, updateHash = true) {
+    const validViews = ['cases', 'payments', 'security', 'wallets', 'metrics', 'all'];
+    if (!validViews.includes(viewName)) viewName = 'cases';
+
+    // Store active view in session
+    sessionStorage.setItem('nexus_admin_active_view', viewName);
+
+    // Update active tab buttons
+    viewBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.view === viewName);
+    });
+
+    // Update top header navigation active state
+    Object.keys(navLinks).forEach(k => {
+      const link = navLinks[k];
+      if (link) {
+        if (k === viewName) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      }
+    });
+
+    // Update URL hash without abrupt scroll jump
+    if (updateHash) {
+      if (history.replaceState) {
+        history.replaceState(null, null, '#' + viewName);
+      } else {
+        window.location.hash = '#' + viewName;
+      }
+    }
+
+    // Toggle section visibility
+    if (viewName === 'all') {
+      if (sections.cases) sections.cases.style.display = 'block';
+      if (sections.payments) sections.payments.style.display = 'block';
+      if (sections.security) sections.security.style.display = 'block';
+      if (sections.wallets) sections.wallets.style.display = 'block';
+      if (sections.metrics) sections.metrics.style.display = 'block';
+    } else {
+      // Hide all first
+      if (sections.cases) sections.cases.style.display = 'none';
+      if (sections.payments) sections.payments.style.display = 'none';
+      if (sections.security) sections.security.style.display = 'none';
+      if (sections.wallets) sections.wallets.style.display = 'none';
+      if (sections.metrics) sections.metrics.style.display = 'none';
+
+      // Show selected only
+      if (viewName === 'cases' && sections.cases) {
+        sections.cases.style.display = 'block';
+      } else if (viewName === 'payments' && sections.payments) {
+        sections.payments.style.display = 'block';
+      } else if (viewName === 'security' && sections.security) {
+        sections.security.style.display = 'block';
+      } else if (viewName === 'wallets' && sections.wallets) {
+        sections.wallets.style.display = 'block';
+      } else if (viewName === 'metrics' && sections.metrics) {
+        sections.metrics.style.display = 'block';
+      }
+    }
+
+    // Scroll workspace switcher into view smoothly if scrolled too far
+    const switcher = document.getElementById('adminWorkspaceNav');
+    if (switcher) {
+      const rect = switcher.getBoundingClientRect();
+      if (rect.top < 0 || rect.top > 250) {
+        switcher.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
+  // Bind click listeners on view buttons
+  viewBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const view = btn.dataset.view;
+      if (view) window.switchAdminView(view);
+    });
+  });
+
+  // Bind header links to switch views
+  if (navLinks.cases) {
+    navLinks.cases.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.switchAdminView('cases');
+    });
+  }
+  if (navLinks.payments) {
+    navLinks.payments.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.switchAdminView('payments');
+    });
+  }
+  if (navLinks.security) {
+    navLinks.security.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.switchAdminView('security');
+    });
+  }
+  if (navLinks.wallets) {
+    navLinks.wallets.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.switchAdminView('wallets');
+    });
+  }
+  if (navLinks.metrics) {
+    navLinks.metrics.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.switchAdminView('metrics');
+    });
+  }
+
+  // Handle URL hash routing
+  function handleHashRoute() {
+    const rawHash = (window.location.hash || '').replace('#', '').toLowerCase();
+    if (!rawHash) return false;
+    let targetView = rawHash;
+    if (targetView === 'treasury') targetView = 'wallets';
+    else if (targetView === 'kpis' || targetView === 'kpi') targetView = 'metrics';
+
+    if (['cases', 'payments', 'security', 'wallets', 'metrics', 'all'].includes(targetView)) {
+      window.switchAdminView(targetView, false);
+      return true;
+    }
+    return false;
+  }
+
+  window.addEventListener('hashchange', handleHashRoute);
+
+  // Initial view activation: Hash > Session > Default 'cases'
+  const routed = handleHashRoute();
+  if (!routed) {
+    const saved = sessionStorage.getItem('nexus_admin_active_view') || 'cases';
+    window.switchAdminView(saved, false);
+  }
+
+  updateWorkspaceViewBadges();
+}
+
+function updateWorkspaceViewBadges() {
+  const casesBadge = document.getElementById('viewCountCases');
+  if (casesBadge) {
+    casesBadge.innerText = (allReports && allReports.length) ? allReports.length : '0';
+  }
+
+  const paymentsBadge = document.getElementById('viewCountPayments');
+  const navPaymentsBadge = document.getElementById('navPendingPaymentsCount');
+  const paymentsList = typeof getLocalPaymentVerifications === 'function' ? getLocalPaymentVerifications() : [];
+  const pendingCount = paymentsList.filter(p => p.status === 'pending').length;
+
+  if (paymentsBadge) {
+    paymentsBadge.innerText = pendingCount > 0 ? `${pendingCount} Pending` : `${paymentsList.length}`;
+    paymentsBadge.style.background = pendingCount > 0 ? 'rgba(244, 63, 94, 0.25)' : 'rgba(255, 255, 255, 0.1)';
+    paymentsBadge.style.color = pendingCount > 0 ? '#fb7185' : '#cbd5e1';
+  }
+  if (navPaymentsBadge) {
+    navPaymentsBadge.innerText = pendingCount;
+  }
+}
