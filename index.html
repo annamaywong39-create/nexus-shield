@@ -41,6 +41,9 @@
       <a href="intelligence.html" class="nav-link"><i class="fas fa-passport"></i> Sanctions &amp; Risk</a>
       <a href="about.html" class="nav-link" data-i18n="nav_about"><i class="fas fa-route"></i> How We Work</a>
       <a href="partners.html" class="nav-link" data-i18n="nav_partners"><i class="fas fa-handshake"></i> Partners</a>
+      <button type="button" class="nav-link" id="openVerifyAgentModalBtn" style="background: none; border: none; cursor: pointer; color: var(--accent-green); font-weight: 600;">
+        <i class="fas fa-user-shield"></i> <span>Verify Agent</span>
+      </button>
       <a href="mailto:support@nexusshield.org" class="nav-link"><i class="fas fa-envelope"></i> Support</a>
       <a href="https://x.com/NEXUSSHIELDhq" target="_blank" rel="noopener noreferrer" class="nav-link nav-icon-link" aria-label="Nexus Shield on X" title="Nexus Shield on X (@NEXUSSHIELDhq)"><i class="fa-brands fa-x-twitter"></i></a>
       <a href="index.html#statusReportId" class="nav-link mobile-only-track"><i class="fas fa-magnifying-glass"></i> Track Case Status</a>
@@ -1556,6 +1559,16 @@ STATEMENT OF SWORN FACTS:
           <div style="font-size: 0.74rem; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em;" id="cryptoLabel">Send exact amount via TRON network:</div>
           <div style="font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0.3rem 0;" id="cryptoAmountDue">10.00 USDT</div>
           
+          <!-- Dynamic Live Deposit QR Code -->
+          <div class="crypto-qr-wrapper" style="text-align: center; margin: 0.65rem auto 0.75rem;">
+            <div style="display: inline-block; background: #ffffff; padding: 0.45rem; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.5);">
+              <img id="cryptoDepositQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=TYk6t1rX9mQ4vW8tY2mB5vC8xL3kM7jP9q" alt="Payment Deposit QR" style="width: 140px; height: 140px; display: block; border-radius: 4px;" loading="lazy">
+            </div>
+            <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
+              <i class="fas fa-qrcode" style="color: var(--accent-cyan);"></i> Scan with Trust Wallet, Binance, or Phantom
+            </div>
+          </div>
+
           <div class="crypto-addr-mono" id="cryptoDepositAddress">TYk6t1rX9mQ4vW8tY2mB5vC8xL3kM7jP9q</div>
 
           <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.5rem;">
@@ -1625,6 +1638,123 @@ STATEMENT OF SWORN FACTS:
   </div>
 </div>
 
+<!-- Official Agent & Channel Verification Modal -->
+<div id="agentVerificationModal" class="modal-overlay" style="display: none;">
+  <div class="modal-card" style="max-width: 580px;">
+    <div class="modal-header-strip">
+      <div>
+        <div class="modal-classification-badge" style="background: rgba(0, 245, 155, 0.15); color: var(--accent-green); border-color: rgba(0, 245, 155, 0.35);">
+          ANTI-FRAUD REGISTRY
+        </div>
+        <h3 style="margin: 0.2rem 0 0; font-size: 1.15rem; color: #fff;">
+          <i class="fas fa-user-shield" style="color: var(--accent-green);"></i> Official Agent &amp; Channel Verification
+        </h3>
+      </div>
+      <button type="button" class="modal-close-icon" id="closeAgentVerifyBtn"><i class="fas fa-xmark"></i></button>
+    </div>
+
+    <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.45; margin-bottom: 1rem;">
+      Secondary recovery scammers frequently impersonate forensic analysts on Telegram, WhatsApp, and social media. Verify if an email address, Telegram username, phone, or Agent ID is an accredited Nexus Shield representative before communicating.
+    </p>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <input type="text" id="verifyAgentInput" placeholder="Enter email, @TelegramHandle, or Agent ID (e.g. support@nexusshield.org)" class="smart-tx-input" style="flex: 1; min-width: 240px; font-size: 0.84rem; padding: 0.65rem 0.85rem;">
+      <button type="button" id="executeAgentVerifyBtn" class="btn-primary" style="padding: 0.65rem 1.2rem; font-size: 0.84rem; white-space: nowrap;">
+        <i class="fas fa-magnifying-glass"></i> Verify Credential
+      </button>
+    </div>
+
+    <!-- Result container -->
+    <div id="agentVerifyResultBox" style="margin-top: 1.2rem; display: none;"></div>
+
+    <div style="margin-top: 1.2rem; padding: 0.85rem 1rem; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 0.74rem; color: #94a3b8; line-height: 1.45;">
+      <strong style="color: #fff;"><i class="fas fa-triangle-exclamation" style="color: var(--accent-amber);"></i> Official Security Policy:</strong>
+      Nexus Shield staff will <strong>NEVER</strong> contact you via unsolicited Telegram DM, will <strong>NEVER</strong> ask for your private keys/seed phrases, and will <strong>NEVER</strong> ask for fund transfers to personal accounts.
+    </div>
+  </div>
+</div>
+
+<!-- Floating Emergency Liaison & Live AI Triage Intake Launcher -->
+<div class="nexus-triage-launcher" id="triageLauncherBtn" title="Speak with a Forensic Case Intake Officer">
+  <div class="launcher-avatar-wrap">
+    <i class="fas fa-robot"></i>
+    <div class="launcher-status-dot"></div>
+  </div>
+  <div class="launcher-text-col">
+    <div class="launcher-title">
+      <span>Intake Liaison</span>
+      <span style="font-size: 0.64rem; background: rgba(0, 245, 155, 0.2); color: var(--accent-green); padding: 0.1rem 0.35rem; border-radius: 4px;">ONLINE</span>
+    </div>
+    <div class="launcher-sub">Speak with Case Officer &bull; Instant File</div>
+  </div>
+</div>
+
+<!-- Floating Triage Bot & WhatsApp Window -->
+<div class="nexus-triage-window" id="triageChatWindow">
+  <!-- Header -->
+  <div class="triage-header">
+    <div class="triage-officer-info">
+      <div class="triage-officer-avatar">
+        <i class="fas fa-shield-halved"></i>
+      </div>
+      <div>
+        <div class="triage-officer-name">
+          <span>Officer Elena</span>
+          <i class="fas fa-circle-check" style="color: var(--accent-green); font-size: 0.72rem;" title="Accredited Forensic Specialist"></i>
+        </div>
+        <div class="triage-officer-status">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent-green); display: inline-block;"></span>
+          <span>Lead Evidence Intake Desk &bull; 24/7 Active</span>
+        </div>
+      </div>
+    </div>
+    <div class="triage-header-actions">
+      <button type="button" class="triage-hdr-btn" id="minimizeTriageBtn" title="Minimize"><i class="fas fa-minus"></i></button>
+      <button type="button" class="triage-hdr-btn" id="closeTriageBtn" title="Close"><i class="fas fa-xmark"></i></button>
+    </div>
+  </div>
+
+  <!-- Channel Switcher: AI Intake Bot vs WhatsApp -->
+  <div class="triage-channel-tabs">
+    <button type="button" class="triage-channel-tab active" id="tabChannelBot">
+      <i class="fas fa-robot"></i> AI Evidence Intake
+    </button>
+    <button type="button" class="triage-channel-tab" id="tabChannelWhatsApp">
+      <i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp Liaison
+    </button>
+  </div>
+
+  <!-- Chat Body (AI Triage) -->
+  <div class="triage-chat-body" id="triageChatBody">
+    <!-- Messages injected by JS -->
+  </div>
+
+  <!-- Chat Input Bar -->
+  <form id="triageInputForm" class="triage-input-bar">
+    <input type="text" id="triageMessageInput" class="triage-input-field" placeholder="Type your answer or select a quick option..." autocomplete="off">
+    <button type="submit" class="triage-send-btn" id="triageSendBtn" title="Send Answer">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </form>
+
+  <!-- WhatsApp Pane (when tab clicked) -->
+  <div class="triage-whatsapp-pane" id="triageWhatsAppPane">
+    <div class="triage-wa-icon-large">
+      <i class="fab fa-whatsapp"></i>
+    </div>
+    <h4 style="font-size: 1.05rem; color: #fff; margin-bottom: 0.35rem;">Connect with an On-Duty Officer</h4>
+    <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.45; margin-bottom: 1.25rem;">
+      If you need direct human assistance or your case involves an active extortion/compromise occurring in real time, contact our emergency WhatsApp triage line immediately.
+    </p>
+    <a href="https://wa.me/?text=Hello%20Nexus%20Shield%20Taskforce%2C%20I%20urgently%20need%20assistance%20with%20a%20cryptocurrency%20fraud%20incident." target="_blank" rel="noopener noreferrer" class="btn-primary" style="background: #25D366; border: none; font-size: 0.86rem; padding: 0.65rem 1.35rem; color: #080d1a; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+      <i class="fab fa-whatsapp" style="font-size: 1.1rem;"></i> Open Official WhatsApp Line
+    </a>
+    <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 1rem;">
+      <i class="fas fa-shield-halved"></i> Verified Nexus Shield Directorate Communications
+    </div>
+  </div>
+</div>
+
 <!-- Footer with Discreet Compliance / Admin Gateway -->
 <footer>
   <div style="max-width: 1360px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
@@ -1639,6 +1769,7 @@ STATEMENT OF SWORN FACTS:
       <a href="about.html">How We Work</a>
       <a href="partners.html">Partners &amp; Alliances</a>
       <a href="chainexplorer.html">ChainExplorer</a>
+      <a href="javascript:void(0)" id="footerVerifyAgentBtn" style="color: var(--accent-green); font-weight: 600;"><i class="fas fa-user-shield"></i> Verify Agent</a>
       <a href="https://ic3.gov" target="_blank" rel="noopener noreferrer">IC3 Referral</a>
     </div>
   </div>
@@ -1648,6 +1779,7 @@ STATEMENT OF SWORN FACTS:
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/translations.js"></script>
 <script src="js/script.js"></script>
+<script src="js/triage-bot.js"></script>
 <script src="js/blockchain-bg.js" defer></script>
 
 <!-- Global Staff Shortcut: Ctrl+Shift+A opens Discreet Staff Portal -->

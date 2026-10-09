@@ -2707,6 +2707,10 @@ function initPaymentAndPdfUnlockController() {
         const lblEl = document.getElementById('cryptoLabel');
         if (addrEl) addrEl.innerText = activeData.addr;
         if (lblEl) lblEl.innerText = activeData.label;
+        const qrEl = document.getElementById("cryptoDepositQrImg");
+        if (qrEl && activeData.addr) {
+          qrEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(activeData.addr)}`;
+        }
       }
       if (step1) step1.style.display = 'block';
       if (step2) step2.style.display = 'none';
@@ -2787,6 +2791,10 @@ function initPaymentAndPdfUnlockController() {
         const amt = document.getElementById('cryptoAmountDue');
         if (lbl) lbl.innerText = data.label;
         if (addr) addr.innerText = data.addr;
+        const qrEl = document.getElementById("cryptoDepositQrImg");
+        if (qrEl && data.addr) {
+          qrEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(data.addr)}`;
+        }
         if (amt) {
           if (data.symbol === 'BTC') amt.innerText = `${(fee / 68000).toFixed(6)} BTC`;
           else if (data.symbol === 'SOL') amt.innerText = `${(fee / 155).toFixed(4)} SOL`;
@@ -3187,3 +3195,70 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.warn(e);
   }
 });
+
+// ======================== GLOBAL EMERGENCY CHANNEL SYNCHRONIZATION ========================
+(function() {
+  function syncGlobalSecurityChannels() {
+    try {
+      const saved = localStorage.getItem('nexus_security_registry');
+      if (!saved) return;
+      const reg = JSON.parse(saved);
+      if (!reg) return;
+
+      if (reg.whatsapp_number) {
+        const cleanDigits = reg.whatsapp_number.replace(/\D/g, '');
+        document.querySelectorAll('a[href*="wa.me"]').forEach(link => {
+          try {
+            const url = new URL(link.href);
+            const currentText = url.searchParams.get('text') || 'Hello%20Nexus%20Shield%20Taskforce%2C%20I%20urgently%20need%20assistance%20with%20a%20cryptocurrency%20fraud%20incident.';
+            link.href = `https://wa.me/${cleanDigits}?text=${encodeURIComponent(currentText)}`;
+          } catch (e) {
+            link.href = `https://wa.me/${cleanDigits}`;
+          }
+        });
+      }
+
+      if (reg.x_handle) {
+        const handle = reg.x_handle.replace(/^@/, '');
+        document.querySelectorAll('a[href*="x.com/"], a[href*="twitter.com/"]').forEach(link => {
+          if (!link.href.includes('/intent/tweet') && !link.href.includes('/share')) {
+            link.href = `https://x.com/${handle}`;
+            if (link.getAttribute('title')) link.setAttribute('title', `Nexus Shield on X (@${handle})`);
+            if (link.getAttribute('aria-label')) link.setAttribute('aria-label', `Nexus Shield on X (@${handle})`);
+          }
+        });
+      }
+
+      if (reg.telegram_handle) {
+        const cleanTg = reg.telegram_handle.replace(/^@/, '');
+        document.querySelectorAll('a[href*="t.me/"]').forEach(link => {
+          link.href = `https://t.me/${cleanTg}`;
+        });
+      }
+
+      if (reg.support_email) {
+        document.querySelectorAll('a[href^="mailto:support@nexusshield.org"]').forEach(link => {
+          link.href = `mailto:${reg.support_email}`;
+        });
+      }
+
+      if (reg.compliance_email) {
+        document.querySelectorAll('a[href^="mailto:compliance@nexusshield.org"]').forEach(link => {
+          link.href = `mailto:${reg.compliance_email}`;
+        });
+      }
+    } catch (e) {}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', syncGlobalSecurityChannels);
+  } else {
+    syncGlobalSecurityChannels();
+  }
+
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'nexus_security_registry') {
+      syncGlobalSecurityChannels();
+    }
+  });
+})();

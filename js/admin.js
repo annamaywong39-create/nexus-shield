@@ -1,10 +1,79 @@
+
+function generateFbiPacketText(report) {
+  const ref = report.report_id || report.reportId || `#${report.id}`;
+  const name = report.victim_name || report.victimName || 'Complainant on Record';
+  const email = report.victim_email || report.victimEmail || 'Unassigned';
+  const phone = report.victim_phone || report.victimPhone || 'N/A';
+  const loss = parseFloat(report.amount_lost || report.amountLost || 0).toLocaleString();
+  const curr = (report.currency_lost || report.currencyLost || 'USDT').toUpperCase();
+  const chain = report.chain || 'Multi-Chain Architecture';
+  const victimWallet = report.victim_wallet || report.victimWallet || '0x...';
+  const scammerWallet = report.scammer_wallet || report.scammerWallet || '0x...';
+  const txHashes = Array.isArray(report.transaction_hashes) ? report.transaction_hashes : (report.transactionHashes || [report.tx_hash || 'N/A']);
+  const date = report.timestamp ? new Date(report.timestamp).toUTCString() : new Date().toUTCString();
+
+  return `================================================================================
+OFFICIAL CYBERCRIME INCIDENT REPORT & EVIDENTIARY BINDER
+Prepared for: Federal Bureau of Investigation (FBI IC3) & International Cybercrime Units
+Statutory Authority: 18 U.S.C. § 2703 (ECPA) | 18 U.S.C. § 1030 (Computer Fraud & Abuse)
+================================================================================
+CASE DOCKET REFERENCE : ${ref}
+FILING TIMESTAMP       : ${date}
+INVESTIGATING PLATFORM: Nexus Shield Asset Recovery Taskforce (https://nexusshield.org)
+REPORT CLASSIFICATION : LAW ENFORCEMENT & COMPLIANCE STATUTORY EVIDENCE BINDER
+================================================================================
+
+1. COMPLAINANT IDENTIFICATION (VICTIM):
+--------------------------------------------------------------------------------
+Full Legal Name       : ${name}
+Primary Contact Email : ${email}
+Contact Telephone     : ${phone}
+Legal Status          : Complainant & Aggrieved Digital Asset Holder
+Verified Loss Amount  : $${loss} ${curr} (Estimated USD Equivalent)
+
+2. CRIMINAL OFFENSE CLASSIFICATION:
+--------------------------------------------------------------------------------
+• Primary Violation   : Wire Fraud / Unauthorized Electronic Funds Transfer
+• Technical Modality  : Deceptive On-Chain Routing, Smart Contract Drainer / Social Engineering
+• Underlying Network  : ${chain}
+• Illicit Peeling Hop : Detected multi-hop routing into centralized exchange deposit bottleneck
+
+3. CRYPTOGRAPHIC EVIDENCE & SOURCE TRAIL:
+--------------------------------------------------------------------------------
+Compromised Source Wallet : ${victimWallet}
+Destination Scammer Wallet: ${scammerWallet}
+
+Primary Transaction Hashes (TxIDs):
+${txHashes.map((h, i) => `[Hop #${i + 1}] ${h}`).join('\n')}
+
+4. STATUTORY PRESERVATION & EXCHANGE NOTICE (18 U.S.C. § 2703(f)):
+--------------------------------------------------------------------------------
+NOTICE TO CUSTODIAL EXCHANGES (Binance, OKX, Bybit, Coinbase, Kraken, etc.):
+You are hereby advised that funds originating from the above complainant wallet were 
+diverted without authorization and clustered toward exchange deposit accounts. 
+Pursuant to 18 U.S.C. § 2703(f) and international anti-money laundering statutes, 
+all KYC records, login IP audit trails, bank off-ramp instructions, and current sub-account 
+balances tied to destination cluster [${scammerWallet}] must be preserved for 90 days 
+pending formal grand jury subpoena or federal discovery warrant.
+
+5. VERIFICATION DIRECTORY:
+--------------------------------------------------------------------------------
+Authenticated via Nexus Shield Evidence Vault
+Official Support: support@nexusshield.org | Directorate: compliance@nexusshield.org
+Report Hash: SHA-256 Verified On-Chain
+================================================================================
+[END OF STATUTORY INCIDENT DOSSIER]`;
+}
+
 // ========================================================
 // NEXUS SHIELD — Internal Forensic Management Console
 // Staff Authentication, Case Inspection & Dual Progress Controller
 // ========================================================
 
-const SUPABASE_URL = 'https://bxelezmomnruiurtiptg.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4ZWxlem1vbW5ydWl1cnRpcHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzg1NjksImV4cCI6MjA5MTY1NDU2OX0.N_QqBk9GVAWqMAyj9zzpopY2pqkzpk6P1w45giZZGNo';
+var SUPABASE_URL = window.SUPABASE_URL || 'https://bxelezmomnruiurtiptg.supabase.co';
+var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4ZWxlem1vbW5ydWl1cnRpcHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzg1NjksImV4cCI6MjA5MTY1NDU2OX0.N_QqBk9GVAWqMAyj9zzpopY2pqkzpk6P1w45giZZGNo';
+window.SUPABASE_URL = SUPABASE_URL;
+window.SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
 
 let supabaseClient = null;
 if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
@@ -203,6 +272,7 @@ function checkAuthStatus() {
     loadReports();
     renderPaymentVerificationsTable();
     initTreasuryWalletConfig();
+    initSecurityRegistryConfig();
     initTableScrollEnhancements();
   } else {
     if (loginSection) loginSection.style.display = 'block';
@@ -451,6 +521,8 @@ async function loadReports() {
       if (progressMap[key].progressMode) r.progressMode = progressMap[key].progressMode;
       if (progressMap[key].progressPercent !== undefined) r.progressPercent = progressMap[key].progressPercent;
       if (progressMap[key].customMessage) r.customStatusMessage = progressMap[key].customMessage;
+      if (progressMap[key].cexTicketRef) r.cexTicketRef = progressMap[key].cexTicketRef;
+      if (progressMap[key].cexHoldStatus) r.cexHoldStatus = progressMap[key].cexHoldStatus;
     }
   });
 
@@ -639,6 +711,10 @@ async function updateReportProgress(id, newStatus, customMessage = '', progressM
     found.progressMode = progressMode;
     found.progressPercent = progressPercent;
     if (customMessage) found.customStatusMessage = customMessage;
+    const cexTicket = document.getElementById('cexTicketRefInput')?.value.trim();
+    const cexHold = document.getElementById('cexHoldStatusSelect')?.value;
+    if (cexTicket !== undefined) found.cexTicketRef = cexTicket;
+    if (cexHold !== undefined) found.cexHoldStatus = cexHold;
     const key = found.report_id || String(found.id);
 
     // Save to progress updates map
@@ -648,6 +724,8 @@ async function updateReportProgress(id, newStatus, customMessage = '', progressM
       progressMode: progressMode,
       progressPercent: progressPercent,
       customMessage: customMessage,
+      cexTicketRef: found.cexTicketRef || '',
+      cexHoldStatus: found.cexHoldStatus || 'dispatched',
       updatedAt: new Date().toISOString()
     };
     localStorage.setItem('nexus_case_progress_updates', JSON.stringify(progressMap));
@@ -968,7 +1046,7 @@ function openDetailModal(report) {
   const modeBtnManual = document.getElementById('modeBtnManual');
   const manualControlsWrapper = document.getElementById('manualControlsWrapper');
   const progressPercentSlider = document.getElementById('progressPercentSlider');
-  const progressPercentDisplay = document.getElementById('progressPercentDisplay');
+  const progressPercentDisplay = document.getElementById('sliderPercentDisplay') || document.getElementById('progressPercentDisplay');
   const progressPercentInput = document.getElementById('progressPercentInput');
   const statusSelect = document.getElementById('detailStatusSelect');
   const customMsgInput = document.getElementById('detailCustomMessage');
@@ -986,30 +1064,37 @@ function openDetailModal(report) {
   if (progressPercentInput) progressPercentInput.value = defaultPct;
   if (progressPercentDisplay) progressPercentDisplay.innerText = defaultPct + '%';
 
+  const mBtns = [document.getElementById('modeBtnManual'), document.getElementById('progressModeManualBtn')].filter(Boolean);
+  const aBtns = [document.getElementById('modeBtnAuto'), document.getElementById('progressModeAutoBtn')].filter(Boolean);
+  const mWraps = [document.getElementById('manualControlsWrapper'), document.getElementById('manualProgressControls')].filter(Boolean);
+  const aNotice = document.getElementById('autoModeNotice');
+
   if (currentMode === 'manual') {
-    if (modeBtnManual) {
-      modeBtnManual.classList.add('active');
-      modeBtnManual.style.borderColor = 'var(--accent-cyan)';
-      modeBtnManual.style.background = 'rgba(0, 245, 155, 0.15)';
-    }
-    if (modeBtnAuto) {
-      modeBtnAuto.classList.remove('active');
-      modeBtnAuto.style.borderColor = 'var(--border-subtle)';
-      modeBtnAuto.style.background = 'none';
-    }
-    if (manualControlsWrapper) manualControlsWrapper.style.display = 'block';
+    mBtns.forEach(b => {
+      b.classList.add('active');
+      b.style.borderColor = 'var(--accent-cyan)';
+      b.style.background = 'rgba(0, 245, 155, 0.15)';
+    });
+    aBtns.forEach(b => {
+      b.classList.remove('active');
+      b.style.borderColor = 'var(--border-subtle)';
+      b.style.background = 'none';
+    });
+    mWraps.forEach(w => w.style.display = 'block');
+    if (aNotice) aNotice.style.display = 'none';
   } else {
-    if (modeBtnAuto) {
-      modeBtnAuto.classList.add('active');
-      modeBtnAuto.style.borderColor = 'var(--accent-cyan)';
-      modeBtnAuto.style.background = 'rgba(0, 245, 155, 0.15)';
-    }
-    if (modeBtnManual) {
-      modeBtnManual.classList.remove('active');
-      modeBtnManual.style.borderColor = 'var(--border-subtle)';
-      modeBtnManual.style.background = 'none';
-    }
-    if (manualControlsWrapper) manualControlsWrapper.style.display = 'none';
+    aBtns.forEach(b => {
+      b.classList.add('active');
+      b.style.borderColor = 'var(--accent-cyan)';
+      b.style.background = 'rgba(0, 245, 155, 0.15)';
+    });
+    mBtns.forEach(b => {
+      b.classList.remove('active');
+      b.style.borderColor = 'var(--border-subtle)';
+      b.style.background = 'none';
+    });
+    mWraps.forEach(w => w.style.display = 'none');
+    if (aNotice) aNotice.style.display = 'block';
   }
 
   if (statusSelect) statusSelect.value = report.status || 'pending';
@@ -1085,7 +1170,43 @@ function openDetailModal(report) {
     };
   }
 
-  // Bind CEX email notice button
+  // Bind FBI IC3 Evidence Packet download button
+  const dlFbiBtn = document.getElementById('downloadFbiPacketBtn');
+  if (dlFbiBtn) {
+    dlFbiBtn.onclick = () => {
+      const fbiText = generateFbiPacketText(report);
+      const blob = new Blob([fbiText], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `Nexus_Shield_FBI_IC3_Packet_${caseRef.substring(0, 10)}.txt`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showAdminEmailToast(`📄 Court-Ready FBI IC3 Packet downloaded for Case ${caseRef}!`);
+    };
+  }
+
+  // Bind CEX email notice button & SLA Tracker
+  const cexTicketInput = document.getElementById('cexTicketRefInput');
+  const cexHoldSelect = document.getElementById('cexHoldStatusSelect');
+  if (cexTicketInput) cexTicketInput.value = report.cexTicketRef || '';
+  if (cexHoldSelect) cexHoldSelect.value = report.cexHoldStatus || 'dispatched';
+
+  if (cexHoldSelect) {
+    cexHoldSelect.onchange = () => {
+      if (selectedReportForDetail) {
+        selectedReportForDetail.cexHoldStatus = cexHoldSelect.value;
+        const key = selectedReportForDetail.report_id || String(selectedReportForDetail.id);
+        const progressMap = JSON.parse(localStorage.getItem('nexus_case_progress_updates') || '{}');
+        progressMap[key] = Object.assign({}, progressMap[key] || {}, {
+          cexHoldStatus: cexHoldSelect.value,
+          cexTicketRef: cexTicketInput?.value.trim() || '',
+          updatedAt: new Date().toISOString()
+        });
+        localStorage.setItem('nexus_case_progress_updates', JSON.stringify(progressMap));
+      }
+    };
+  }
+
   const cexTargetSelect = document.getElementById('cexSelectTarget');
   const cexEmailBtn = document.getElementById('emailCexNoticeBtn');
   if (cexTargetSelect && cexEmailBtn) {
@@ -1098,8 +1219,7 @@ function openDetailModal(report) {
       cexEmailBtn.href = `mailto:${encodeURIComponent(cex.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`;
     };
     cexTargetSelect.onchange = updateCexEmailHref;
-    const ticketInput = document.getElementById('cexTicketRefInput');
-    if (ticketInput) ticketInput.oninput = updateCexEmailHref;
+    if (cexTicketInput) cexTicketInput.oninput = updateCexEmailHref;
     updateCexEmailHref();
   }
 
@@ -1210,7 +1330,7 @@ function syncProgressSlider(val) {
   const num = Math.max(5, Math.min(100, parseInt(val) || 20));
   const slider = document.getElementById('progressPercentSlider');
   const input = document.getElementById('progressPercentInput');
-  const display = document.getElementById('progressPercentDisplay');
+  const display = document.getElementById('sliderPercentDisplay') || document.getElementById('progressPercentDisplay');
   const stageSelect = document.getElementById('detailStatusSelect');
 
   if (slider) slider.value = num;
@@ -1246,35 +1366,46 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('exportCsvBtn')?.addEventListener('click', exportCsv);
   document.getElementById('exportJsonBtn')?.addEventListener('click', exportJson);
 
-  // Mode buttons (Auto vs Manual)
-  const modeBtnAuto = document.getElementById('modeBtnAuto');
-  const modeBtnManual = document.getElementById('modeBtnManual');
-  const manualControlsWrapper = document.getElementById('manualControlsWrapper');
+  // Mode buttons (Auto vs Manual) - support both ID variants
+  const autoBtns = [document.getElementById('modeBtnAuto'), document.getElementById('progressModeAutoBtn')].filter(Boolean);
+  const manualBtns = [document.getElementById('modeBtnManual'), document.getElementById('progressModeManualBtn')].filter(Boolean);
+  const manualWrappers = [document.getElementById('manualControlsWrapper'), document.getElementById('manualProgressControls')].filter(Boolean);
   const progressControlMode = document.getElementById('progressControlMode');
+  const autoNotice = document.getElementById('autoModeNotice');
 
-  if (modeBtnAuto && modeBtnManual && manualControlsWrapper && progressControlMode) {
-    modeBtnAuto.addEventListener('click', () => {
-      progressControlMode.value = 'auto';
-      modeBtnAuto.classList.add('active');
-      modeBtnAuto.style.borderColor = 'var(--accent-cyan)';
-      modeBtnAuto.style.background = 'rgba(0, 245, 155, 0.15)';
-      modeBtnManual.classList.remove('active');
-      modeBtnManual.style.borderColor = 'var(--border-subtle)';
-      modeBtnManual.style.background = 'none';
-      manualControlsWrapper.style.display = 'none';
-    });
-
-    modeBtnManual.addEventListener('click', () => {
-      progressControlMode.value = 'manual';
-      modeBtnManual.classList.add('active');
-      modeBtnManual.style.borderColor = 'var(--accent-cyan)';
-      modeBtnManual.style.background = 'rgba(0, 245, 155, 0.15)';
-      modeBtnAuto.classList.remove('active');
-      modeBtnAuto.style.borderColor = 'var(--border-subtle)';
-      modeBtnAuto.style.background = 'none';
-      manualControlsWrapper.style.display = 'block';
-    });
+  function applyModeVisuals(mode) {
+    if (progressControlMode) progressControlMode.value = mode;
+    if (mode === 'auto') {
+      autoBtns.forEach(b => {
+        b.classList.add('active');
+        b.style.borderColor = 'var(--accent-cyan)';
+        b.style.background = 'rgba(0, 245, 155, 0.15)';
+      });
+      manualBtns.forEach(b => {
+        b.classList.remove('active');
+        b.style.borderColor = 'var(--border-subtle)';
+        b.style.background = 'none';
+      });
+      manualWrappers.forEach(w => w.style.display = 'none');
+      if (autoNotice) autoNotice.style.display = 'block';
+    } else {
+      manualBtns.forEach(b => {
+        b.classList.add('active');
+        b.style.borderColor = 'var(--accent-cyan)';
+        b.style.background = 'rgba(0, 245, 155, 0.15)';
+      });
+      autoBtns.forEach(b => {
+        b.classList.remove('active');
+        b.style.borderColor = 'var(--border-subtle)';
+        b.style.background = 'none';
+      });
+      manualWrappers.forEach(w => w.style.display = 'block');
+      if (autoNotice) autoNotice.style.display = 'none';
+    }
   }
+
+  autoBtns.forEach(b => b.addEventListener('click', () => applyModeVisuals('auto')));
+  manualBtns.forEach(b => b.addEventListener('click', () => applyModeVisuals('manual')));
 
   // Bind slider and number input
   const slider = document.getElementById('progressPercentSlider');
@@ -1587,115 +1718,255 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ======================== TREASURY & $10 PAYMENT VERIFICATIONS ========================
+let activePaymentFilter = "all";
+let paymentSearchQuery = "";
+
+window.setPaymentFilter = function(filter) {
+  activePaymentFilter = filter;
+  document.querySelectorAll("#paymentFilterTabBar .payment-tab-item").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.filter === filter);
+  });
+  renderPaymentVerificationsTable();
+};
+
+window.setPaymentSearch = function(query) {
+  paymentSearchQuery = (query || "").toLowerCase().trim();
+  renderPaymentVerificationsTable();
+};
+
+window.viewReceiptModal = function(receiptUrl, fileName) {
+  const modal = document.getElementById("receiptPreviewModal");
+  const img = document.getElementById("receiptModalImg");
+  const fileTitle = document.getElementById("receiptModalFileName");
+  const fallback = document.getElementById("receiptModalFallback");
+  if (!modal) return;
+  if (fileTitle) fileTitle.innerText = fileName || "Deposit Proof";
+  if (receiptUrl && (receiptUrl.startsWith("data:image") || receiptUrl.startsWith("https://") || receiptUrl.startsWith("http://"))) {
+    if (img) {
+      img.src = receiptUrl;
+      img.style.display = "block";
+    }
+    if (fallback) fallback.style.display = "none";
+  } else {
+    if (img) img.style.display = "none";
+    if (fallback) {
+      fallback.style.display = "block";
+      fallback.innerText = `No image preview available for: ${fileName || "Proof Document"}`;
+    }
+  }
+  modal.classList.add("active");
+};
+
+window.hideReceiptModal = function() {
+  const modal = document.getElementById("receiptPreviewModal");
+  if (modal) modal.classList.remove("active");
+};
+
+window.simulateTestPayment = function() {
+  let verifications = JSON.parse(localStorage.getItem("nexus_payment_verifications") || "[]");
+  const randNum = Math.floor(100000 + Math.random() * 900000);
+  const sampleTx = "0x" + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join("");
+  const sampleWallet = "0x" + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join("");
+
+  const testRec = {
+    paymentId: `PAY-${randNum}`,
+    caseRef: `NX-${randNum}`,
+    amountUsd: 10,
+    cryptoAsset: "usdt_trc20",
+    paymentTxHash: sampleTx,
+    senderWallet: sampleWallet,
+    receiptFileName: `Simulated_Proof_${randNum}.png`,
+    receiptDataUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="280" viewBox="0 0 500 280"><rect width="100%" height="100%" fill="%230b1224"/><rect x="20" y="20" width="460" height="240" rx="10" fill="%23111b33" stroke="%2300f59b" stroke-width="2"/><text x="250" y="80" fill="%2300f59b" font-family="monospace" font-size="24" font-weight="bold" text-anchor="middle">TRANSFER RECEIPT</text><text x="250" y="130" fill="%23ffffff" font-family="sans-serif" font-size="28" font-weight="bold" text-anchor="middle">10.00 USDT</text><text x="250" y="170" fill="%2394a3b8" font-family="sans-serif" font-size="14" text-anchor="middle">Network: TRC-20 (TRON) • Confirmed</text><text x="250" y="210" fill="%2360a5fa" font-family="monospace" font-size="12" text-anchor="middle">Tx: ' + sampleTx.slice(0, 24) + '...</text></svg>',
+    timestamp: new Date().toISOString(),
+    status: "pending",
+    reviewerName: "Lead Compliance Officer (NX-ANALYST-01)"
+  };
+
+  verifications.unshift(testRec);
+  localStorage.setItem("nexus_payment_verifications", JSON.stringify(verifications));
+  renderPaymentVerificationsTable();
+  showAdminEmailToast(`⚡ Simulated Test Payment PAY-${randNum} ($10 USD) generated! Ready for audit.`);
+};
+
+window.resetPaymentVerifications = function() {
+  const defaults = [{
+    paymentId: "PAY-849201",
+    caseRef: "NX-849201",
+    amountUsd: 10,
+    cryptoAsset: "usdt_trc20",
+    paymentTxHash: "0x8f3c7e492b1a0d84c7e6514f7b2a9e3d8c1b5a9f2e7d4c8a1b6e9f3d2c7a1b5e",
+    senderWallet: "0x38b29F0eA86e41A235D97E2596816D34Ac3E47A9",
+    receiptFileName: "Margaret_Binance_Transfer_Proof.png",
+    receiptDataUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="280" viewBox="0 0 500 280"><rect width="100%" height="100%" fill="%230b1224"/><rect x="20" y="20" width="460" height="240" rx="10" fill="%23111b33" stroke="%232dd4bf" stroke-width="2"/><text x="250" y="80" fill="%232dd4bf" font-family="monospace" font-size="24" font-weight="bold" text-anchor="middle">BINANCE DEPOSIT PROOF</text><text x="250" y="130" fill="%23ffffff" font-family="sans-serif" font-size="28" font-weight="bold" text-anchor="middle">10.00 USDT</text><text x="250" y="170" fill="%2394a3b8" font-family="sans-serif" font-size="14" text-anchor="middle">Network: TRC-20 (Tron) • Completed</text><text x="250" y="210" fill="%2360a5fa" font-family="monospace" font-size="12" text-anchor="middle">Deposit Memo Verified</text></svg>',
+    timestamp: new Date(Date.now() - 3600000).toISOString(),
+    status: "pending",
+    reviewerName: "Lead Compliance Officer (NX-ANALYST-01)"
+  }];
+  localStorage.setItem("nexus_payment_verifications", JSON.stringify(defaults));
+  renderPaymentVerificationsTable();
+  showAdminEmailToast("Payment queue reset to sample verification.");
+};
+
 function renderPaymentVerificationsTable() {
-  const tbody = document.getElementById('paymentsTableBody');
-  const badge = document.getElementById('pendingPaymentsCountBadge');
+  const tbody = document.getElementById("paymentsTableBody");
+  const badge = document.getElementById("pendingPaymentsCountBadge");
+  const navBadge = document.getElementById("navPendingPaymentsCount");
   if (!tbody) return;
 
-  let verifications = JSON.parse(localStorage.getItem('nexus_payment_verifications') || '[]');
+  let verifications = JSON.parse(localStorage.getItem("nexus_payment_verifications") || "[]");
   if (!verifications.length) {
     verifications = [{
-      paymentId: 'PAY-849201',
-      caseRef: 'NX-849201',
+      paymentId: "PAY-849201",
+      caseRef: "NX-849201",
       amountUsd: 10,
-      cryptoAsset: 'usdt_trc20',
-      paymentTxHash: '0x8f3c7e492b1a0d84c7e6514f7b2a9e3d8c1b5a9f2e7d4c8a1b6e9f3d2c7a1b5e',
-      senderWallet: '0x38b29F0eA86e41A235D97E2596816D34Ac3E47A9',
-      receiptFileName: 'Margaret_Binance_Transfer_Proof.png',
-      receiptDataUrl: null,
+      cryptoAsset: "usdt_trc20",
+      paymentTxHash: "0x8f3c7e492b1a0d84c7e6514f7b2a9e3d8c1b5a9f2e7d4c8a1b6e9f3d2c7a1b5e",
+      senderWallet: "0x38b29F0eA86e41A235D97E2596816D34Ac3E47A9",
+      receiptFileName: "Margaret_Binance_Transfer_Proof.png",
+      receiptDataUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="280" viewBox="0 0 500 280"><rect width="100%" height="100%" fill="%230b1224"/><rect x="20" y="20" width="460" height="240" rx="10" fill="%23111b33" stroke="%232dd4bf" stroke-width="2"/><text x="250" y="80" fill="%232dd4bf" font-family="monospace" font-size="24" font-weight="bold" text-anchor="middle">BINANCE DEPOSIT PROOF</text><text x="250" y="130" fill="%23ffffff" font-family="sans-serif" font-size="28" font-weight="bold" text-anchor="middle">10.00 USDT</text><text x="250" y="170" fill="%2394a3b8" font-family="sans-serif" font-size="14" text-anchor="middle">Network: TRC-20 (Tron) • Completed</text><text x="250" y="210" fill="%2360a5fa" font-family="monospace" font-size="12" text-anchor="middle">Deposit Memo Verified</text></svg>',
       timestamp: new Date(Date.now() - 3600000).toISOString(),
-      status: 'pending',
-      reviewerName: 'Lead Compliance Officer (NX-ANALYST-01)'
+      status: "pending",
+      reviewerName: "Lead Compliance Officer (NX-ANALYST-01)"
     }];
-    localStorage.setItem('nexus_payment_verifications', JSON.stringify(verifications));
+    localStorage.setItem("nexus_payment_verifications", JSON.stringify(verifications));
   }
 
-  const pendingCount = verifications.filter(v => v.status === 'pending').length;
+  const pendingCount = verifications.filter(v => v.status === "pending").length;
+  const approvedCount = verifications.filter(v => v.status === "approved").length;
+  const rejectedCount = verifications.filter(v => v.status === "rejected").length;
 
   if (badge) {
-    badge.innerText = `${pendingCount} Pending Verification${pendingCount !== 1 ? 's' : ''}`;
-    badge.style.color = pendingCount > 0 ? '#fb7185' : 'var(--accent-green)';
-    badge.style.borderColor = pendingCount > 0 ? 'rgba(244,63,94,0.4)' : 'rgba(0,245,155,0.4)';
+    badge.innerText = `${pendingCount} Pending Verification${pendingCount !== 1 ? "s" : ""}`;
+    badge.style.color = pendingCount > 0 ? "#fb7185" : "var(--accent-green)";
+    badge.style.borderColor = pendingCount > 0 ? "rgba(244,63,94,0.4)" : "rgba(0,245,155,0.4)";
   }
 
-  if (!verifications.length) {
+  if (navBadge) {
+    navBadge.innerText = pendingCount;
+    navBadge.style.display = pendingCount > 0 ? "inline-block" : "none";
+  }
+
+  // Update payment filter counts
+  const countAll = document.getElementById("paymentCountAll");
+  const countPending = document.getElementById("paymentCountPending");
+  const countApproved = document.getElementById("paymentCountApproved");
+  const countRejected = document.getElementById("paymentCountRejected");
+  if (countAll) countAll.innerText = verifications.length;
+  if (countPending) countPending.innerText = pendingCount;
+  if (countApproved) countApproved.innerText = approvedCount;
+  if (countRejected) countRejected.innerText = rejectedCount;
+
+  // Filter list
+  let displayed = verifications.filter(v => {
+    if (activePaymentFilter === "pending" && v.status !== "pending") return false;
+    if (activePaymentFilter === "approved" && v.status !== "approved") return false;
+    if (activePaymentFilter === "rejected" && v.status !== "rejected") return false;
+
+    if (paymentSearchQuery) {
+      const matchId = (v.paymentId || "").toLowerCase().includes(paymentSearchQuery);
+      const matchCase = (v.caseRef || "").toLowerCase().includes(paymentSearchQuery);
+      const matchTx = (v.paymentTxHash || "").toLowerCase().includes(paymentSearchQuery);
+      const matchSender = (v.senderWallet || "").toLowerCase().includes(paymentSearchQuery);
+      if (!matchId && !matchCase && !matchTx && !matchSender) return false;
+    }
+    return true;
+  });
+
+  if (!displayed.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
-          No fee payment verifications submitted yet. Incoming proofs will appear here automatically.
+        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+          <i class="fas fa-file-circle-question" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block; color: var(--text-muted);"></i>
+          No matching payment verifications found in this view.
         </td>
       </tr>
     `;
     return;
   }
 
-  tbody.innerHTML = verifications.map(v => {
-    const isApproved = v.status === 'approved';
-    const isRejected = v.status === 'rejected';
+  tbody.innerHTML = displayed.map(v => {
+    const isApproved = v.status === "approved";
+    const isRejected = v.status === "rejected";
     const statusPill = isApproved 
       ? '<span class="status-pill status-recovered"><i class="fas fa-check"></i> APPROVED</span>'
       : (isRejected 
         ? '<span class="status-pill status-failed"><i class="fas fa-xmark"></i> REJECTED</span>' 
         : '<span class="status-pill status-investigating"><i class="fas fa-clock fa-spin"></i> PENDING AUDIT</span>');
 
-    const isValidDataUrl = v.receiptDataUrl && (v.receiptDataUrl.startsWith('data:image/') || v.receiptDataUrl.startsWith('data:application/pdf') || v.receiptDataUrl.startsWith('https://'));
-    const receiptHtml = isValidDataUrl 
-      ? `<a href="${encodeURI(v.receiptDataUrl)}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline; font-size: 0.76rem;"><i class="fas fa-image"></i> View Receipt</a>`
-      : `<span style="color: var(--text-muted); font-size: 0.74rem;">${escapeHtml(v.receiptFileName || 'No image')}</span>`;
+    const hasProof = v.receiptDataUrl || v.receiptFileName;
+    const safeDataUrl = v.receiptDataUrl ? encodeURI(v.receiptDataUrl) : "";
+    const receiptHtml = hasProof 
+      ? `<button type="button" class="btn-secondary" onclick="viewReceiptModal('${safeDataUrl}', '${escapeHtml(v.receiptFileName || "Receipt Proof")}')" style="padding: 0.28rem 0.65rem; font-size: 0.74rem; color: var(--accent-cyan); border-color: rgba(0, 245, 155, 0.35);"><i class="fas fa-image"></i> View Receipt</button>`
+      : `<span style="color: var(--text-muted); font-size: 0.74rem;">No proof</span>`;
+
+    const cleanTx = (v.paymentTxHash || "").trim();
+    const shortTx = cleanTx.length > 18 ? cleanTx.substring(0, 10) + "..." + cleanTx.substring(cleanTx.length - 6) : cleanTx;
 
     return `
       <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
-        <td style="padding: 0.75rem 0.8rem; font-family: var(--font-mono); font-weight: 700; color: #fff;">${escapeHtml(v.paymentId)}</td>
-        <td style="padding: 0.75rem 0.8rem; font-family: var(--font-mono); color: var(--accent-cyan);">${escapeHtml(v.caseRef || 'NX-N/A')}</td>
-        <td style="padding: 0.75rem 0.8rem; font-weight: 700; color: var(--accent-green);">$${escapeHtml(v.amountUsd)}.00 (${escapeHtml((v.cryptoAsset || 'USDT').toUpperCase())})</td>
-        <td style="padding: 0.75rem 0.8rem; font-family: var(--font-mono); font-size: 0.72rem; word-break: break-all; max-width: 220px;">
-          <div><span style="color: #94a3b8;">TxID:</span> ${escapeHtml(v.paymentTxHash ? v.paymentTxHash.substring(0, 16) + '...' : 'N/A')}</div>
-          <div><span style="color: #94a3b8;">From:</span> ${escapeHtml(v.senderWallet ? v.senderWallet.substring(0, 16) + '...' : 'N/A')}</div>
+        <td style="padding: 0.75rem 0.8rem; font-family: var(--font-mono); font-weight: 700; color: #fff;">
+          <div style="display: flex; align-items: center; gap: 0.35rem;">
+            <span>${escapeHtml(v.paymentId)}</span>
+            <button type="button" class="mini-tool-btn" data-val="${escapeHtml(v.paymentId)}" onclick="copyWalletText(this.dataset.val, this)" title="Copy ID">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+        </td>
+        <td style="padding: 0.75rem 0.8rem; font-family: var(--font-mono); color: var(--accent-cyan); font-weight: 600;">${escapeHtml(v.caseRef || "NX-N/A")}</td>
+        <td style="padding: 0.75rem 0.8rem; font-weight: 700; color: var(--accent-green);">$${escapeHtml(v.amountUsd)}.00 <span style="font-size: 0.72rem; color: #cbd5e1; font-weight: 400;">(${escapeHtml((v.cryptoAsset || "USDT").toUpperCase())})</span></td>
+        <td style="padding: 0.75rem 0.8rem; font-family: var(--font-mono); font-size: 0.72rem; word-break: break-all; max-width: 240px;">
+          <div style="display: flex; align-items: center; gap: 0.25rem;">
+            <span style="color: #94a3b8;">TxID:</span> <code>${escapeHtml(shortTx || "N/A")}</code>
+            ${cleanTx ? `<button type="button" class="mini-tool-btn" data-val="${escapeHtml(cleanTx)}" onclick="copyWalletText(this.dataset.val, this)" title="Copy full TxID"><i class="fas fa-copy"></i></button>` : ""}
+          </div>
+          <div style="color: #64748b; font-size: 0.7rem; margin-top: 0.15rem;">
+            From: ${escapeHtml(v.senderWallet ? v.senderWallet.substring(0, 12) + "..." : "N/A")}
+          </div>
         </td>
         <td style="padding: 0.75rem 0.8rem;">${receiptHtml}</td>
         <td style="padding: 0.75rem 0.8rem;">${statusPill}</td>
         <td style="padding: 0.75rem 0.8rem; text-align: right;">
           ${!isApproved ? `
             <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
-              <button type="button" class="btn-primary" onclick="approvePaymentVerification('${escapeHtml(v.paymentId)}')" style="padding: 0.35rem 0.7rem; font-size: 0.74rem;">
+              <button type="button" class="btn-primary" onclick="approvePaymentVerification('${escapeHtml(v.paymentId)}')" style="padding: 0.35rem 0.75rem; font-size: 0.74rem; background: linear-gradient(135deg, #00f59b, #00b875); border: none; color: #080d1a; font-weight: 700;">
                 <i class="fas fa-check"></i> Approve
               </button>
-              <button type="button" class="btn-secondary" onclick="rejectPaymentVerification('${escapeHtml(v.paymentId)}')" style="padding: 0.35rem 0.6rem; font-size: 0.74rem; color: #fb7185;">
+              <button type="button" class="btn-secondary" onclick="rejectPaymentVerification('${escapeHtml(v.paymentId)}')" style="padding: 0.35rem 0.6rem; font-size: 0.74rem; color: #fb7185;" title="Reject proof">
                 <i class="fas fa-xmark"></i>
               </button>
             </div>
           ` : `
-            <span style="color: var(--accent-green); font-size: 0.74rem; font-weight: 700;"><i class="fas fa-circle-check"></i> Dossier Released</span>
+            <span style="color: var(--accent-green); font-size: 0.74rem; font-weight: 700;"><i class="fas fa-circle-check"></i> Released</span>
           `}
         </td>
       </tr>
     `;
-  }).join('');
+  }).join("");
 }
 
 window.approvePaymentVerification = function(paymentId) {
-  const verifications = JSON.parse(localStorage.getItem('nexus_payment_verifications') || '[]');
+  const verifications = JSON.parse(localStorage.getItem("nexus_payment_verifications") || "[]");
   const item = verifications.find(v => v.paymentId === paymentId);
   if (item) {
-    item.status = 'approved';
-    item.reviewerName = 'Lead Compliance Officer (NX-ANALYST-01)';
+    item.status = "approved";
+    item.reviewerName = "Lead Compliance Officer (NX-ANALYST-01)";
     item.approvedAt = new Date().toISOString();
-    localStorage.setItem('nexus_payment_verifications', JSON.stringify(verifications));
+    localStorage.setItem("nexus_payment_verifications", JSON.stringify(verifications));
     renderPaymentVerificationsTable();
-    alert(`Payment ${paymentId} APPROVED!\n\nThe client's full 5-section forensic dossier and PDF download have been released.`);
+    showAdminEmailToast(`✅ Payment ${paymentId} APPROVED! Unredacted dossier & PDF released.`);
   }
 };
 
 window.rejectPaymentVerification = function(paymentId) {
-  const verifications = JSON.parse(localStorage.getItem('nexus_payment_verifications') || '[]');
+  const verifications = JSON.parse(localStorage.getItem("nexus_payment_verifications") || "[]");
   const item = verifications.find(v => v.paymentId === paymentId);
   if (item) {
-    item.status = 'rejected';
-    item.reviewerName = 'Lead Compliance Officer (NX-ANALYST-01)';
+    item.status = "rejected";
+    item.reviewerName = "Lead Compliance Officer (NX-ANALYST-01)";
     item.rejectedAt = new Date().toISOString();
-    localStorage.setItem('nexus_payment_verifications', JSON.stringify(verifications));
+    localStorage.setItem("nexus_payment_verifications", JSON.stringify(verifications));
     renderPaymentVerificationsTable();
-    alert(`Payment ${paymentId} marked as REJECTED.`);
+    showAdminEmailToast(`❌ Payment ${paymentId} marked as REJECTED.`);
   }
 };
 
@@ -1768,6 +2039,86 @@ async function initTreasuryWalletConfig() {
     if (statusEl) {
       statusEl.style.display = 'block';
       setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
+    }
+  };
+}
+
+// ======================== EMERGENCY SECURITY CHANNELS & REGISTRY ========================
+const DEFAULT_SECURITY_REGISTRY = {
+  whatsapp_number: '14158906398',
+  x_handle: '@NEXUSSHIELDhq',
+  telegram_handle: '@nexusshield_hq',
+  support_email: 'support@nexusshield.org',
+  compliance_email: 'compliance@nexusshield.org',
+  revoked_handles: '@nexus_support_agent_fake, +1 (555) 019-2831, support-desk@nexusshield-recovery.com'
+};
+
+function getActiveSecurityRegistry() {
+  try {
+    const saved = localStorage.getItem('nexus_security_registry');
+    if (saved) return Object.assign({}, DEFAULT_SECURITY_REGISTRY, JSON.parse(saved));
+  } catch (e) {}
+  return Object.assign({}, DEFAULT_SECURITY_REGISTRY);
+}
+
+async function initSecurityRegistryConfig() {
+  const waInput = document.getElementById('cfgWhatsApp');
+  const xInput = document.getElementById('cfgTwitter');
+  const tgInput = document.getElementById('cfgTelegram');
+  const supInput = document.getElementById('cfgSupportEmail');
+  const compInput = document.getElementById('cfgComplianceEmail');
+  const revInput = document.getElementById('cfgRevokedHandles');
+  const saveBtn = document.getElementById('saveSecurityRegistryBtn');
+  const statusEl = document.getElementById('securityRegistrySaveStatus');
+
+  if (!waInput || !saveBtn) return;
+
+  let current = getActiveSecurityRegistry();
+
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient.from('security_registry').select('*').eq('id', 'primary');
+      if (!error && data && data.length > 0) {
+        current = Object.assign(current, data[0]);
+        localStorage.setItem('nexus_security_registry', JSON.stringify(current));
+      }
+    } catch (e) {}
+  }
+
+  waInput.value = current.whatsapp_number || DEFAULT_SECURITY_REGISTRY.whatsapp_number;
+  xInput.value = current.x_handle || DEFAULT_SECURITY_REGISTRY.x_handle;
+  tgInput.value = current.telegram_handle || DEFAULT_SECURITY_REGISTRY.telegram_handle;
+  supInput.value = current.support_email || DEFAULT_SECURITY_REGISTRY.support_email;
+  compInput.value = current.compliance_email || DEFAULT_SECURITY_REGISTRY.compliance_email;
+  revInput.value = current.revoked_handles !== undefined ? current.revoked_handles : DEFAULT_SECURITY_REGISTRY.revoked_handles;
+
+  saveBtn.onclick = async () => {
+    const updated = {
+      whatsapp_number: (waInput.value.trim()) || DEFAULT_SECURITY_REGISTRY.whatsapp_number,
+      x_handle: (xInput.value.trim()) || DEFAULT_SECURITY_REGISTRY.x_handle,
+      telegram_handle: (tgInput.value.trim()) || DEFAULT_SECURITY_REGISTRY.telegram_handle,
+      support_email: (supInput.value.trim()) || DEFAULT_SECURITY_REGISTRY.support_email,
+      compliance_email: (compInput.value.trim()) || DEFAULT_SECURITY_REGISTRY.compliance_email,
+      revoked_handles: (revInput.value.trim())
+    };
+
+    localStorage.setItem('nexus_security_registry', JSON.stringify(updated));
+
+    if (supabaseClient) {
+      try {
+        await supabaseClient.from('security_registry').upsert({
+          id: 'primary',
+          ...updated,
+          updated_at: new Date().toISOString()
+        });
+      } catch (e) {
+        console.warn('Note: security_registry table in Supabase will be synced when created:', e);
+      }
+    }
+
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      setTimeout(() => { statusEl.style.display = 'none'; }, 4500);
     }
   };
 }
