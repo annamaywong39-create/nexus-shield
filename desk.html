@@ -662,7 +662,7 @@
       </p>
 
       <div class="form-row" style="margin-bottom: 0.85rem;">
-        <div class="input-group" style="margin-bottom: 0;">
+        <div class="input-group" style="margin-bottom: 0; flex: 1.2;">
           <label for="cexSelectTarget">Destination Exchange &amp; Compliance Desk:</label>
           <select id="cexSelectTarget" style="font-size: 0.85rem;">
             <option value="binance">Binance (compliance@binance.com / case-inquiry@binance.com)</option>
@@ -675,9 +675,19 @@
             <option value="gate">Gate.io (support@mail.gate.io)</option>
           </select>
         </div>
-        <div class="input-group" style="margin-bottom: 0;">
-          <label for="cexTicketRefInput">Exchange Ticket / Internal LE Ref (Optional):</label>
-          <input type="text" id="cexTicketRefInput" placeholder="e.g. BIN-LE-94821 or Case-NX-8492" style="font-size: 0.85rem;">
+        <div class="input-group" style="margin-bottom: 0; flex: 1;">
+          <label for="cexTicketRefInput">Exchange Ticket / LE Ref ID:</label>
+          <input type="text" id="cexTicketRefInput" placeholder="e.g. BIN-LE-94821 or OKX-CRIME-88" style="font-size: 0.85rem;">
+        </div>
+        <div class="input-group" style="margin-bottom: 0; flex: 1;">
+          <label for="cexHoldStatusSelect">48h Hold SLA Status:</label>
+          <select id="cexHoldStatusSelect" style="font-size: 0.85rem;">
+            <option value="dispatched">Notice Dispatched (48h Pending)</option>
+            <option value="acknowledged">Acknowledged by CEX Compliance</option>
+            <option value="frozen">Active Administrative Hold (Frozen)</option>
+            <option value="warrant_filed">Judicial Seizure Warrant Filed</option>
+            <option value="restituted">Funds Preserved for Restitution</option>
+          </select>
         </div>
       </div>
 
@@ -715,6 +725,9 @@
         </a>
         <button id="downloadProgressLetterBtn" class="btn-secondary" style="font-size: 0.82rem; padding: 0.45rem 1rem;">
           <i class="fas fa-file-signature"></i> Download Report (.txt)
+        </button>
+        <button type="button" id="downloadFbiPacketBtn" class="btn-secondary" style="font-size: 0.82rem; padding: 0.45rem 1rem; color: var(--accent-green); border-color: rgba(0, 245, 155, 0.4);">
+          <i class="fas fa-file-shield"></i> FBI IC3 Incident Packet
         </button>
       </div>
     </div>

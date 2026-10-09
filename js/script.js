@@ -2707,6 +2707,10 @@ function initPaymentAndPdfUnlockController() {
         const lblEl = document.getElementById('cryptoLabel');
         if (addrEl) addrEl.innerText = activeData.addr;
         if (lblEl) lblEl.innerText = activeData.label;
+        const qrEl = document.getElementById("cryptoDepositQrImg");
+        if (qrEl && activeData.addr) {
+          qrEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(activeData.addr)}`;
+        }
       }
       if (step1) step1.style.display = 'block';
       if (step2) step2.style.display = 'none';
@@ -2787,6 +2791,10 @@ function initPaymentAndPdfUnlockController() {
         const amt = document.getElementById('cryptoAmountDue');
         if (lbl) lbl.innerText = data.label;
         if (addr) addr.innerText = data.addr;
+        const qrEl = document.getElementById("cryptoDepositQrImg");
+        if (qrEl && data.addr) {
+          qrEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(data.addr)}`;
+        }
         if (amt) {
           if (data.symbol === 'BTC') amt.innerText = `${(fee / 68000).toFixed(6)} BTC`;
           else if (data.symbol === 'SOL') amt.innerText = `${(fee / 155).toFixed(4)} SOL`;

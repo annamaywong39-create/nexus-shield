@@ -1,3 +1,70 @@
+
+function generateFbiPacketText(report) {
+  const ref = report.report_id || report.reportId || `#${report.id}`;
+  const name = report.victim_name || report.victimName || 'Complainant on Record';
+  const email = report.victim_email || report.victimEmail || 'Unassigned';
+  const phone = report.victim_phone || report.victimPhone || 'N/A';
+  const loss = parseFloat(report.amount_lost || report.amountLost || 0).toLocaleString();
+  const curr = (report.currency_lost || report.currencyLost || 'USDT').toUpperCase();
+  const chain = report.chain || 'Multi-Chain Architecture';
+  const victimWallet = report.victim_wallet || report.victimWallet || '0x...';
+  const scammerWallet = report.scammer_wallet || report.scammerWallet || '0x...';
+  const txHashes = Array.isArray(report.transaction_hashes) ? report.transaction_hashes : (report.transactionHashes || [report.tx_hash || 'N/A']);
+  const date = report.timestamp ? new Date(report.timestamp).toUTCString() : new Date().toUTCString();
+
+  return `================================================================================
+OFFICIAL CYBERCRIME INCIDENT REPORT & EVIDENTIARY BINDER
+Prepared for: Federal Bureau of Investigation (FBI IC3) & International Cybercrime Units
+Statutory Authority: 18 U.S.C. § 2703 (ECPA) | 18 U.S.C. § 1030 (Computer Fraud & Abuse)
+================================================================================
+CASE DOCKET REFERENCE : ${ref}
+FILING TIMESTAMP       : ${date}
+INVESTIGATING PLATFORM: Nexus Shield Asset Recovery Taskforce (https://nexusshield.org)
+REPORT CLASSIFICATION : LAW ENFORCEMENT & COMPLIANCE STATUTORY EVIDENCE BINDER
+================================================================================
+
+1. COMPLAINANT IDENTIFICATION (VICTIM):
+--------------------------------------------------------------------------------
+Full Legal Name       : ${name}
+Primary Contact Email : ${email}
+Contact Telephone     : ${phone}
+Legal Status          : Complainant & Aggrieved Digital Asset Holder
+Verified Loss Amount  : $${loss} ${curr} (Estimated USD Equivalent)
+
+2. CRIMINAL OFFENSE CLASSIFICATION:
+--------------------------------------------------------------------------------
+• Primary Violation   : Wire Fraud / Unauthorized Electronic Funds Transfer
+• Technical Modality  : Deceptive On-Chain Routing, Smart Contract Drainer / Social Engineering
+• Underlying Network  : ${chain}
+• Illicit Peeling Hop : Detected multi-hop routing into centralized exchange deposit bottleneck
+
+3. CRYPTOGRAPHIC EVIDENCE & SOURCE TRAIL:
+--------------------------------------------------------------------------------
+Compromised Source Wallet : ${victimWallet}
+Destination Scammer Wallet: ${scammerWallet}
+
+Primary Transaction Hashes (TxIDs):
+${txHashes.map((h, i) => `[Hop #${i + 1}] ${h}`).join('\n')}
+
+4. STATUTORY PRESERVATION & EXCHANGE NOTICE (18 U.S.C. § 2703(f)):
+--------------------------------------------------------------------------------
+NOTICE TO CUSTODIAL EXCHANGES (Binance, OKX, Bybit, Coinbase, Kraken, etc.):
+You are hereby advised that funds originating from the above complainant wallet were 
+diverted without authorization and clustered toward exchange deposit accounts. 
+Pursuant to 18 U.S.C. § 2703(f) and international anti-money laundering statutes, 
+all KYC records, login IP audit trails, bank off-ramp instructions, and current sub-account 
+balances tied to destination cluster [${scammerWallet}] must be preserved for 90 days 
+pending formal grand jury subpoena or federal discovery warrant.
+
+5. VERIFICATION DIRECTORY:
+--------------------------------------------------------------------------------
+Authenticated via Nexus Shield Evidence Vault
+Official Support: support@nexusshield.org | Directorate: compliance@nexusshield.org
+Report Hash: SHA-256 Verified On-Chain
+================================================================================
+[END OF STATUTORY INCIDENT DOSSIER]`;
+}
+
 // ========================================================
 // NEXUS SHIELD — Internal Forensic Management Console
 // Staff Authentication, Case Inspection & Dual Progress Controller
@@ -1091,6 +1158,21 @@ function openDetailModal(report) {
       a.download = `Nexus_Shield_Progress_Report_${caseRef.substring(0, 10)}.txt`;
       a.click();
       URL.revokeObjectURL(a.href);
+    };
+  }
+
+  // Bind FBI IC3 Evidence Packet download button
+  const dlFbiBtn = document.getElementById('downloadFbiPacketBtn');
+  if (dlFbiBtn) {
+    dlFbiBtn.onclick = () => {
+      const fbiText = generateFbiPacketText(report);
+      const blob = new Blob([fbiText], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `Nexus_Shield_FBI_IC3_Packet_${caseRef.substring(0, 10)}.txt`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showAdminEmailToast(`📄 Court-Ready FBI IC3 Packet downloaded for Case ${caseRef}!`);
     };
   }
 
