@@ -381,7 +381,7 @@ Report Hash: SHA-256 Verified On-Chain
     URL.revokeObjectURL(a.href);
   };
 
-  // ======================== 4. LIVE AI FORENSIC TRIAGE INTAKE BOT ========================
+  // ======================== 4. LIVE ONLINE CLIENT REPRESENTATIVE CHAT ========================
   let triageState = {
     step: 0,
     scamType: '',
@@ -391,7 +391,8 @@ Report Hash: SHA-256 Verified On-Chain
     victimName: '',
     victimEmail: '',
     victimPhone: '',
-    createdReportId: null
+    createdReportId: null,
+    isVerifying: false
   };
 
   function initTriageBot() {
@@ -459,7 +460,7 @@ Report Hash: SHA-256 Verified On-Chain
           ${htmlContent}
           ${chipsHtml}
         </div>
-        <div class="triage-msg-time">${timeStr} &bull; Officer Elena</div>
+        <div class="triage-msg-time">${timeStr} &bull; Elena (Online Representative)</div>
       `;
 
       chatBody.appendChild(msgDiv);
@@ -490,17 +491,28 @@ Report Hash: SHA-256 Verified On-Chain
       chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    // Starting conversation
+    // Starting conversation: Warm, comforting, non-depressing
     function startTriageGreeting() {
       triageState.step = 0;
+      triageState.scamType = '';
+      triageState.lossAmount = '';
+      triageState.originInput = '';
+      triageState.victimName = '';
+      triageState.victimEmail = '';
+      triageState.createdReportId = null;
+      triageState.isVerifying = false;
+
       addBotMessage(
-        `Hello, I'm <strong>Officer Elena</strong> with the Nexus Shield Digital Forensics Unit. I understand you may have experienced an unauthorized withdrawal or digital fraud.<br><br>You're in a safe, encrypted environment. <strong>What kind of incident occurred?</strong>`,
+        `👋 <strong>Welcome to Nexus Shield!</strong><br><br>
+        You are chatting live with an <strong>online client representative</strong>. We are here to support and assist you with any problem or question regarding your digital assets, wallets, or transactions.<br><br>
+        Please take a deep breath &mdash; you are in safe hands. <strong>What issue can we help you with today?</strong>`,
         [
-          { label: 'Malicious Link / Wallet Drainer', val: 'Wallet Drainer', icon: 'fas fa-link-slash' },
-          { label: 'Fake Investment Platform', val: 'Fake Investment', icon: 'fas fa-chart-line' },
-          { label: 'Pig-Butchering / Telegram Romance', val: 'Pig-Butchering', icon: 'fas fa-heart-crack' },
-          { label: 'Compromised Private Key / Seed', val: 'Compromised Seed', icon: 'fas fa-key' },
-          { label: 'P2P / OTC Escrow Fraud', val: 'P2P Escrow', icon: 'fas fa-handshake-slash' }
+          { label: '💰 Crypto lost / unauthorized withdrawal', val: 'Unauthorized Wallet Transfer', icon: 'fas fa-wallet' },
+          { label: '📈 Trading / broker platform issue', val: 'Investment / Broker Platform', icon: 'fas fa-chart-line' },
+          { label: '🔗 Phishing link / suspicious dApp approval', val: 'Phishing / Drainer Contract', icon: 'fas fa-link-slash' },
+          { label: '🤝 Sent funds to someone I met online', val: 'Social / P2P Impersonator', icon: 'fas fa-user-shield' },
+          { label: '🛡️ Verify an official agent or handle', val: 'VERIFY_AGENT', icon: 'fas fa-shield-check' },
+          { label: '💬 Chat on WhatsApp with specialist', val: 'OPEN_WHATSAPP', icon: 'fab fa-whatsapp' }
         ]
       );
     }
@@ -510,18 +522,118 @@ Report Hash: SHA-256 Verified On-Chain
       const val = textVal.trim();
       if (!val) return;
 
+      if (val === 'OPEN_WHATSAPP') {
+        const secReg = getLiveSecurityRegistry();
+        const rawNum = (secReg.whatsapp_number || '14158906398').replace(/\D/g, '');
+        addBotMessage(
+          `🟢 <strong>Direct WhatsApp Specialist Line:</strong><br><br>
+          You can chat directly with an on-duty specialist on your phone right now on our official verified line:<br><br>
+          <a href="https://wa.me/${rawNum}?text=Hello%20Nexus%20Shield%2C%20I%20am%20chatting%20from%20the%20website%20and%20need%20assistance." target="_blank" rel="noopener noreferrer" class="btn-primary" style="background: #25D366; border: none; font-size: 0.84rem; padding: 0.55rem 1.15rem; color: #080d1a; font-weight: 700; display: inline-flex; align-items: center; gap: 0.45rem; text-decoration: none; border-radius: 6px;">
+            <i class="fab fa-whatsapp" style="font-size: 1.1rem;"></i> Open WhatsApp Chat Now
+          </a>`,
+          [
+            { label: 'Return to Chat Assistant', val: 'RESTART', icon: 'fas fa-arrow-left' }
+          ]
+        );
+        return;
+      }
+
+      if (val === 'VERIFY_AGENT') {
+        triageState.isVerifying = true;
+        addBotMessage(
+          `🛡️ <strong>Official Credential & Channel Verification:</strong><br><br>
+          Please type the email address, phone number, Telegram handle, or Agent ID you would like to check (for example: <code>@NEXUSSHIELDhq</code> or <code>support@nexusshield.org</code>):`
+        );
+        return;
+      }
+
+      if (triageState.isVerifying) {
+        triageState.isVerifying = false;
+        const query = val.toLowerCase().replace(/^@/, '');
+        const secReg = getLiveSecurityRegistry();
+
+        // 1. Check revoked first
+        const revokedItems = (secReg.revoked_handles || '').split(',').map(s => s.trim().toLowerCase().replace(/^@/, '')).filter(Boolean);
+        const queryDigits = query.replace(/\D/g, '');
+        const isRevoked = revokedItems.some(rev => {
+          if (!rev) return false;
+          const revDigits = rev.replace(/\D/g, '');
+          if (revDigits.length >= 7 && queryDigits.length >= 7) {
+            return revDigits.includes(queryDigits) || queryDigits.includes(revDigits);
+          }
+          return rev === query || query.includes(rev) || rev.includes(query);
+        });
+
+        if (isRevoked) {
+          addBotMessage(
+            `🚨 <strong style="color: #ef4444;">FRAUD ADVISORY: REVOKED OR IMPERSONATOR HANDLE!</strong><br><br>
+            The identifier <code>${escapeHtml(val)}</code> has been officially marked as <strong>COMPROMISED or a FRAUDULENT IMPERSONATOR</strong>.<br><br>
+            ⚠️ <strong>DO NOT SEND FUNDS OR SEED PHRASES.</strong> Cease contact immediately.`,
+            [
+              { label: 'Verify another identifier', val: 'VERIFY_AGENT', icon: 'fas fa-shield-check' },
+              { label: 'Report an incident for recovery', val: 'RESTART', icon: 'fas fa-rotate' }
+            ]
+          );
+          return;
+        }
+
+        // 2. Check active directory
+        const activeDir = [
+          { type: 'email', val: secReg.support_email || 'support@nexusshield.org', role: 'Official Support Desk' },
+          { type: 'email', val: secReg.compliance_email || 'compliance@nexusshield.org', role: 'Official Compliance & Legal Liaison' },
+          { type: 'x', val: secReg.x_handle || '@nexusshieldhq', role: 'Official Verified X Profile' },
+          { type: 'telegram', val: secReg.telegram_handle || '@nexusshield_hq', role: 'Official Telegram Channel' },
+          { type: 'phone', val: secReg.whatsapp_number || '+14158906398', role: 'Official WhatsApp Hotline' },
+          { type: 'agent_id', val: 'nx-analyst-01', role: 'Accredited Senior Investigator (ID: NX-ANALYST-01)' },
+          { type: 'agent_id', val: 'nx-officer-elena', role: 'Accredited Intake Specialist (ID: NX-OFFICER-ELENA)' }
+        ];
+
+        const match = activeDir.find(item => {
+          const itemVal = item.val.toLowerCase().replace(/^@/, '');
+          if (item.type === 'phone' && queryDigits.length >= 7) {
+            const itemDigits = item.val.replace(/\D/g, '');
+            return itemDigits.includes(queryDigits) || queryDigits.includes(itemDigits);
+          }
+          return itemVal === query || itemVal.includes(query) || query.includes(itemVal);
+        });
+
+        if (match) {
+          addBotMessage(
+            `✅ <strong style="color: var(--accent-green);">VERIFIED OFFICIAL CREDENTIAL!</strong><br><br>
+            <code>${escapeHtml(match.val)}</code> is confirmed active on the official Nexus Shield Directorate Registry.<br>
+            &bull; <strong>Designation:</strong> ${match.role}`,
+            [
+              { label: 'Report an incident for recovery', val: 'RESTART', icon: 'fas fa-plus' },
+              { label: 'Chat on WhatsApp', val: 'OPEN_WHATSAPP', icon: 'fab fa-whatsapp' }
+            ]
+          );
+        } else {
+          addBotMessage(
+            `⚠️ <strong style="color: #fb7185;">UNVERIFIED IDENTIFIER:</strong><br><br>
+            The identifier <code>${escapeHtml(val)}</code> was <strong>NOT found</strong> in our official staff directory.<br><br>
+            Secondary recovery scammers frequently create fake profiles claiming to be investigators. Never share private keys or send advance fees.`,
+            [
+              { label: 'Check another identifier', val: 'VERIFY_AGENT', icon: 'fas fa-magnifying-glass' },
+              { label: 'Open incident recovery case', val: 'RESTART', icon: 'fas fa-folder-plus' }
+            ]
+          );
+        }
+        return;
+      }
+
       switch(triageState.step) {
-        case 0: // Scam Type chosen
+        case 0: // Situation chosen
           triageState.scamType = val;
           triageState.step = 1;
           setTimeout(() => {
             addBotMessage(
-              `Noted: <strong>[${escapeHtml(val)}]</strong>. We deal with these attack vectors daily.<br><br>Approximately <strong>how much was lost</strong>, and in which cryptocurrency? (e.g. <em>15,000 USDT</em> or <em>0.5 BTC</em>)`,
+              `I am so sorry you are going through this. Please know that you are not alone, and our forensic team handles these exact situations every day to help trace funds back to destination exchanges.<br><br>
+              To help us understand your situation, <strong>roughly how much was involved</strong>?`,
               [
-                { label: '$1,000 - $5,000 USDT', val: '3500 USDT' },
-                { label: '$5,000 - $25,000 USDT', val: '15000 USDT' },
-                { label: '$25,000 - $100,000 USDT', val: '45000 USDT' },
-                { label: '$100,000+ (High Priority)', val: '120000 USDT' }
+                { label: 'Under $2,500', val: '1,500 USDT' },
+                { label: '$2,500 – $10,000', val: '6,000 USDT' },
+                { label: '$10,000 – $50,000', val: '25,000 USDT' },
+                { label: '$50,000+ (Priority Case)', val: '75,000 USDT' }
               ]
             );
           }, 350);
@@ -532,10 +644,12 @@ Report Hash: SHA-256 Verified On-Chain
           triageState.step = 2;
           setTimeout(() => {
             addBotMessage(
-              `Loss recorded: <strong>${escapeHtml(val)}</strong>.<br><br>To map the peeling chains and destination exchange, please paste your <strong>Transaction Hash (TxID)</strong>, the <strong>scammer's deposit wallet address</strong>, or the scam platform's URL:`,
+              `Thank you for letting me know. We take every incident seriously, regardless of amount.<br><br>
+              Do you have a <strong>Transaction Hash (TxID)</strong>, or the <strong>wallet address</strong> where the funds went? (If you don't have it handy right now, don't worry &mdash; you can paste what you have, or let us know and we will guide you!)`,
               [
                 { label: 'Use Sample Ethereum TxID', val: '0x8f3c7e492b1a0d84c7e6514f7b2a9e3d8c1b5a9f2e7d4c8a1b6e9f3d2c7a1b5e' },
-                { label: 'I only have the scammer address', val: '0x71C931fC60F25eA49b0A1d86dAc467aC05eA19B7' }
+                { label: 'I only have the scammer address', val: '0x71C931fC60F25eA49b0A1d86dAc467aC05eA19B7' },
+                { label: 'I need help finding my TxID', val: 'Need help locating transaction details' }
               ]
             );
           }, 350);
@@ -546,7 +660,8 @@ Report Hash: SHA-256 Verified On-Chain
           triageState.step = 3;
           setTimeout(() => {
             addBotMessage(
-              `Origin pointer captured: <code>${escapeHtml(val.substring(0, 20))}...</code><br><br>To assign your official statutory Case Reference and generate your court-admissible evidence binder, what is your <strong>genuine full legal name</strong>?`
+              `Thank you! We have logged that starting reference for our blockchain tracing nodes.<br><br>
+              Who do I have the pleasure of speaking with today? (Please share your first name or preferred name)`
             );
           }, 350);
           break;
@@ -556,7 +671,8 @@ Report Hash: SHA-256 Verified On-Chain
           triageState.step = 4;
           setTimeout(() => {
             addBotMessage(
-              `Thank you, <strong>${escapeHtml(val)}</strong>.<br><br>What is your <strong>best contact email address</strong> where we can dispatch encrypted forensic updates and official statutory notices?`
+              `Wonderful to meet you, <strong>${escapeHtml(val)}</strong>. We are here to support you every step of the way.<br><br>
+              What is the best <strong>email address or WhatsApp number</strong> where our forensic team can send your Case Reference and preliminary tracing dossier?`
             );
           }, 350);
           break;
@@ -565,22 +681,21 @@ Report Hash: SHA-256 Verified On-Chain
           triageState.victimEmail = val;
           triageState.step = 5;
 
-          // Clean values
           const cleanAmt = parseFloat(triageState.lossAmount.replace(/[^0-9.]/g, '')) || 15000;
           const cleanCurr = triageState.lossAmount.toUpperCase().includes('BTC') ? 'BTC' : (triageState.lossAmount.toUpperCase().includes('SOL') ? 'SOL' : 'USDT');
 
           setTimeout(() => {
             addBotMessage(
-              `📋 <strong>Case Docket Ready for Immediate Filing:</strong><br>
+              `📋 <strong>Here is your incident summary, ${escapeHtml(triageState.victimName)}:</strong><br><br>
               &bull; <strong>Complainant:</strong> ${escapeHtml(triageState.victimName)}<br>
               &bull; <strong>Contact:</strong> ${escapeHtml(triageState.victimEmail)}<br>
-              &bull; <strong>Incident Type:</strong> ${escapeHtml(triageState.scamType)}<br>
-              &bull; <strong>Documented Loss:</strong> ${cleanAmt.toLocaleString()} ${cleanCurr}<br>
-              &bull; <strong>Target Origin:</strong> <code>${escapeHtml(triageState.originInput.substring(0, 18))}...</code><br><br>
-              Shall I officially register this docket with the taskforce and initiate active blockchain tracing nodes right now?`,
+              &bull; <strong>Incident:</strong> ${escapeHtml(triageState.scamType)}<br>
+              &bull; <strong>Approximate Amount:</strong> ${cleanAmt.toLocaleString()} ${cleanCurr}<br>
+              &bull; <strong>Reference:</strong> <code>${escapeHtml(triageState.originInput.substring(0, 22))}...</code><br><br>
+              Shall we register your case with the taskforce and initiate blockchain tracing nodes right now?`,
               [
-                { label: '🚀 Yes, Register Case & Launch Tracing', val: 'EXECUTE_REGISTRATION', icon: 'fas fa-rocket' },
-                { label: 'Restart Intake', val: 'RESTART', icon: 'fas fa-rotate' }
+                { label: '🚀 Yes, Register Case & Start Tracing', val: 'EXECUTE_REGISTRATION', icon: 'fas fa-rocket' },
+                { label: 'Update My Details', val: 'RESTART', icon: 'fas fa-rotate' }
               ]
             );
           }, 400);
@@ -607,6 +722,11 @@ Report Hash: SHA-256 Verified On-Chain
             const statusSection = document.getElementById('caseStatusSection') || document.getElementById('caseStatusResult');
             statusSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             addBotMessage('📊 Switched to your live on-screen case dashboard.');
+          } else if (val === 'WHATSAPP_CASE') {
+            const secReg = getLiveSecurityRegistry();
+            const rawNum = (secReg.whatsapp_number || '14158906398').replace(/\D/g, '');
+            const msg = encodeURIComponent(`Hello Nexus Shield, I just filed Case ${triageState.createdReportId} through the online representative and need urgent assistance.`);
+            window.open(`https://wa.me/${rawNum}?text=${msg}`, '_blank');
           }
           break;
       }
@@ -686,13 +806,14 @@ Report Hash: SHA-256 Verified On-Chain
       triageState.step = 6;
 
       addBotMessage(
-        `🎉 <strong>Docket Registered Successfully!</strong><br><br>
-        Your official Case Reference ID is: <strong style="color: var(--accent-cyan); font-size: 1.05rem;">${caseRef}</strong><br><br>
-        Node crawlers have initiated multi-hop peeling-chain analysis. Your case is now open in our internal investigation queue.<br><br>
-        What would you like to do next?`,
+        `✨ <strong>Thank you, ${escapeHtml(triageState.victimName)}! Your case is now registered.</strong><br><br>
+        📋 <strong>Your Official Case Reference:</strong> <strong style="color: var(--accent-cyan); font-size: 1.05rem;">${caseRef}</strong><br><br>
+        Our forensic analysts have received your incident details and initialized on-chain hop analysis to track destination exchanges.<br><br>
+        How would you like to proceed?`,
         [
-          { label: '📄 Download FBI IC3 Police Incident Packet', val: 'DOWNLOAD_FBI', icon: 'fas fa-file-shield' },
-          { label: '📊 View Live On-Screen Dashboard', val: 'VIEW_DASHBOARD', icon: 'fas fa-chart-pie' }
+          { label: '🟢 Speak with Officer on WhatsApp', val: 'WHATSAPP_CASE', icon: 'fab fa-whatsapp' },
+          { label: '📄 Download FBI IC3 Police Dossier', val: 'DOWNLOAD_FBI', icon: 'fas fa-file-shield' },
+          { label: '📊 View Live Status on Website', val: 'VIEW_DASHBOARD', icon: 'fas fa-chart-pie' }
         ]
       );
 
@@ -719,7 +840,6 @@ Report Hash: SHA-256 Verified On-Chain
       handleTriageAnswer(txt);
     });
   }
-
   // ======================== INITIALIZATION ========================
   document.addEventListener('DOMContentLoaded', () => {
     initDynamicPaymentQr();
