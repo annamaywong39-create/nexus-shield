@@ -45,6 +45,9 @@
       <a href="#treasuryWalletsSection" class="nav-link" id="navLinkTreasury">
         <i class="fas fa-wallet"></i> Receiving Wallets
       </a>
+      <a href="#securityChannelsSection" class="nav-link" id="navLinkSecurity">
+        <i class="fas fa-shield-virus"></i> Channels &amp; Verification
+      </a>
       <a href="#kpiSection" class="nav-link" id="navLinkKpis">
         <i class="fas fa-chart-line"></i> Loss Metrics
       </a>
@@ -293,6 +296,74 @@
       </div>
       <div id="treasurySaveStatus" style="display: none; margin-top: 0.85rem; font-size: 0.82rem; color: var(--accent-green); font-weight: 600; background: rgba(0,245,155,0.1); border: 1px solid rgba(0,245,155,0.3); padding: 0.5rem 0.8rem; border-radius: 6px;">
         <i class="fas fa-check-circle"></i> Receiving wallets updated successfully! Website checkout now displays these addresses.
+      </div>
+    </div>
+
+        <!-- ==================== 3. COMMUNICATIONS, SOCIAL HANDLES & VERIFICATION REGISTRY ==================== -->
+    <div class="portal-card" id="securityChannelsSection" style="padding: 1.6rem; margin-bottom: 1.8rem; border-color: rgba(192, 132, 252, 0.4); background: linear-gradient(135deg, rgba(20, 15, 35, 0.96), rgba(8, 12, 24, 0.98));">
+      <div class="card-header-row" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem;">
+        <div class="card-title-group">
+          <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+            <h2 style="margin: 0; font-size: 1.18rem;"><i class="fas fa-shield-virus" style="color: #c084fc;"></i> Emergency Communications, Socials &amp; Anti-Fraud Registry</h2>
+            <span class="phase-step-badge" style="background: rgba(192, 132, 252, 0.15); border-color: rgba(192, 132, 252, 0.4); color: #d8b4fe; font-size: 0.72rem;">
+              LIVE FRONTEND SYNC
+            </span>
+          </div>
+          <div class="card-subtitle" style="margin-top: 0.25rem;">
+            Control your official WhatsApp number, X handle, and support emails. Changes update the live website and the client "Verify Agent" directory instantly.
+          </div>
+        </div>
+        <button type="button" id="saveSecurityRegistryBtn" class="btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.82rem; background: linear-gradient(135deg, #a855f7, #7c3aed); border: none;">
+          <i class="fas fa-floppy-disk"></i> Save &amp; Sync Registry
+        </button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.2rem;">
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #6ee7b7; display: block; margin-bottom: 0.35rem;">
+            <i class="fab fa-whatsapp"></i> Official WhatsApp Hotline (Raw phone digits for wa.me):
+          </label>
+          <input type="text" id="cfgWhatsApp" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="15550198492 (country code + number, no spaces)">
+        </div>
+
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #93c5fd; display: block; margin-bottom: 0.35rem;">
+            <i class="fa-brands fa-x-twitter"></i> Official X (Twitter) Handle:
+          </label>
+          <input type="text" id="cfgTwitter" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="@NEXUSSHIELDhq">
+        </div>
+
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #38bdf8; display: block; margin-bottom: 0.35rem;">
+            <i class="fab fa-telegram"></i> Official Telegram Support Channel / Handle:
+          </label>
+          <input type="text" id="cfgTelegram" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="@NexusShieldOfficial">
+        </div>
+
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #fde68a; display: block; margin-bottom: 0.35rem;">
+            <i class="fas fa-envelope"></i> Primary Support Desk Email:
+          </label>
+          <input type="email" id="cfgSupportEmail" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="support@nexusshield.org">
+        </div>
+
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #fb7185; display: block; margin-bottom: 0.35rem;">
+            <i class="fas fa-gavel"></i> Legal &amp; Exchange Compliance Email:
+          </label>
+          <input type="email" id="cfgComplianceEmail" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="compliance@nexusshield.org">
+        </div>
+
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #f43f5e; display: block; margin-bottom: 0.35rem;">
+            <i class="fas fa-skull-crossbones"></i> Compromised / Revoked Handles (Instant Fraud Warning):
+          </label>
+          <input type="text" id="cfgRevokedHandles" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(244,63,94,0.4); color: #fda4af; border-radius: 6px;" placeholder="e.g. @OldHackedHandle, fake_support_telegram (comma-separated)">
+        </div>
+      </div>
+
+      <div id="securityRegistrySaveStatus" style="display: none; margin-top: 0.85rem; font-size: 0.82rem; color: #d8b4fe; font-weight: 600; background: rgba(192,132,252,0.12); border: 1px solid rgba(192,132,252,0.35); padding: 0.6rem 0.85rem; border-radius: 6px;">
+        <i class="fas fa-circle-check"></i> Security Registry updated! Front-end verification tool, WhatsApp buttons, and X links now reflect these settings.
       </div>
     </div>
 

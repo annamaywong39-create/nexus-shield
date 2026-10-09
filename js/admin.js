@@ -272,6 +272,7 @@ function checkAuthStatus() {
     loadReports();
     renderPaymentVerificationsTable();
     initTreasuryWalletConfig();
+    initSecurityRegistryConfig();
     initTableScrollEnhancements();
   } else {
     if (loginSection) loginSection.style.display = 'block';
@@ -520,6 +521,8 @@ async function loadReports() {
       if (progressMap[key].progressMode) r.progressMode = progressMap[key].progressMode;
       if (progressMap[key].progressPercent !== undefined) r.progressPercent = progressMap[key].progressPercent;
       if (progressMap[key].customMessage) r.customStatusMessage = progressMap[key].customMessage;
+      if (progressMap[key].cexTicketRef) r.cexTicketRef = progressMap[key].cexTicketRef;
+      if (progressMap[key].cexHoldStatus) r.cexHoldStatus = progressMap[key].cexHoldStatus;
     }
   });
 
@@ -708,6 +711,10 @@ async function updateReportProgress(id, newStatus, customMessage = '', progressM
     found.progressMode = progressMode;
     found.progressPercent = progressPercent;
     if (customMessage) found.customStatusMessage = customMessage;
+    const cexTicket = document.getElementById('cexTicketRefInput')?.value.trim();
+    const cexHold = document.getElementById('cexHoldStatusSelect')?.value;
+    if (cexTicket !== undefined) found.cexTicketRef = cexTicket;
+    if (cexHold !== undefined) found.cexHoldStatus = cexHold;
     const key = found.report_id || String(found.id);
 
     // Save to progress updates map
@@ -717,6 +724,8 @@ async function updateReportProgress(id, newStatus, customMessage = '', progressM
       progressMode: progressMode,
       progressPercent: progressPercent,
       customMessage: customMessage,
+      cexTicketRef: found.cexTicketRef || '',
+      cexHoldStatus: found.cexHoldStatus || 'dispatched',
       updatedAt: new Date().toISOString()
     };
     localStorage.setItem('nexus_case_progress_updates', JSON.stringify(progressMap));
@@ -1176,7 +1185,28 @@ function openDetailModal(report) {
     };
   }
 
-  // Bind CEX email notice button
+  // Bind CEX email notice button & SLA Tracker
+  const cexTicketInput = document.getElementById('cexTicketRefInput');
+  const cexHoldSelect = document.getElementById('cexHoldStatusSelect');
+  if (cexTicketInput) cexTicketInput.value = report.cexTicketRef || '';
+  if (cexHoldSelect) cexHoldSelect.value = report.cexHoldStatus || 'dispatched';
+
+  if (cexHoldSelect) {
+    cexHoldSelect.onchange = () => {
+      if (selectedReportForDetail) {
+        selectedReportForDetail.cexHoldStatus = cexHoldSelect.value;
+        const key = selectedReportForDetail.report_id || String(selectedReportForDetail.id);
+        const progressMap = JSON.parse(localStorage.getItem('nexus_case_progress_updates') || '{}');
+        progressMap[key] = Object.assign({}, progressMap[key] || {}, {
+          cexHoldStatus: cexHoldSelect.value,
+          cexTicketRef: cexTicketInput?.value.trim() || '',
+          updatedAt: new Date().toISOString()
+        });
+        localStorage.setItem('nexus_case_progress_updates', JSON.stringify(progressMap));
+      }
+    };
+  }
+
   const cexTargetSelect = document.getElementById('cexSelectTarget');
   const cexEmailBtn = document.getElementById('emailCexNoticeBtn');
   if (cexTargetSelect && cexEmailBtn) {
@@ -1189,8 +1219,7 @@ function openDetailModal(report) {
       cexEmailBtn.href = `mailto:${encodeURIComponent(cex.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`;
     };
     cexTargetSelect.onchange = updateCexEmailHref;
-    const ticketInput = document.getElementById('cexTicketRefInput');
-    if (ticketInput) ticketInput.oninput = updateCexEmailHref;
+    if (cexTicketInput) cexTicketInput.oninput = updateCexEmailHref;
     updateCexEmailHref();
   }
 
@@ -2010,6 +2039,86 @@ async function initTreasuryWalletConfig() {
     if (statusEl) {
       statusEl.style.display = 'block';
       setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
+    }
+  };
+}
+
+// ======================== EMERGENCY SECURITY CHANNELS & REGISTRY ========================
+const DEFAULT_SECURITY_REGISTRY = {
+  whatsapp_number: '14158906398',
+  x_handle: '@NEXUSSHIELDhq',
+  telegram_handle: '@nexusshield_hq',
+  support_email: 'support@nexusshield.org',
+  compliance_email: 'compliance@nexusshield.org',
+  revoked_handles: '@nexus_support_agent_fake, +1 (555) 019-2831, support-desk@nexusshield-recovery.com'
+};
+
+function getActiveSecurityRegistry() {
+  try {
+    const saved = localStorage.getItem('nexus_security_registry');
+    if (saved) return Object.assign({}, DEFAULT_SECURITY_REGISTRY, JSON.parse(saved));
+  } catch (e) {}
+  return Object.assign({}, DEFAULT_SECURITY_REGISTRY);
+}
+
+async function initSecurityRegistryConfig() {
+  const waInput = document.getElementById('cfgWhatsApp');
+  const xInput = document.getElementById('cfgTwitter');
+  const tgInput = document.getElementById('cfgTelegram');
+  const supInput = document.getElementById('cfgSupportEmail');
+  const compInput = document.getElementById('cfgComplianceEmail');
+  const revInput = document.getElementById('cfgRevokedHandles');
+  const saveBtn = document.getElementById('saveSecurityRegistryBtn');
+  const statusEl = document.getElementById('securityRegistrySaveStatus');
+
+  if (!waInput || !saveBtn) return;
+
+  let current = getActiveSecurityRegistry();
+
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient.from('security_registry').select('*').eq('id', 'primary');
+      if (!error && data && data.length > 0) {
+        current = Object.assign(current, data[0]);
+        localStorage.setItem('nexus_security_registry', JSON.stringify(current));
+      }
+    } catch (e) {}
+  }
+
+  waInput.value = current.whatsapp_number || DEFAULT_SECURITY_REGISTRY.whatsapp_number;
+  xInput.value = current.x_handle || DEFAULT_SECURITY_REGISTRY.x_handle;
+  tgInput.value = current.telegram_handle || DEFAULT_SECURITY_REGISTRY.telegram_handle;
+  supInput.value = current.support_email || DEFAULT_SECURITY_REGISTRY.support_email;
+  compInput.value = current.compliance_email || DEFAULT_SECURITY_REGISTRY.compliance_email;
+  revInput.value = current.revoked_handles !== undefined ? current.revoked_handles : DEFAULT_SECURITY_REGISTRY.revoked_handles;
+
+  saveBtn.onclick = async () => {
+    const updated = {
+      whatsapp_number: (waInput.value.trim()) || DEFAULT_SECURITY_REGISTRY.whatsapp_number,
+      x_handle: (xInput.value.trim()) || DEFAULT_SECURITY_REGISTRY.x_handle,
+      telegram_handle: (tgInput.value.trim()) || DEFAULT_SECURITY_REGISTRY.telegram_handle,
+      support_email: (supInput.value.trim()) || DEFAULT_SECURITY_REGISTRY.support_email,
+      compliance_email: (compInput.value.trim()) || DEFAULT_SECURITY_REGISTRY.compliance_email,
+      revoked_handles: (revInput.value.trim())
+    };
+
+    localStorage.setItem('nexus_security_registry', JSON.stringify(updated));
+
+    if (supabaseClient) {
+      try {
+        await supabaseClient.from('security_registry').upsert({
+          id: 'primary',
+          ...updated,
+          updated_at: new Date().toISOString()
+        });
+      } catch (e) {
+        console.warn('Note: security_registry table in Supabase will be synced when created:', e);
+      }
+    }
+
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      setTimeout(() => { statusEl.style.display = 'none'; }, 4500);
     }
   };
 }

@@ -38,18 +38,89 @@
     updateQr();
   }
 
-  // ======================== 2. OFFICIAL AGENT & CHANNEL VERIFICATION ========================
-  const OFFICIAL_DIRECTORY = [
-    { type: 'email', val: 'support@nexusshield.org', role: 'Primary Case Intake & Client Support Desk', dept: 'Operations & Triage' },
-    { type: 'email', val: 'compliance@nexusshield.org', role: 'Statutory Law Enforcement & Legal Liaison', dept: 'Legal & Exchange Freeze Directorate' },
-    { type: 'email', val: 'recovery@nexusshield.org', role: 'Forensic Peeling-Chain Investigation Desk', dept: 'Digital Asset Intelligence Unit' },
-    { type: 'email', val: 'lead.analyst@nexusshield.org', role: 'Senior Blockchain Forensic Examiner', dept: 'Technical Forensics' },
-    { type: 'x', val: '@nexusshieldhq', role: 'Official Verified Communications Channel', dept: 'Public Announcements & Threat Advisories' },
-    { type: 'web', val: 'nexusshield.org', role: 'Primary Institutional Domain', dept: 'Secure Cloudflare Protected Infrastructure' },
-    { type: 'agent_id', val: 'nx-analyst-01', role: 'Senior Forensic Investigator (ID: NX-ANALYST-01)', dept: 'CEX Freeze Response Team' },
-    { type: 'agent_id', val: 'nx-analyst-02', role: 'Blockchain Data Scientist (ID: NX-ANALYST-02)', dept: 'Clustering & Graph Intelligence' },
-    { type: 'agent_id', val: 'nx-officer-elena', role: 'Lead Triage Officer (ID: NX-OFFICER-ELENA)', dept: '24/7 Digital Evidence Intake' }
-  ];
+  // ======================== 2. OFFICIAL AGENT, SOCIALS & CHANNEL VERIFICATION ========================
+  const DEFAULT_SECURITY_REGISTRY = {
+    whatsapp_number: '14158906398',
+    x_handle: '@NEXUSSHIELDhq',
+    telegram_handle: '@nexusshield_hq',
+    support_email: 'support@nexusshield.org',
+    compliance_email: 'compliance@nexusshield.org',
+    revoked_handles: '@nexus_support_agent_fake, +1 (555) 019-2831, support-desk@nexusshield-recovery.com'
+  };
+
+  function getLiveSecurityRegistry() {
+    try {
+      const saved = localStorage.getItem('nexus_security_registry');
+      if (saved) return Object.assign({}, DEFAULT_SECURITY_REGISTRY, JSON.parse(saved));
+    } catch (e) {}
+    return Object.assign({}, DEFAULT_SECURITY_REGISTRY);
+  }
+
+  // Synchronize front-end links and buttons to reflect live admin security registry
+  function syncFrontEndChannels() {
+    const reg = getLiveSecurityRegistry();
+
+    // 1. WhatsApp Action Links
+    if (reg.whatsapp_number) {
+      const cleanDigits = reg.whatsapp_number.replace(/\D/g, '');
+      const waLinks = document.querySelectorAll('a[href*="wa.me"]');
+      waLinks.forEach(link => {
+        try {
+          const url = new URL(link.href);
+          const currentText = url.searchParams.get('text') || 'Hello%20Nexus%20Shield%20Taskforce%2C%20I%20urgently%20need%20assistance%20with%20a%20cryptocurrency%20fraud%20incident.';
+          link.href = `https://wa.me/${cleanDigits}?text=${encodeURIComponent(currentText)}`;
+        } catch (e) {
+          link.href = `https://wa.me/${cleanDigits}`;
+        }
+      });
+    }
+
+    // 2. Official X (Twitter) Profile Links
+    if (reg.x_handle) {
+      const handle = reg.x_handle.replace(/^@/, '');
+      const xLinks = document.querySelectorAll('a[href*="x.com/"], a[href*="twitter.com/"]');
+      xLinks.forEach(link => {
+        // Only update links that point to our profile or intent
+        if (!link.href.includes('/intent/tweet') && !link.href.includes('/share')) {
+          link.href = `https://x.com/${handle}`;
+          if (link.getAttribute('title')) {
+            link.setAttribute('title', `Nexus Shield on X (@${handle})`);
+          }
+          if (link.getAttribute('aria-label')) {
+            link.setAttribute('aria-label', `Nexus Shield on X (@${handle})`);
+          }
+        }
+      });
+    }
+
+    // 3. Telegram Links
+    if (reg.telegram_handle) {
+      const cleanTg = reg.telegram_handle.replace(/^@/, '');
+      const tgLinks = document.querySelectorAll('a[href*="t.me/"]');
+      tgLinks.forEach(link => {
+        link.href = `https://t.me/${cleanTg}`;
+      });
+    }
+
+    // 4. Primary Support Email Links
+    if (reg.support_email) {
+      const supLinks = document.querySelectorAll('a[href^="mailto:support@nexusshield.org"]');
+      supLinks.forEach(link => {
+        link.href = `mailto:${reg.support_email}`;
+      });
+    }
+
+    // 5. Compliance Email Links
+    if (reg.compliance_email) {
+      const compLinks = document.querySelectorAll('a[href^="mailto:compliance@nexusshield.org"]');
+      compLinks.forEach(link => {
+        link.href = `mailto:${reg.compliance_email}`;
+      });
+    }
+  }
+
+  // Expose syncFrontEndChannels to window
+  window.syncFrontEndChannels = syncFrontEndChannels;
 
   window.openAgentVerifyModal = function() {
     const modal = document.getElementById('agentVerificationModal');
@@ -79,23 +150,93 @@
     });
 
     const runVerification = () => {
-      const query = (input?.value || '').toLowerCase().trim().replace(/^@/, '');
+      const rawQuery = (input?.value || '').trim();
+      const query = rawQuery.toLowerCase().replace(/^@/, '');
+
       if (!query || query.length < 3) {
         if (resultBox) {
           resultBox.style.display = 'block';
           resultBox.className = 'verify-result-card failure';
+          resultBox.style.borderColor = 'rgba(244, 63, 94, 0.4)';
+          resultBox.style.background = 'rgba(244, 63, 94, 0.08)';
           resultBox.innerHTML = `
             <div style="font-weight: 700; color: #fb7185; margin-bottom: 0.25rem;">
               <i class="fas fa-circle-exclamation"></i> Input Required
             </div>
-            <div style="font-size: 0.78rem; color: #cbd5e1;">Please enter a valid email address, @Telegram handle, or Agent ID to verify.</div>
+            <div style="font-size: 0.78rem; color: #cbd5e1;">Please enter a valid email address, @Telegram handle, phone number, or Agent ID to verify.</div>
           `;
         }
         return;
       }
 
-      const match = OFFICIAL_DIRECTORY.find(item => {
+      const secReg = getLiveSecurityRegistry();
+
+      // 1. CRITICAL FRAUD CHECK: Check if query matches revoked/compromised blacklist first!
+      const revokedItems = (secReg.revoked_handles || '')
+        .split(',')
+        .map(s => s.trim().toLowerCase().replace(/^@/, ''))
+        .filter(Boolean);
+
+      const queryDigits = query.replace(/\D/g, '');
+      const isRevoked = revokedItems.some(rev => {
+        if (!rev) return false;
+        const revDigits = rev.replace(/\D/g, '');
+        if (revDigits.length >= 7 && queryDigits.length >= 7) {
+          return revDigits.includes(queryDigits) || queryDigits.includes(revDigits);
+        }
+        return rev === query || query.includes(rev) || rev.includes(query);
+      });
+
+      if (isRevoked) {
+        if (!resultBox) return;
+        resultBox.style.display = 'block';
+        resultBox.className = 'verify-result-card failure';
+        resultBox.style.borderColor = '#ef4444';
+        resultBox.style.background = 'rgba(239, 68, 68, 0.15)';
+        resultBox.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(239, 68, 68, 0.35); display: flex; align-items: center; justify-content: center; color: #f87171; font-size: 1.15rem; flex-shrink: 0;">
+              <i class="fas fa-skull-crossbones"></i>
+            </div>
+            <div>
+              <div style="font-weight: 800; color: #ef4444; font-size: 0.95rem; letter-spacing: 0.02em;">
+                REVOKED / COMPROMISED / BLACKLISTED IMPERSONATOR
+              </div>
+              <div style="font-size: 0.72rem; color: #fca5a5;">High-Urgency Threat Advisory Issued by Nexus Shield Directorate</div>
+            </div>
+          </div>
+          <div style="font-size: 0.8rem; color: #fee2e2; line-height: 1.5; background: rgba(0,0,0,0.45); padding: 0.75rem; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.45);">
+            <strong>SECURITY ALERT:</strong> The identifier <code>${escapeHtml(rawQuery)}</code> has been officially flagged as <strong>COMPROMISED, REVOKED, or a MALICIOUS RECOVERY SCAM IMPERSONATOR</strong>.
+          </div>
+          <div style="margin-top: 0.65rem; font-size: 0.75rem; color: #fca5a5; line-height: 1.5;">
+            <strong>🚨 CEASE ALL COMMUNICATIONS IMMEDIATELY:</strong> Do NOT transfer funds, authorize contract approvals, or reveal seed phrases. Please notify the Directorate immediately at <code>${escapeHtml(secReg.compliance_email || 'compliance@nexusshield.org')}</code>.
+          </div>
+        `;
+        return;
+      }
+
+      // 2. DYNAMIC DIRECTORY MERGING LIVE ADMIN SETTINGS & ACCREDITED AGENTS
+      const activeDirectory = [
+        { type: 'email', val: secReg.support_email || 'support@nexusshield.org', role: 'Primary Case Intake & Support Desk', dept: 'Operations & Complainant Support' },
+        { type: 'email', val: secReg.compliance_email || 'compliance@nexusshield.org', role: 'Statutory Law Enforcement & Legal Liaison', dept: 'Legal & Exchange Freeze Directorate' },
+        { type: 'email', val: 'recovery@nexusshield.org', role: 'Forensic Peeling-Chain Investigation Desk', dept: 'Digital Asset Intelligence Unit' },
+        { type: 'email', val: 'investigations@nexusshield.org', role: 'Asset Tracing & Exchange Seizure Unit', dept: 'Digital Forensics & Incident Response' },
+        { type: 'email', val: 'lead.analyst@nexusshield.org', role: 'Senior Blockchain Forensic Examiner', dept: 'Technical Forensics' },
+        { type: 'x', val: secReg.x_handle || '@nexusshieldhq', role: 'Official Verified Communications Channel', dept: 'Public Announcements & Threat Advisories' },
+        { type: 'telegram', val: secReg.telegram_handle || '@nexusshield_hq', role: 'Official Encrypted Incident Desk', dept: 'Operational Security & Alerts' },
+        { type: 'phone', val: secReg.whatsapp_number || '+1 (415) 890-6398', role: 'Official Rapid Triage & Fraud Hotline', dept: '24/7 Rapid Response Desk' },
+        { type: 'web', val: 'nexusshield.org', role: 'Primary Institutional Domain', dept: 'Secure Cloudflare Protected Infrastructure' },
+        { type: 'agent_id', val: 'nx-analyst-01', role: 'Senior Forensic Investigator (ID: NX-ANALYST-01)', dept: 'CEX Freeze Response Team' },
+        { type: 'agent_id', val: 'nx-analyst-02', role: 'Blockchain Data Scientist (ID: NX-ANALYST-02)', dept: 'Clustering & Graph Intelligence' },
+        { type: 'agent_id', val: 'nx-officer-elena', role: 'Lead Triage Officer (ID: NX-OFFICER-ELENA)', dept: '24/7 Digital Evidence Intake' }
+      ];
+
+      const match = activeDirectory.find(item => {
         const itemVal = item.val.toLowerCase().replace(/^@/, '');
+        if (item.type === 'phone' && queryDigits.length >= 7) {
+          const itemDigits = item.val.replace(/\D/g, '');
+          return itemDigits.includes(queryDigits) || queryDigits.includes(itemDigits);
+        }
         return itemVal === query || itemVal.includes(query) || query.includes(itemVal);
       });
 
@@ -104,16 +245,18 @@
 
       if (match) {
         resultBox.className = 'verify-result-card success';
+        resultBox.style.borderColor = 'rgba(0, 245, 155, 0.4)';
+        resultBox.style.background = 'rgba(0, 245, 155, 0.08)';
         resultBox.innerHTML = `
           <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(0, 245, 155, 0.2); display: flex; align-items: center; justify-content: center; color: var(--accent-green); font-size: 1rem;">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: rgba(0, 245, 155, 0.2); display: flex; align-items: center; justify-content: center; color: var(--accent-green); font-size: 1rem; flex-shrink: 0;">
               <i class="fas fa-shield-check"></i>
             </div>
             <div>
-              <div style="font-weight: 800; color: var(--accent-green); font-size: 0.9rem;">
+              <div style="font-weight: 800; color: var(--accent-green); font-size: 0.92rem;">
                 VERIFIED OFFICIAL CREDENTIAL
               </div>
-              <div style="font-size: 0.72rem; color: #94a3b8;">Cryptographically Accredited Representative</div>
+              <div style="font-size: 0.72rem; color: #94a3b8;">Cryptographically Accredited Representative / Channel</div>
             </div>
           </div>
           <div style="font-size: 0.8rem; color: #e2e8f0; line-height: 1.5; background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 6px; border: 1px solid rgba(0, 245, 155, 0.25);">
@@ -127,23 +270,25 @@
         `;
       } else {
         resultBox.className = 'verify-result-card failure';
+        resultBox.style.borderColor = 'rgba(244, 63, 94, 0.35)';
+        resultBox.style.background = 'rgba(244, 63, 94, 0.08)';
         resultBox.innerHTML = `
           <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(244, 63, 94, 0.2); display: flex; align-items: center; justify-content: center; color: #fb7185; font-size: 1rem;">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: rgba(244, 63, 94, 0.2); display: flex; align-items: center; justify-content: center; color: #fb7185; font-size: 1rem; flex-shrink: 0;">
               <i class="fas fa-triangle-exclamation"></i>
             </div>
             <div>
-              <div style="font-weight: 800; color: #fb7185; font-size: 0.9rem;">
+              <div style="font-weight: 800; color: #fb7185; font-size: 0.92rem;">
                 UNVERIFIED / SUSPECTED IMPERSONATOR
               </div>
               <div style="font-size: 0.72rem; color: #cbd5e1;">Not Found in Authorized Registry</div>
             </div>
           </div>
           <div style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.5; background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 6px; border: 1px solid rgba(244, 63, 94, 0.25);">
-            The identifier <code>${escapeHtml(query)}</code> is <strong>NOT</strong> an authorized representative of Nexus Shield.
+            The identifier <code>${escapeHtml(rawQuery)}</code> is <strong>NOT</strong> an authorized representative or channel of Nexus Shield.
           </div>
           <div style="margin-top: 0.6rem; font-size: 0.74rem; color: #fda4af; line-height: 1.45;">
-            <strong>⚠️ CRITICAL WARNING:</strong> Recovery scammers frequently create fake profiles claiming to be our investigators. <strong>NEVER</strong> share private keys, seed phrases, or transfer money to personal wallets. Report this impersonation to <code>compliance@nexusshield.org</code>.
+            <strong>⚠️ CRITICAL WARNING:</strong> Recovery scammers frequently create fake profiles claiming to be our investigators. <strong>NEVER</strong> share private keys, seed phrases, or transfer money to personal wallets. Report this impersonation to <code>${escapeHtml(secReg.compliance_email || 'compliance@nexusshield.org')}</code>.
           </div>
         `;
       }
@@ -580,6 +725,14 @@ Report Hash: SHA-256 Verified On-Chain
     initDynamicPaymentQr();
     initAgentVerification();
     initTriageBot();
+    syncFrontEndChannels();
+  });
+
+  // Re-sync immediately if admin updates security registry in another tab
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'nexus_security_registry') {
+      syncFrontEndChannels();
+    }
   });
 
   // Defensive HTML escape
