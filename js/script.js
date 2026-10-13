@@ -1009,18 +1009,19 @@ async function fetchReportById(reportId) {
   const cleanedId = (reportId || "").trim();
   if (!cleanedId) return null;
 
+  // Anti-IDOR / Anti-Scraping Protection: Disallow sequential integer ID scraping
+  if (/^\d{1,4}$/.test(cleanedId)) {
+    console.warn('Sequential numeric case lookups are disabled for client privacy. Please use full Case Reference (e.g. NX-XXXXXX).');
+    return null;
+  }
+
   let report = null;
 
   if (supabaseClient) {
     try {
-      let query = supabaseClient.from('reports').select('*');
-      const isNum = /^\d+$/.test(cleanedId) || (cleanedId.startsWith('#') && /^\d+$/.test(cleanedId.slice(1)));
-      if (isNum) {
-        const num = parseInt(cleanedId.replace('#', ''), 10);
-        query = query.eq('id', num);
-      } else {
-        query = query.eq('report_id', cleanedId);
-      }
+      // Privacy Enforcement: Select ONLY public timeline/status fields — NEVER expose victim email, phone, or name to public query!
+      let query = supabaseClient.from('reports').select('report_id, status, stage, chain, currency_lost, amount_lost, timestamp, clientAlert, customStatusMessage');
+      query = query.eq('report_id', cleanedId);
       let { data, error } = await query;
       if (!error && data && data.length > 0) report = data[0];
     } catch (err) {
@@ -2642,7 +2643,6 @@ function initPaymentAndPdfUnlockController() {
 
   // Waiting card & simulator
   const waitingCard = document.getElementById('waitingApprovalCard');
-  const simulateApproveBtn = document.getElementById('simulateAdminApproveBtn');
 
   let activeCrypto = 'usdt_trc20';
   let uploadedReceiptName = '';
@@ -2952,9 +2952,33 @@ function initPaymentAndPdfUnlockController() {
         reviewerName: 'Lead Compliance Officer (NX-ANALYST-01)'
       };
 
+      // 1. Save locally with truncated receipt URL to protect localStorage quota
+      const safeRec = Object.assign({}, newRec, {
+        receiptDataUrl: newRec.receiptDataUrl ? newRec.receiptDataUrl.substring(0, 40000) : null
+      });
       const verifications = JSON.parse(localStorage.getItem('nexus_payment_verifications') || '[]');
-      verifications.unshift(newRec);
-      localStorage.setItem('nexus_payment_verifications', JSON.stringify(verifications));
+      verifications.unshift(safeRec);
+      localStorage.setItem('nexus_payment_verifications', JSON.stringify(verifications.slice(0, 15)));
+
+      // 2. Cross-Device Sync: Insert into Supabase payment_verifications table so it reaches the Admin Desk on any computer
+      if (supabaseClient) {
+        supabaseClient.from('payment_verifications').insert([{
+          payment_id: newRec.paymentId,
+          case_ref: newRec.caseRef,
+          amount_usd: newRec.amountUsd,
+          crypto_asset: newRec.cryptoAsset,
+          payment_tx_hash: newRec.paymentTxHash,
+          sender_wallet: newRec.senderWallet,
+          receipt_file_name: newRec.receiptFileName,
+          receipt_data_url: safeRec.receiptDataUrl,
+          status: 'pending',
+          created_at: newRec.timestamp
+        }]).then(() => {
+          console.log('Payment verification queued to centralized database.');
+        }).catch(err => {
+          console.warn('Supabase payment sync notice:', err);
+        });
+      }
 
       // Close modal
       if (modal) modal.style.display = 'none';
@@ -2972,33 +2996,33 @@ function initPaymentAndPdfUnlockController() {
 
       showEmailToast('📤 Proof submitted! Awaiting Senior Forensic Desk verification.');
 
-      // Polling for admin approval
+      // Polling for admin approval (checks both local storage AND live Supabase record)
       if (verificationPollTimer) clearInterval(verificationPollTimer);
-      verificationPollTimer = setInterval(() => {
+      verificationPollTimer = setInterval(async () => {
+        // Check local
         const stored = JSON.parse(localStorage.getItem('nexus_payment_verifications') || '[]');
         const cur = stored.find(v => v.paymentId === activePaymentId);
         if (cur && cur.status === 'approved') {
           triggerDossierUnlock(cur.reviewerName || 'Senior Compliance Officer');
+          return;
         }
-      }, 2000);
+
+        // Check live backend
+        if (supabaseClient && activePaymentId) {
+          try {
+            const { data } = await supabaseClient.from('payment_verifications').select('status, reviewer_name').eq('payment_id', activePaymentId).single();
+            if (data && data.status === 'approved') {
+              if (cur) cur.status = 'approved';
+              localStorage.setItem('nexus_payment_verifications', JSON.stringify(stored));
+              triggerDossierUnlock(data.reviewer_name || 'Senior Compliance Officer');
+            }
+          } catch (e) {}
+        }
+      }, 3000);
     });
   }
 
-  // Simulate Instant Admin Approval (Dev/Demo button)
-  if (simulateApproveBtn) {
-    simulateApproveBtn.addEventListener('click', () => {
-      const stored = JSON.parse(localStorage.getItem('nexus_payment_verifications') || '[]');
-      if (activePaymentId) {
-        const cur = stored.find(v => v.paymentId === activePaymentId);
-        if (cur) {
-          cur.status = 'approved';
-          cur.reviewerName = 'Lead Compliance Officer (NX-ANALYST-01)';
-          localStorage.setItem('nexus_payment_verifications', JSON.stringify(stored));
-        }
-      }
-      triggerDossierUnlock('Lead Compliance Officer (NX-ANALYST-01)');
-    });
-  }
+// Test mode simulate button permanently removed for production security
 
   // Download PDF
   if (downloadPdfBtn) {

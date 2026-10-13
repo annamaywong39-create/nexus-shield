@@ -1,14 +1,77 @@
 /**
  * Cloudflare Pages Serverless Function
  * Handles automated email dispatch via Resend API
+ * Security Hardening: Origin verification, rate-limiting, and input sanitization
  * Endpoint: POST /api/send-confirmation
  */
+
+// In-memory IP rate limiter (sliding window: max 5 requests per 10 mins per IP)
+const ipRateLimits = new Map();
+
+function isRateLimited(clientIp) {
+  const now = Date.now();
+  const windowMs = 10 * 60 * 1000;
+  const maxRequests = 5;
+
+  const userRecord = ipRateLimits.get(clientIp) || [];
+  const validTimestamps = userRecord.filter(t => (now - t) < windowMs);
+
+  if (validTimestamps.length >= maxRequests) {
+    return true;
+  }
+
+  validTimestamps.push(now);
+  ipRateLimits.set(clientIp, validTimestamps);
+  return false;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 
 export async function onRequestPost(context) {
   const { request, env } = context;
 
   try {
+    // 1. Origin & Referer Validation (Anti-Open Relay)
+    const origin = request.headers.get('Origin') || '';
+    const referer = request.headers.get('Referer') || '';
+    const allowed = ['nexusshield.org', 'www.nexusshield.org', 'localhost', '127.0.0.1', 'pages.dev'];
+    const isOriginAllowed = allowed.some(domain => origin.includes(domain) || referer.includes(domain));
+
+    if (!isOriginAllowed && origin) {
+      return new Response(JSON.stringify({ error: 'Forbidden: Request origin unauthorized' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // 2. IP Rate Limiting
+    const clientIp = request.headers.get('CF-Connecting-IP') || request.headers.get('x-forwarded-for') || 'unknown';
+    if (isRateLimited(clientIp)) {
+      return new Response(JSON.stringify({ error: 'Too many requests. Please try again in 10 minutes.' }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json', 'Retry-After': '600' }
+      });
+    }
+
     const report = await request.json();
+
+    // 3. Email Format Validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!report || !report.victimEmail || !emailRegex.test(report.victimEmail)) {
+      return new Response(JSON.stringify({ error: 'Valid complainant email address required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     if (!report || !report.victimEmail) {
       return new Response(JSON.stringify({ error: 'Missing complainant email' }), {

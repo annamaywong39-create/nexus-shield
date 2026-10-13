@@ -85,8 +85,11 @@ if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
   }
 }
 
-// Authorized Passcodes & Staff Accounts (Strong Cryptographic Passcode Only)
-const VALID_PASSWORDS = ['NexusDesk#2026'];
+// Authorized Passcode Hashes (SHA-256) — Plaintext credentials are NEVER stored in code
+const VALID_PASSCODE_HASHES = [
+  '9cd078754746dcdbf900a3e4100deb2a1b97707f0ccaf4f19388aa7c0a984db3' // SHA-256 of authorized passcode
+];
+
 const VALID_ACCOUNTS = [
   'support@nexusshield.org',
   'recovery@nexusshield.org',
@@ -97,6 +100,11 @@ const VALID_ACCOUNTS = [
   'nexus_ops',
   'lead.analyst'
 ];
+
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 let allReports = [];
 let currentFilteredReports = [];
@@ -258,7 +266,15 @@ let failedLoginAttempts = parseInt(sessionStorage.getItem('admin_login_fails') |
 let lockoutUntil = parseInt(sessionStorage.getItem('admin_lockout_until') || '0');
 
 function checkAuthStatus() {
-  const isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
+  const token = sessionStorage.getItem('admin_session_token');
+  const expires = parseInt(sessionStorage.getItem('admin_session_expires') || '0', 10);
+  const now = Date.now();
+  const isLoggedIn = Boolean(sessionStorage.getItem('admin_logged_in') === 'true' && token && expires && now < expires);
+
+  if (!isLoggedIn && token) {
+    handleLogout();
+    return;
+  }
   const loginSection = document.getElementById('adminLoginSection');
   const dashboardSection = document.getElementById('adminDashboardSection');
   const sessionIndicator = document.getElementById('sessionIndicator');
@@ -283,7 +299,7 @@ function checkAuthStatus() {
   }
 }
 
-function handleLoginSubmit(e) {
+async function handleLoginSubmit(e) {
   e.preventDefault();
   const idInput = document.getElementById('investigatorId');
   const passcodeInput = document.getElementById('adminPasscode');
@@ -303,14 +319,43 @@ function handleLoginSubmit(e) {
   const investigatorId = idInput ? idInput.value.trim().toLowerCase() : '';
   const passcode = passcodeInput ? passcodeInput.value.trim() : '';
 
-  const isPasscodeValid = VALID_PASSWORDS.includes(passcode);
+  const hashedInput = await sha256Hex(passcode);
+  const isPasscodeValid = VALID_PASSCODE_HASHES.includes(hashedInput);
   const isIdValid = !investigatorId || VALID_ACCOUNTS.includes(investigatorId) || investigatorId.endsWith('@nexusshield.org') || investigatorId.endsWith('@nexus-shield.org');
 
   if (isPasscodeValid && isIdValid) {
+    failedLoginAttempts = 0;
     sessionStorage.removeItem('admin_login_fails');
     sessionStorage.removeItem('admin_lockout_until');
+
+    // Generate cryptographically secure session token (24 random bytes) with 8-hour expiry
+    const randomBytes = new Uint8Array(24);
+    crypto.getRandomValues(randomBytes);
+    const sessionToken = Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+
+    sessionStorage.setItem('admin_session_token', sessionToken);
+    sessionStorage.setItem('admin_session_expires', String(Date.now() + 8 * 3600 * 1000));
     sessionStorage.setItem('admin_logged_in', 'true');
     sessionStorage.setItem('admin_user_id', investigatorId || 'support@nexusshield.org');
+
+    // Attempt Supabase Auth login to obtain an authenticated session for RLS enforcement
+    if (supabaseClient && supabaseClient.auth) {
+      try {
+        const authEmail = (investigatorId && investigatorId.includes('@')) ? investigatorId : 'support@nexusshield.org';
+        const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+          email: authEmail,
+          password: passcode
+        });
+        if (authData && authData.session) {
+          console.log('✅ Supabase Auth: Senior Staff session established for', authEmail);
+          sessionStorage.setItem('admin_supabase_authed', 'true');
+        } else if (authError) {
+          console.info('Supabase Auth note (local desk session active):', authError.message);
+        }
+      } catch (err) {
+        console.info('Supabase Auth attempt note:', err);
+      }
+    }
     if (errorMsg) errorMsg.style.display = 'none';
     checkAuthStatus();
   } else {
@@ -339,7 +384,14 @@ function handleLoginSubmit(e) {
 }
 
 function handleLogout() {
+  sessionStorage.removeItem('admin_session_token');
+  sessionStorage.removeItem('admin_session_expires');
   sessionStorage.removeItem('admin_logged_in');
+  sessionStorage.removeItem('admin_user_id');
+  sessionStorage.removeItem('admin_supabase_authed');
+  if (supabaseClient && supabaseClient.auth) {
+    try { supabaseClient.auth.signOut(); } catch (e) {}
+  }
   checkAuthStatus();
 }
 
@@ -759,9 +811,13 @@ async function updateReportProgress(id, newStatus, customMessage = '', progressM
     } catch (e) {}
 
     // Update Supabase if connected
-    if (supabaseClient && !isNaN(parseInt(found.id))) {
+    if (supabaseClient) {
       try {
-        await supabaseClient.from('reports').update({ status: newStatus }).eq('id', parseInt(found.id));
+        if (!isNaN(parseInt(found.id))) {
+          await supabaseClient.from('reports').update({ status: newStatus }).eq('id', parseInt(found.id));
+        } else if (found.report_id) {
+          await supabaseClient.from('reports').update({ status: newStatus }).eq('report_id', found.report_id);
+        }
       } catch (e) {
         console.warn('Supabase update exception:', e);
       }
@@ -1006,7 +1062,12 @@ function openDetailModal(report) {
   
   const urlEl = document.getElementById('detailScamUrl');
   if (report.website_url) {
-    urlEl.innerHTML = `<a href="${report.website_url}" target="_blank" rel="noopener noreferrer" class="explorer-link">${report.website_url}</a>`;
+    const rawUrl = String(report.website_url).trim();
+    if (/^https?:\/\//i.test(rawUrl)) {
+      urlEl.innerHTML = `<a href="${escapeHtml(rawUrl)}" target="_blank" rel="noopener noreferrer" class="explorer-link">${escapeHtml(rawUrl)}</a>`;
+    } else {
+      urlEl.innerText = rawUrl;
+    }
   } else {
     urlEl.innerText = 'None Reported';
   }
@@ -1535,6 +1596,18 @@ document.addEventListener('DOMContentLoaded', () => {
     alertsMap[key] = alertObj;
     localStorage.setItem('nexus_case_alerts', JSON.stringify(alertsMap));
 
+    // Cross-Device Sync: Persist alert to Supabase reports table
+    if (supabaseClient) {
+      try {
+        const updatePayload = { clientAlert: JSON.stringify(alertObj) };
+        if (!isNaN(parseInt(selectedReportForDetail.id))) {
+          supabaseClient.from('reports').update(updatePayload).eq('id', parseInt(selectedReportForDetail.id)).then(() => {}).catch(() => {});
+        } else if (selectedReportForDetail.report_id) {
+          supabaseClient.from('reports').update(updatePayload).eq('report_id', selectedReportForDetail.report_id).then(() => {}).catch(() => {});
+        }
+      } catch (e) {}
+    }
+
     // Update in local reports list
     try {
       const local = JSON.parse(localStorage.getItem('nexus_local_reports') || '[]');
@@ -1622,6 +1695,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (alertsMap[key]) {
       alertsMap[key].active = false;
       localStorage.setItem('nexus_case_alerts', JSON.stringify(alertsMap));
+    }
+
+    if (supabaseClient) {
+      try {
+        const updatePayload = { clientAlert: JSON.stringify({ active: false }) };
+        if (!isNaN(parseInt(selectedReportForDetail.id))) {
+          supabaseClient.from('reports').update(updatePayload).eq('id', parseInt(selectedReportForDetail.id)).then(() => {}).catch(() => {});
+        } else if (selectedReportForDetail.report_id) {
+          supabaseClient.from('reports').update(updatePayload).eq('report_id', selectedReportForDetail.report_id).then(() => {}).catch(() => {});
+        }
+      } catch (e) {}
     }
     document.getElementById('alertActiveToggle').checked = false;
     applyFilters();
@@ -1822,11 +1906,43 @@ window.resetPaymentVerifications = function() {
   showAdminEmailToast("Payment queue reset to sample verification.");
 };
 
-function renderPaymentVerificationsTable() {
+async function renderPaymentVerificationsTable() {
   const tbody = document.getElementById("paymentsTableBody");
   const badge = document.getElementById("pendingPaymentsCountBadge");
   const navBadge = document.getElementById("navPendingPaymentsCount");
   if (!tbody) return;
+
+  // Sync latest from Supabase if connected
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient.from('payment_verifications').select('*').order('created_at', { ascending: false });
+      if (!error && data && data.length) {
+        const localList = JSON.parse(localStorage.getItem("nexus_payment_verifications") || "[]");
+        data.forEach(remote => {
+          const idx = localList.findIndex(l => l.paymentId === remote.payment_id);
+          const mapped = {
+            paymentId: remote.payment_id,
+            caseRef: remote.case_ref,
+            amountUsd: remote.amount_usd,
+            cryptoAsset: remote.crypto_asset,
+            paymentTxHash: remote.payment_tx_hash,
+            senderWallet: remote.sender_wallet,
+            receiptFileName: remote.receipt_file_name || 'deposit_receipt_proof.png',
+            receiptDataUrl: remote.receipt_data_url,
+            timestamp: remote.created_at,
+            status: remote.status,
+            reviewerName: remote.reviewer_name || 'Lead Compliance Officer (NX-ANALYST-01)'
+          };
+          if (idx >= 0) {
+            localList[idx] = Object.assign(localList[idx], mapped);
+          } else {
+            localList.unshift(mapped);
+          }
+        });
+        localStorage.setItem("nexus_payment_verifications", JSON.stringify(localList));
+      }
+    } catch (e) {}
+  }
 
   let verifications = JSON.parse(localStorage.getItem("nexus_payment_verifications") || "[]");
   if (!verifications.length) {
@@ -1961,7 +2077,7 @@ function renderPaymentVerificationsTable() {
   if (typeof updateWorkspaceViewBadges === 'function') updateWorkspaceViewBadges();
 }
 
-window.approvePaymentVerification = function(paymentId) {
+window.approvePaymentVerification = async function(paymentId) {
   const verifications = JSON.parse(localStorage.getItem("nexus_payment_verifications") || "[]");
   const item = verifications.find(v => v.paymentId === paymentId);
   if (item) {
@@ -1969,12 +2085,21 @@ window.approvePaymentVerification = function(paymentId) {
     item.reviewerName = "Lead Compliance Officer (NX-ANALYST-01)";
     item.approvedAt = new Date().toISOString();
     localStorage.setItem("nexus_payment_verifications", JSON.stringify(verifications));
+    if (supabaseClient) {
+      try {
+        await supabaseClient.from('payment_verifications').update({
+          status: 'approved',
+          reviewer_name: 'Lead Compliance Officer (NX-ANALYST-01)',
+          approved_at: new Date().toISOString()
+        }).eq('payment_id', paymentId);
+      } catch (e) {}
+    }
     renderPaymentVerificationsTable();
     showAdminEmailToast(`✅ Payment ${paymentId} APPROVED! Unredacted dossier & PDF released.`);
   }
 };
 
-window.rejectPaymentVerification = function(paymentId) {
+window.rejectPaymentVerification = async function(paymentId) {
   const verifications = JSON.parse(localStorage.getItem("nexus_payment_verifications") || "[]");
   const item = verifications.find(v => v.paymentId === paymentId);
   if (item) {
@@ -1982,6 +2107,15 @@ window.rejectPaymentVerification = function(paymentId) {
     item.reviewerName = "Lead Compliance Officer (NX-ANALYST-01)";
     item.rejectedAt = new Date().toISOString();
     localStorage.setItem("nexus_payment_verifications", JSON.stringify(verifications));
+    if (supabaseClient) {
+      try {
+        await supabaseClient.from('payment_verifications').update({
+          status: 'rejected',
+          reviewer_name: 'Lead Compliance Officer (NX-ANALYST-01)',
+          rejected_at: new Date().toISOString()
+        }).eq('payment_id', paymentId);
+      } catch (e) {}
+    }
     renderPaymentVerificationsTable();
     showAdminEmailToast(`❌ Payment ${paymentId} marked as REJECTED.`);
   }
