@@ -250,26 +250,7 @@
         </div>
       </div>
 
-      <!-- Floating Batch Actions Command Dock -->
-      <div id="batchActionsDock" class="batch-actions-dock" style="display: none;">
-        <div class="batch-dock-inner">
-          <div class="batch-dock-info">
-            <i class="fas fa-list-check" style="color: var(--accent-cyan); font-size: 1rem;"></i>
-            <span id="batchSelectedCountText"><strong>0</strong> cases selected</span>
-          </div>
-          <div class="batch-dock-actions">
-            <button type="button" id="batchCloseRecoveredBtn" class="btn-primary" style="background: linear-gradient(135deg, #00f59b, #00b875); border: none; color: #080d1a; font-weight: 700; padding: 0.45rem 1rem; font-size: 0.8rem; cursor: pointer; border-radius: 20px;">
-              <i class="fas fa-circle-check"></i> Close: Restituted (100%)
-            </button>
-            <button type="button" id="batchCloseArchivedBtn" class="btn-secondary" style="background: rgba(148, 163, 184, 0.15); border: 1px solid rgba(148, 163, 184, 0.35); color: #cbd5e1; font-weight: 600; padding: 0.45rem 1rem; font-size: 0.8rem; cursor: pointer; border-radius: 20px;">
-              <i class="fas fa-box-archive"></i> Close: Archive / Done
-            </button>
-            <button type="button" id="batchClearSelectionBtn" class="btn-secondary" style="background: none; border: 1px solid rgba(255,255,255,0.18); color: #94a3b8; padding: 0.45rem 0.8rem; font-size: 0.8rem; cursor: pointer; border-radius: 20px;" title="Deselect all">
-              <i class="fas fa-xmark"></i> Deselect
-            </button>
-          </div>
-        </div>
-      </div>
+      
 
       <!-- Responsive Table -->
       <div class="admin-table-wrapper" id="reportsTableWrapper">
@@ -1079,5 +1060,25 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/admin.js"></script>
 <script src="js/blockchain-bg.js" defer></script>
+<!-- Floating Batch Actions Command Dock (Anchored to Viewport) -->
+<div id="batchActionsDock" class="batch-actions-dock" style="display: none;">
+  <div class="batch-dock-inner">
+    <div class="batch-dock-info">
+      <i class="fas fa-list-check" style="color: var(--accent-cyan); font-size: 1rem;"></i>
+      <span id="batchSelectedCountText"><strong>0</strong> cases selected</span>
+    </div>
+    <div class="batch-dock-actions">
+      <button type="button" id="batchCloseRecoveredBtn" class="btn-primary" style="background: linear-gradient(135deg, #00f59b, #00b875); border: none; color: #080d1a; font-weight: 700; padding: 0.45rem 1rem; font-size: 0.8rem; cursor: pointer; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.35rem;">
+        <i class="fas fa-circle-check"></i> Close: Restituted (100%)
+      </button>
+      <button type="button" id="batchCloseArchivedBtn" class="btn-secondary" style="background: rgba(148, 163, 184, 0.15); border: 1px solid rgba(148, 163, 184, 0.35); color: #cbd5e1; font-weight: 600; padding: 0.45rem 1rem; font-size: 0.8rem; cursor: pointer; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.35rem;">
+        <i class="fas fa-box-archive"></i> Close: Archive / Done
+      </button>
+      <button type="button" id="batchClearSelectionBtn" class="btn-secondary" style="background: none; border: 1px solid rgba(255,255,255,0.18); color: #94a3b8; padding: 0.45rem 0.8rem; font-size: 0.8rem; cursor: pointer; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.35rem;" title="Deselect all">
+        <i class="fas fa-xmark"></i> Deselect
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
