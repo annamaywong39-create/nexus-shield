@@ -380,12 +380,14 @@ code, .mono {
   text-decoration: none;
   font-size: 0.84rem;
   font-weight: 500;
-  padding: 0.45rem 0.95rem;
+  padding: 0.45rem 0.85rem;
   border-radius: var(--radius-sm);
   transition: all 0.15s ease;
   display: flex;
   align-items: center;
   gap: 0.45rem;
+  white-space: nowrap !important;
+  flex-shrink: 0;
 }
 
 .nav-link:hover {
@@ -6472,3 +6474,70 @@ body.nav-drawer-open .header {
     scrollbar-width: thin;
   }
 }
+
+.status-closed { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.35); }
+.status-archived { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.35); }
+
+/* ========================================================
+   ENTERPRISE BATCH ACTIONS COMMAND DOCK & SLA EXPLAINER
+   ======================================================== */
+.batch-actions-dock {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  animation: slideUpBatchDock 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpBatchDock {
+  from { opacity: 0; transform: translate(-50%, 25px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.batch-dock-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: rgba(10, 16, 32, 0.96);
+  border: 1px solid rgba(0, 245, 155, 0.45);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 25px rgba(0, 245, 155, 0.15);
+  border-radius: 999px;
+  padding: 0.55rem 1.35rem;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.batch-dock-info {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.82rem;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.batch-dock-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.row-selected {
+  background: rgba(0, 245, 155, 0.08) !important;
+}
+
+.sla-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+
+.sla-fresh { background: rgba(0, 245, 155, 0.12); color: #00f59b; border: 1px solid rgba(0, 245, 155, 0.3); }
+.sla-warning { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+.sla-overdue { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
