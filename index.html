@@ -467,9 +467,7 @@ STATEMENT OF SWORN FACTS:
               <div>
                 <span style="color: #94a3b8;">Status:</span> <span class="status-pill status-investigating" id="waitingStatusText">PENDING ADMIN AUDIT</span>
               </div>
-              <button type="button" id="simulateAdminApproveBtn" class="btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.74rem; background: rgba(0, 245, 155, 0.15); border-color: rgba(0, 245, 155, 0.4); color: var(--accent-green);">
-                <i class="fas fa-check-double"></i> Test Mode: Simulate Instant Admin Approval
-              </button>
+
             </div>
           </div>
 
@@ -1674,37 +1672,37 @@ STATEMENT OF SWORN FACTS:
   </div>
 </div>
 
-<!-- Floating Emergency Liaison & Live AI Triage Intake Launcher -->
-<div class="nexus-triage-launcher" id="triageLauncherBtn" title="Speak with a Forensic Case Intake Officer">
-  <div class="launcher-avatar-wrap">
-    <i class="fas fa-robot"></i>
+<!-- Floating Live Support Representative Launcher Badge -->
+<div class="nexus-triage-launcher" id="triageLauncherBtn" title="Chat with an Online Representative">
+  <div class="launcher-avatar-wrap" style="background: linear-gradient(135deg, #00f59b, #2d9fff);">
+    <i class="fas fa-headset" style="color: #080d1a;"></i>
     <div class="launcher-status-dot"></div>
   </div>
   <div class="launcher-text-col">
     <div class="launcher-title">
-      <span>Intake Liaison</span>
-      <span style="font-size: 0.64rem; background: rgba(0, 245, 155, 0.2); color: var(--accent-green); padding: 0.1rem 0.35rem; border-radius: 4px;">ONLINE</span>
+      <span>Online Support</span>
+      <span style="font-size: 0.62rem; background: rgba(0, 245, 155, 0.2); color: var(--accent-green); padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 700;">LIVE</span>
     </div>
-    <div class="launcher-sub">Speak with Case Officer &bull; Instant File</div>
+    <div class="launcher-sub">Chat with representative</div>
   </div>
 </div>
 
-<!-- Floating Triage Bot & WhatsApp Window -->
+<!-- Floating Live Support Chat Window -->
 <div class="nexus-triage-window" id="triageChatWindow">
   <!-- Header -->
   <div class="triage-header">
     <div class="triage-officer-info">
-      <div class="triage-officer-avatar">
-        <i class="fas fa-shield-halved"></i>
+      <div class="triage-officer-avatar" style="background: linear-gradient(135deg, #00f59b, #2d9fff);">
+        <i class="fas fa-headset"></i>
       </div>
       <div>
         <div class="triage-officer-name">
-          <span>Officer Elena</span>
-          <i class="fas fa-circle-check" style="color: var(--accent-green); font-size: 0.72rem;" title="Accredited Forensic Specialist"></i>
+          <span>Elena (Client Support)</span>
+          <i class="fas fa-circle-check" style="color: var(--accent-green); font-size: 0.72rem;" title="Verified Nexus Shield Representative"></i>
         </div>
         <div class="triage-officer-status">
           <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent-green); display: inline-block;"></span>
-          <span>Lead Evidence Intake Desk &bull; 24/7 Active</span>
+          <span>Online Representative &bull; Here to help you</span>
         </div>
       </div>
     </div>
@@ -1714,25 +1712,25 @@ STATEMENT OF SWORN FACTS:
     </div>
   </div>
 
-  <!-- Channel Switcher: AI Intake Bot vs WhatsApp -->
+  <!-- Channel Switcher: Live Representative vs WhatsApp Direct Line -->
   <div class="triage-channel-tabs">
     <button type="button" class="triage-channel-tab active" id="tabChannelBot">
-      <i class="fas fa-robot"></i> AI Evidence Intake
+      <i class="fas fa-comment-dots"></i> Live Chat Desk
     </button>
     <button type="button" class="triage-channel-tab" id="tabChannelWhatsApp">
-      <i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp Liaison
+      <i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp Direct
     </button>
   </div>
 
-  <!-- Chat Body (AI Triage) -->
+  <!-- Chat Body (Live Triage) -->
   <div class="triage-chat-body" id="triageChatBody">
     <!-- Messages injected by JS -->
   </div>
 
   <!-- Chat Input Bar -->
   <form id="triageInputForm" class="triage-input-bar">
-    <input type="text" id="triageMessageInput" class="triage-input-field" placeholder="Type your answer or select a quick option..." autocomplete="off">
-    <button type="submit" class="triage-send-btn" id="triageSendBtn" title="Send Answer">
+    <input type="text" id="triageMessageInput" class="triage-input-field" placeholder="Type your message or select an option below..." autocomplete="off">
+    <button type="submit" class="triage-send-btn" id="triageSendBtn" title="Send Message">
       <i class="fas fa-paper-plane"></i>
     </button>
   </form>
@@ -1742,11 +1740,11 @@ STATEMENT OF SWORN FACTS:
     <div class="triage-wa-icon-large">
       <i class="fab fa-whatsapp"></i>
     </div>
-    <h4 style="font-size: 1.05rem; color: #fff; margin-bottom: 0.35rem;">Connect with an On-Duty Officer</h4>
+    <h4 style="font-size: 1.05rem; color: #fff; margin-bottom: 0.35rem;">Chat with an Online Specialist</h4>
     <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.45; margin-bottom: 1.25rem;">
-      If you need direct human assistance or your case involves an active extortion/compromise occurring in real time, contact our emergency WhatsApp triage line immediately.
+      If you prefer to chat with a specialist directly on your phone or have urgent questions regarding an ongoing issue, our official WhatsApp line is open 24/7.
     </p>
-    <a href="https://wa.me/?text=Hello%20Nexus%20Shield%20Taskforce%2C%20I%20urgently%20need%20assistance%20with%20a%20cryptocurrency%20fraud%20incident." target="_blank" rel="noopener noreferrer" class="btn-primary" style="background: #25D366; border: none; font-size: 0.86rem; padding: 0.65rem 1.35rem; color: #080d1a; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+    <a href="https://wa.me/?text=Hello%20Nexus%20Shield%2C%20I%20am%20chatting%20from%20the%20website%20and%20need%20assistance." target="_blank" rel="noopener noreferrer" class="btn-primary" style="background: #25D366; border: none; font-size: 0.86rem; padding: 0.65rem 1.35rem; color: #080d1a; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
       <i class="fab fa-whatsapp" style="font-size: 1.1rem;"></i> Open Official WhatsApp Line
     </a>
     <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 1rem;">

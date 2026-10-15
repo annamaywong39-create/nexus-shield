@@ -35,20 +35,20 @@
 
     <!-- Dedicated Staff / Admin Navigation -->
     <nav class="nav-links" id="adminDeskNav">
-      <a href="#paymentsSection" class="nav-link" id="navLinkPayments" style="color: var(--accent-green); font-weight: 700;">
-        <i class="fas fa-file-invoice-dollar"></i> Payment Audits ($10 Reports)
-        <span class="badge-nav-pending" id="navPendingPaymentsCount" style="background: rgba(244,63,94,0.25); color: #fb7185; border: 1px solid rgba(244,63,94,0.5); font-size: 0.7rem; padding: 0.1rem 0.45rem; border-radius: 999px; margin-left: 0.3rem;">0</span>
-      </a>
-      <a href="#casesTerminalSection" class="nav-link" id="navLinkCases">
+      <a href="#cases" class="nav-link" id="navLinkCases">
         <i class="fas fa-list-check"></i> Case Queue
       </a>
-      <a href="#treasuryWalletsSection" class="nav-link" id="navLinkTreasury">
-        <i class="fas fa-wallet"></i> Receiving Wallets
+      <a href="#payments" class="nav-link" id="navLinkPayments" style="color: var(--accent-green); font-weight: 700;">
+        <i class="fas fa-file-invoice-dollar"></i> Payment Audits ($10)
+        <span class="badge-nav-pending" id="navPendingPaymentsCount" style="background: rgba(244,63,94,0.25); color: #fb7185; border: 1px solid rgba(244,63,94,0.5); font-size: 0.7rem; padding: 0.1rem 0.45rem; border-radius: 999px; margin-left: 0.3rem;">0</span>
       </a>
-      <a href="#securityChannelsSection" class="nav-link" id="navLinkSecurity">
+      <a href="#security" class="nav-link" id="navLinkSecurity">
         <i class="fas fa-shield-virus"></i> Channels &amp; Verification
       </a>
-      <a href="#kpiSection" class="nav-link" id="navLinkKpis">
+      <a href="#wallets" class="nav-link" id="navLinkTreasury">
+        <i class="fas fa-wallet"></i> Receiving Wallets
+      </a>
+      <a href="#metrics" class="nav-link" id="navLinkKpis">
         <i class="fas fa-chart-line"></i> Loss Metrics
       </a>
       <a href="index.html" target="_blank" rel="noopener noreferrer" class="nav-link" style="color: var(--accent-cyan);" title="View Public Website">
@@ -121,254 +121,43 @@
 
   <!-- 2. FULL ADMIN DASHBOARD VIEW (Shown when authenticated) -->
   <section id="adminDashboardSection" style="display: none;">
-    <!-- Top KPI Stats Grid -->
-    <div class="admin-stats-grid" id="kpiSection">
-      <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-title">Cataloged Cases</span>
-          <i class="fas fa-database kpi-icon"></i>
-        </div>
-        <div class="kpi-num" id="totalReportsKpi">140</div>
-      </div>
 
-      <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-title">Documented Losses</span>
-          <i class="fas fa-money-bill-transfer kpi-icon" style="color: var(--accent-amber);"></i>
-        </div>
-        <div class="kpi-num" id="totalLossKpi" style="color: #fde68a;">$0</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-title">Active Investigations</span>
-          <i class="fas fa-magnifying-glass-chart kpi-icon" style="color: #c084fc;"></i>
-        </div>
-        <div class="kpi-num" id="activeCasesKpi" style="color: #c084fc;">0</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-title">Flagged Scammer Wallets</span>
-          <i class="fas fa-triangle-exclamation kpi-icon" style="color: var(--accent-rose);"></i>
-        </div>
-        <div class="kpi-num" id="scammersKpi" style="color: #fb7185;">0</div>
-      </div>
-    </div>
-
-    <!-- ==================== 1. PAYMENT AUDITS & VERIFICATIONS ($10 FORENSIC REPORTS) ==================== -->
-    <div class="portal-card" id="paymentsSection" style="padding: 1.6rem; margin-bottom: 1.8rem; border-color: rgba(0, 245, 155, 0.4); background: linear-gradient(135deg, rgba(13, 21, 39, 0.96), rgba(7, 11, 22, 0.98)); box-shadow: 0 8px 32px rgba(0, 245, 155, 0.08);">
-      <div class="card-header-row" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 0.8rem;">
-        <div class="card-title-group">
-          <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
-            <h2 style="margin: 0; font-size: 1.25rem;">
-              <i class="fas fa-file-invoice-dollar" style="color: var(--accent-green);"></i> Payment Audits &amp; Verifications ($10 Reports)
-            </h2>
-            <div class="phase-step-badge" id="pendingPaymentsCountBadge" style="background: rgba(0, 245, 155, 0.15); border-color: rgba(0, 245, 155, 0.35); color: var(--accent-green); font-size: 0.76rem; padding: 0.2rem 0.65rem;">
-              0 Pending Verifications
-            </div>
-          </div>
-          <div class="card-subtitle" style="margin-top: 0.35rem;">
-            Inspect client payment transaction hashes, verify uploaded deposit proofs, and 1-click authorize unredacted forensic dossiers.
-          </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
-          <button type="button" class="btn-primary" onclick="simulateTestPayment()" style="padding: 0.45rem 0.95rem; font-size: 0.78rem; background: linear-gradient(135deg, rgba(0, 245, 155, 0.2), rgba(0, 245, 155, 0.35)); border-color: rgba(0, 245, 155, 0.5); color: #fff;">
-            <i class="fas fa-plus"></i> Simulate Test Payment ($10)
-          </button>
-          <button type="button" class="btn-secondary" onclick="resetPaymentVerifications()" style="padding: 0.45rem 0.85rem; font-size: 0.78rem;">
-            <i class="fas fa-rotate"></i> Reset Queue
-          </button>
-        </div>
-      </div>
-
-      <!-- Payment Filter & Search Toolbar -->
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; margin-bottom: 1rem; flex-wrap: wrap; background: rgba(0,0,0,0.3); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-        <!-- Status Filter Tabs -->
-        <div class="smart-queue-tab-bar" style="margin: 0; gap: 0.35rem;" id="paymentFilterTabBar">
-          <button type="button" class="smart-tab-item payment-tab-item active" data-filter="all" onclick="setPaymentFilter('all')">
-            <i class="fas fa-layer-group"></i> All Payments <span id="paymentCountAll" style="margin-left: 0.25rem;">0</span>
-          </button>
-          <button type="button" class="smart-tab-item payment-tab-item" data-filter="pending" onclick="setPaymentFilter('pending')">
-            <i class="fas fa-clock" style="color: #fb7185;"></i> Pending Audit <span id="paymentCountPending" style="margin-left: 0.25rem; color: #fb7185;">0</span>
-          </button>
-          <button type="button" class="smart-tab-item payment-tab-item" data-filter="approved" onclick="setPaymentFilter('approved')">
-            <i class="fas fa-check-circle" style="color: var(--accent-green);"></i> Approved <span id="paymentCountApproved" style="margin-left: 0.25rem; color: var(--accent-green);">0</span>
-          </button>
-          <button type="button" class="smart-tab-item payment-tab-item" data-filter="rejected" onclick="setPaymentFilter('rejected')">
-            <i class="fas fa-times-circle" style="color: var(--text-muted);"></i> Rejected <span id="paymentCountRejected" style="margin-left: 0.25rem;">0</span>
-          </button>
-        </div>
-
-        <!-- Search Input -->
-        <div style="flex: 1; max-width: 320px; min-width: 200px;">
-          <input type="text" id="paymentSearchInput" oninput="setPaymentSearch(this.value)" placeholder="Search Case ID, TxID, or Payment ID..." style="width: 100%; font-size: 0.78rem; padding: 0.45rem 0.75rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #fff;">
-        </div>
-      </div>
-
-      <!-- Quick Slide Toolbar for Payments Table -->
-      <div class="table-scroll-controls-bar">
-        <div class="scroll-helper-hint">
-          <i class="fas fa-arrows-left-right" style="color: var(--accent-green);"></i>
-          <span>Slide left/right to view full verification data:</span>
-        </div>
-        <div class="table-scroll-actions">
-          <button type="button" class="btn-slide-nav" onclick="slideTable('paymentsTableContainer', -300)">
-            <i class="fas fa-chevron-left"></i> Slide Left
-          </button>
-          <button type="button" class="btn-slide-jump" onclick="slideTableTo('paymentsTableContainer', 'start')">
-            Payment Ref
-          </button>
-          <button type="button" class="btn-slide-jump" onclick="slideTableTo('paymentsTableContainer', 'mid')">
-            TxID &amp; Proof
-          </button>
-          <button type="button" class="btn-slide-jump" onclick="slideTableTo('paymentsTableContainer', 'end')">
-            Status &amp; Actions
-          </button>
-          <button type="button" class="btn-slide-nav" onclick="slideTable('paymentsTableContainer', 300)">
-            Slide Right <i class="fas fa-chevron-right"></i>
-          </button>
-        </div>
-      </div>
-
-      <div id="paymentsTableContainer">
-        <table class="cases-table" style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
-          <thead>
-            <tr style="background: rgba(255, 255, 255, 0.04); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
-              <th style="padding: 0.6rem 0.8rem; text-align: left;">Payment Ref</th>
-              <th style="padding: 0.6rem 0.8rem; text-align: left;">Case ID</th>
-              <th style="padding: 0.6rem 0.8rem; text-align: left;">Fee &amp; Network</th>
-              <th style="padding: 0.6rem 0.8rem; text-align: left;">Payment TxID &amp; Sender</th>
-              <th style="padding: 0.6rem 0.8rem; text-align: left;">Receipt Proof</th>
-              <th style="padding: 0.6rem 0.8rem; text-align: left;">Audit Status</th>
-              <th style="padding: 0.6rem 0.8rem; text-align: right;">Action</th>
-            </tr>
-          </thead>
-          <tbody id="paymentsTableBody">
-            <!-- Rendered by js/admin.js -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ==================== 2. TREASURY RECEIVING WALLETS CONFIGURATION ==================== -->
-    <div class="portal-card" id="treasuryWalletsSection" style="padding: 1.6rem; margin-bottom: 1.8rem; border-color: rgba(45, 159, 255, 0.35); background: linear-gradient(135deg, rgba(13, 21, 39, 0.95), rgba(7, 11, 22, 0.98));">
-      <div class="card-header-row" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem;">
-        <div class="card-title-group">
-          <h2 style="margin: 0; font-size: 1.15rem;"><i class="fas fa-wallet" style="color: var(--accent-cyan);"></i> Treasury Receiving Wallets Setup</h2>
-          <div class="card-subtitle" style="margin-top: 0.25rem;">Configure the destination cryptocurrency addresses shown to victims when paying the $10 forensic unlock fee.</div>
-        </div>
-        <button type="button" id="saveTreasuryWalletsBtn" class="btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.82rem;">
-          <i class="fas fa-floppy-disk"></i> Save &amp; Update Wallets
+    <!-- Dedicated Workspace Section Switcher (Sub-Navigation) -->
+    <div class="admin-workspace-nav" id="adminWorkspaceNav">
+      <div class="admin-workspace-tabs">
+        <span class="workspace-label">
+          <i class="fas fa-layer-group"></i> Workspace:
+        </span>
+        <button type="button" class="admin-view-btn active" data-view="cases" id="viewBtnCases">
+          <i class="fas fa-list-check" style="color: var(--primary-light);"></i> Cases Queue
+          <span class="view-tab-count" id="viewCountCases">0</span>
+        </button>
+        <button type="button" class="admin-view-btn" data-view="payments" id="viewBtnPayments">
+          <i class="fas fa-file-invoice-dollar" style="color: var(--accent-green);"></i> Payment Audits ($10)
+          <span class="view-tab-count" id="viewCountPayments">0</span>
+        </button>
+        <button type="button" class="admin-view-btn" data-view="security" id="viewBtnSecurity">
+          <i class="fas fa-shield-virus" style="color: #c084fc;"></i> Channels &amp; Anti-Fraud
+        </button>
+        <button type="button" class="admin-view-btn" data-view="wallets" id="viewBtnWallets">
+          <i class="fas fa-wallet" style="color: #38bdf8;"></i> Receiving Wallets
+        </button>
+        <button type="button" class="admin-view-btn" data-view="metrics" id="viewBtnMetrics">
+          <i class="fas fa-chart-line" style="color: #fde68a;"></i> Loss Analytics
         </button>
       </div>
 
-      <div style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); display: grid; gap: 1rem;">
-        <div>
-          <label style="font-size: 0.74rem; font-weight: 700; color: #a7f3d0; display: block; margin-bottom: 0.35rem;">
-            <i class="fas fa-coins"></i> USDT (TRC-20 / TRON Network):
-          </label>
-          <input type="text" id="cfgUsdtTrc20" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="TYk6t1rX9mQ4vW8tY2mB5vC8xL3kM7jP9q">
-        </div>
-
-        <div>
-          <label style="font-size: 0.74rem; font-weight: 700; color: #93c5fd; display: block; margin-bottom: 0.35rem;">
-            <i class="fab fa-ethereum"></i> USDT (ERC-20 / Ethereum Network):
-          </label>
-          <input type="text" id="cfgUsdtErc20" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="0x94fC28e75e11A235D97E2596816D34Ac3E47A9">
-        </div>
-
-        <div>
-          <label style="font-size: 0.74rem; font-weight: 700; color: #fde68a; display: block; margin-bottom: 0.35rem;">
-            <i class="fab fa-bitcoin"></i> Bitcoin (BTC SegWit / Native):
-          </label>
-          <input type="text" id="cfgBtc" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq">
-        </div>
-
-        <div>
-          <label style="font-size: 0.74rem; font-weight: 700; color: #c084fc; display: block; margin-bottom: 0.35rem;">
-            <i class="fas fa-bolt"></i> Solana (SOL SPL Network):
-          </label>
-          <input type="text" id="cfgSol" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU">
-        </div>
-      </div>
-      <div id="treasurySaveStatus" style="display: none; margin-top: 0.85rem; font-size: 0.82rem; color: var(--accent-green); font-weight: 600; background: rgba(0,245,155,0.1); border: 1px solid rgba(0,245,155,0.3); padding: 0.5rem 0.8rem; border-radius: 6px;">
-        <i class="fas fa-check-circle"></i> Receiving wallets updated successfully! Website checkout now displays these addresses.
-      </div>
-    </div>
-
-        <!-- ==================== 3. COMMUNICATIONS, SOCIAL HANDLES & VERIFICATION REGISTRY ==================== -->
-    <div class="portal-card" id="securityChannelsSection" style="padding: 1.6rem; margin-bottom: 1.8rem; border-color: rgba(192, 132, 252, 0.4); background: linear-gradient(135deg, rgba(20, 15, 35, 0.96), rgba(8, 12, 24, 0.98));">
-      <div class="card-header-row" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem;">
-        <div class="card-title-group">
-          <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
-            <h2 style="margin: 0; font-size: 1.18rem;"><i class="fas fa-shield-virus" style="color: #c084fc;"></i> Emergency Communications, Socials &amp; Anti-Fraud Registry</h2>
-            <span class="phase-step-badge" style="background: rgba(192, 132, 252, 0.15); border-color: rgba(192, 132, 252, 0.4); color: #d8b4fe; font-size: 0.72rem;">
-              LIVE FRONTEND SYNC
-            </span>
-          </div>
-          <div class="card-subtitle" style="margin-top: 0.25rem;">
-            Control your official WhatsApp number, X handle, and support emails. Changes update the live website and the client "Verify Agent" directory instantly.
-          </div>
-        </div>
-        <button type="button" id="saveSecurityRegistryBtn" class="btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.82rem; background: linear-gradient(135deg, #a855f7, #7c3aed); border: none;">
-          <i class="fas fa-floppy-disk"></i> Save &amp; Sync Registry
+      <div class="admin-workspace-tools">
+        <button type="button" class="admin-view-btn admin-view-btn-stacked" data-view="all" id="viewBtnAll" title="Display all sections together in one stacked view">
+          <i class="fas fa-arrows-split-up-and-left"></i> View All Stacked
         </button>
       </div>
-
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.2rem;">
-        <div>
-          <label style="font-size: 0.74rem; font-weight: 700; color: #6ee7b7; display: block; margin-bottom: 0.35rem;">
-            <i class="fab fa-whatsapp"></i> Official WhatsApp Hotline (Raw phone digits for wa.me):
-          </label>
-          <input type="text" id="cfgWhatsApp" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="15550198492 (country code + number, no spaces)">
-        </div>
-
-        <div>
-          <label style="font-size: 0.74rem; font-weight: 700; color: #93c5fd; display: block; margin-bottom: 0.35rem;">
-            <i class="fa-brands fa-x-twitter"></i> Official X (Twitter) Handle:
-          </label>
-          <input type="text" id="cfgTwitter" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="@NEXUSSHIELDhq">
-        </div>
-
-        <div>
-          <label style="font-size: 0.74rem; font-weight: 700; color: #38bdf8; display: block; margin-bottom: 0.35rem;">
-            <i class="fab fa-telegram"></i> Official Telegram Support Channel / Handle:
-          </label>
-          <input type="text" id="cfgTelegram" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="@NexusShieldOfficial">
-        </div>
-
-        <div>
-          <label style="font-size: 0.74rem; font-weight: 700; color: #fde68a; display: block; margin-bottom: 0.35rem;">
-            <i class="fas fa-envelope"></i> Primary Support Desk Email:
-          </label>
-          <input type="email" id="cfgSupportEmail" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="support@nexusshield.org">
-        </div>
-
-        <div>
-          <label style="font-size: 0.74rem; font-weight: 700; color: #fb7185; display: block; margin-bottom: 0.35rem;">
-            <i class="fas fa-gavel"></i> Legal &amp; Exchange Compliance Email:
-          </label>
-          <input type="email" id="cfgComplianceEmail" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="compliance@nexusshield.org">
-        </div>
-
-        <div>
-          <label style="font-size: 0.74rem; font-weight: 700; color: #f43f5e; display: block; margin-bottom: 0.35rem;">
-            <i class="fas fa-skull-crossbones"></i> Compromised / Revoked Handles (Instant Fraud Warning):
-          </label>
-          <input type="text" id="cfgRevokedHandles" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(244,63,94,0.4); color: #fda4af; border-radius: 6px;" placeholder="e.g. @OldHackedHandle, fake_support_telegram (comma-separated)">
-        </div>
-      </div>
-
-      <div id="securityRegistrySaveStatus" style="display: none; margin-top: 0.85rem; font-size: 0.82rem; color: #d8b4fe; font-weight: 600; background: rgba(192,132,252,0.12); border: 1px solid rgba(192,132,252,0.35); padding: 0.6rem 0.85rem; border-radius: 6px;">
-        <i class="fas fa-circle-check"></i> Security Registry updated! Front-end verification tool, WhatsApp buttons, and X links now reflect these settings.
-      </div>
     </div>
 
-    <!-- Repository Management Console -->
-    <div class="portal-card" id="casesTerminalSection" style="padding: 1.8rem;">
+
+    <div class="portal-card admin-section-pane" id="casesTerminalSection" style="padding: 1.8rem; margin-bottom: 1.8rem;">
+      <div class="workspace-badge-strip" style="background: rgba(45, 159, 255, 0.15); color: var(--primary-light); border: 1px solid rgba(45, 159, 255, 0.3);"><i class="fas fa-list-check"></i> Workspace: Case Queue &amp; Investigation Terminal</div>
+      
       <div class="card-header-row" style="margin-bottom: 1.2rem;">
         <div class="card-title-group">
           <h2><i class="fas fa-list-check" style="color: var(--primary-light);"></i> Case Management &amp; Progress Terminal</h2>
@@ -487,6 +276,306 @@
             <tr><td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Loading evidence records...</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <div class="portal-card admin-section-pane" id="paymentsSection" style="padding: 1.6rem; margin-bottom: 1.8rem; border-color: rgba(0, 245, 155, 0.4); background: linear-gradient(135deg, rgba(13, 21, 39, 0.96), rgba(7, 11, 22, 0.98)); box-shadow: 0 8px 32px rgba(0, 245, 155, 0.08);">
+      <div class="workspace-badge-strip" style="background: rgba(0, 245, 155, 0.15); color: var(--accent-green); border: 1px solid rgba(0, 245, 155, 0.3);"><i class="fas fa-file-invoice-dollar"></i> Workspace: Payment Audits &amp; Proof Verification</div>
+      
+      <div class="card-header-row" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 0.8rem;">
+        <div class="card-title-group">
+          <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+            <h2 style="margin: 0; font-size: 1.25rem;">
+              <i class="fas fa-file-invoice-dollar" style="color: var(--accent-green);"></i> Payment Audits &amp; Verifications ($10 Reports)
+            </h2>
+            <div class="phase-step-badge" id="pendingPaymentsCountBadge" style="background: rgba(0, 245, 155, 0.15); border-color: rgba(0, 245, 155, 0.35); color: var(--accent-green); font-size: 0.76rem; padding: 0.2rem 0.65rem;">
+              0 Pending Verifications
+            </div>
+          </div>
+          <div class="card-subtitle" style="margin-top: 0.35rem;">
+            Inspect client payment transaction hashes, verify uploaded deposit proofs, and 1-click authorize unredacted forensic dossiers.
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="btn-primary" onclick="simulateTestPayment()" style="padding: 0.45rem 0.95rem; font-size: 0.78rem; background: linear-gradient(135deg, rgba(0, 245, 155, 0.2), rgba(0, 245, 155, 0.35)); border-color: rgba(0, 245, 155, 0.5); color: #fff;">
+            <i class="fas fa-plus"></i> Simulate Test Payment ($10)
+          </button>
+          <button type="button" class="btn-secondary" onclick="resetPaymentVerifications()" style="padding: 0.45rem 0.85rem; font-size: 0.78rem;">
+            <i class="fas fa-rotate"></i> Reset Queue
+          </button>
+        </div>
+      </div>
+
+      <!-- Payment Filter & Search Toolbar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; margin-bottom: 1rem; flex-wrap: wrap; background: rgba(0,0,0,0.3); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        <!-- Status Filter Tabs -->
+        <div class="smart-queue-tab-bar" style="margin: 0; gap: 0.35rem;" id="paymentFilterTabBar">
+          <button type="button" class="smart-tab-item payment-tab-item active" data-filter="all" onclick="setPaymentFilter('all')">
+            <i class="fas fa-layer-group"></i> All Payments <span id="paymentCountAll" style="margin-left: 0.25rem;">0</span>
+          </button>
+          <button type="button" class="smart-tab-item payment-tab-item" data-filter="pending" onclick="setPaymentFilter('pending')">
+            <i class="fas fa-clock" style="color: #fb7185;"></i> Pending Audit <span id="paymentCountPending" style="margin-left: 0.25rem; color: #fb7185;">0</span>
+          </button>
+          <button type="button" class="smart-tab-item payment-tab-item" data-filter="approved" onclick="setPaymentFilter('approved')">
+            <i class="fas fa-check-circle" style="color: var(--accent-green);"></i> Approved <span id="paymentCountApproved" style="margin-left: 0.25rem; color: var(--accent-green);">0</span>
+          </button>
+          <button type="button" class="smart-tab-item payment-tab-item" data-filter="rejected" onclick="setPaymentFilter('rejected')">
+            <i class="fas fa-times-circle" style="color: var(--text-muted);"></i> Rejected <span id="paymentCountRejected" style="margin-left: 0.25rem;">0</span>
+          </button>
+        </div>
+
+        <!-- Search Input -->
+        <div style="flex: 1; max-width: 320px; min-width: 200px;">
+          <input type="text" id="paymentSearchInput" oninput="setPaymentSearch(this.value)" placeholder="Search Case ID, TxID, or Payment ID..." style="width: 100%; font-size: 0.78rem; padding: 0.45rem 0.75rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #fff;">
+        </div>
+      </div>
+
+      <!-- Quick Slide Toolbar for Payments Table -->
+      <div class="table-scroll-controls-bar">
+        <div class="scroll-helper-hint">
+          <i class="fas fa-arrows-left-right" style="color: var(--accent-green);"></i>
+          <span>Slide left/right to view full verification data:</span>
+        </div>
+        <div class="table-scroll-actions">
+          <button type="button" class="btn-slide-nav" onclick="slideTable('paymentsTableContainer', -300)">
+            <i class="fas fa-chevron-left"></i> Slide Left
+          </button>
+          <button type="button" class="btn-slide-jump" onclick="slideTableTo('paymentsTableContainer', 'start')">
+            Payment Ref
+          </button>
+          <button type="button" class="btn-slide-jump" onclick="slideTableTo('paymentsTableContainer', 'mid')">
+            TxID &amp; Proof
+          </button>
+          <button type="button" class="btn-slide-jump" onclick="slideTableTo('paymentsTableContainer', 'end')">
+            Status &amp; Actions
+          </button>
+          <button type="button" class="btn-slide-nav" onclick="slideTable('paymentsTableContainer', 300)">
+            Slide Right <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="paymentsTableContainer">
+        <table class="cases-table" style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+          <thead>
+            <tr style="background: rgba(255, 255, 255, 0.04); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+              <th style="padding: 0.6rem 0.8rem; text-align: left;">Payment Ref</th>
+              <th style="padding: 0.6rem 0.8rem; text-align: left;">Case ID</th>
+              <th style="padding: 0.6rem 0.8rem; text-align: left;">Fee &amp; Network</th>
+              <th style="padding: 0.6rem 0.8rem; text-align: left;">Payment TxID &amp; Sender</th>
+              <th style="padding: 0.6rem 0.8rem; text-align: left;">Receipt Proof</th>
+              <th style="padding: 0.6rem 0.8rem; text-align: left;">Audit Status</th>
+              <th style="padding: 0.6rem 0.8rem; text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="paymentsTableBody">
+            <!-- Rendered by js/admin.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ==================== 2. TREASURY RECEIVING WALLETS CONFIGURATION ==================== -->
+
+    <div class="portal-card admin-section-pane" id="securityChannelsSection" style="padding: 1.6rem; margin-bottom: 1.8rem; border-color: rgba(192, 132, 252, 0.4); background: linear-gradient(135deg, rgba(20, 15, 35, 0.96), rgba(8, 12, 24, 0.98));">
+      <div class="workspace-badge-strip" style="background: rgba(192, 132, 252, 0.15); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3);"><i class="fas fa-shield-virus"></i> Workspace: Emergency Channels &amp; Anti-Fraud Registry</div>
+      
+      <div class="card-header-row" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem;">
+        <div class="card-title-group">
+          <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+            <h2 style="margin: 0; font-size: 1.18rem;"><i class="fas fa-shield-virus" style="color: #c084fc;"></i> Emergency Communications, Socials &amp; Anti-Fraud Registry</h2>
+            <span class="phase-step-badge" style="background: rgba(192, 132, 252, 0.15); border-color: rgba(192, 132, 252, 0.4); color: #d8b4fe; font-size: 0.72rem;">
+              LIVE FRONTEND SYNC
+            </span>
+          </div>
+          <div class="card-subtitle" style="margin-top: 0.25rem;">
+            Control your official WhatsApp number, X handle, and support emails. Changes update the live website and the client "Verify Agent" directory instantly.
+          </div>
+        </div>
+        <button type="button" id="saveSecurityRegistryBtn" class="btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.82rem; background: linear-gradient(135deg, #a855f7, #7c3aed); border: none;">
+          <i class="fas fa-floppy-disk"></i> Save &amp; Sync Registry
+        </button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.2rem;">
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #6ee7b7; display: block; margin-bottom: 0.35rem;">
+            <i class="fab fa-whatsapp"></i> Official WhatsApp Hotline (Raw phone digits for wa.me):
+          </label>
+          <input type="text" id="cfgWhatsApp" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="15550198492 (country code + number, no spaces)">
+        </div>
+
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #93c5fd; display: block; margin-bottom: 0.35rem;">
+            <i class="fa-brands fa-x-twitter"></i> Official X (Twitter) Handle:
+          </label>
+          <input type="text" id="cfgTwitter" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="@NEXUSSHIELDhq">
+        </div>
+
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #38bdf8; display: block; margin-bottom: 0.35rem;">
+            <i class="fab fa-telegram"></i> Official Telegram Support Channel / Handle:
+          </label>
+          <input type="text" id="cfgTelegram" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="@NexusShieldOfficial">
+        </div>
+
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #fde68a; display: block; margin-bottom: 0.35rem;">
+            <i class="fas fa-envelope"></i> Primary Support Desk Email:
+          </label>
+          <input type="email" id="cfgSupportEmail" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="support@nexusshield.org">
+        </div>
+
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #fb7185; display: block; margin-bottom: 0.35rem;">
+            <i class="fas fa-gavel"></i> Legal &amp; Exchange Compliance Email:
+          </label>
+          <input type="email" id="cfgComplianceEmail" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="compliance@nexusshield.org">
+        </div>
+
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #f43f5e; display: block; margin-bottom: 0.35rem;">
+            <i class="fas fa-skull-crossbones"></i> Compromised / Revoked Handles (Instant Fraud Warning):
+          </label>
+          <input type="text" id="cfgRevokedHandles" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(244,63,94,0.4); color: #fda4af; border-radius: 6px;" placeholder="e.g. @OldHackedHandle, fake_support_telegram (comma-separated)">
+        </div>
+      </div>
+
+      <div id="securityRegistrySaveStatus" style="display: none; margin-top: 0.85rem; font-size: 0.82rem; color: #d8b4fe; font-weight: 600; background: rgba(192,132,252,0.12); border: 1px solid rgba(192,132,252,0.35); padding: 0.6rem 0.85rem; border-radius: 6px;">
+        <i class="fas fa-circle-check"></i> Security Registry updated! Front-end verification tool, WhatsApp buttons, and X links now reflect these settings.
+      </div>
+    </div>
+
+    <div class="portal-card admin-section-pane" id="treasuryWalletsSection" style="padding: 1.6rem; margin-bottom: 1.8rem; border-color: rgba(45, 159, 255, 0.35); background: linear-gradient(135deg, rgba(13, 21, 39, 0.95), rgba(7, 11, 22, 0.98));">
+      <div class="workspace-badge-strip" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);"><i class="fas fa-wallet"></i> Workspace: Receiving Treasury Wallets</div>
+      
+      <div class="card-header-row" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem;">
+        <div class="card-title-group">
+          <h2 style="margin: 0; font-size: 1.15rem;"><i class="fas fa-wallet" style="color: var(--accent-cyan);"></i> Treasury Receiving Wallets Setup</h2>
+          <div class="card-subtitle" style="margin-top: 0.25rem;">Configure the destination cryptocurrency addresses shown to victims when paying the $10 forensic unlock fee.</div>
+        </div>
+        <button type="button" id="saveTreasuryWalletsBtn" class="btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.82rem;">
+          <i class="fas fa-floppy-disk"></i> Save &amp; Update Wallets
+        </button>
+      </div>
+
+      <div style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); display: grid; gap: 1rem;">
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #a7f3d0; display: block; margin-bottom: 0.35rem;">
+            <i class="fas fa-coins"></i> USDT (TRC-20 / TRON Network):
+          </label>
+          <input type="text" id="cfgUsdtTrc20" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="TYk6t1rX9mQ4vW8tY2mB5vC8xL3kM7jP9q">
+        </div>
+
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #93c5fd; display: block; margin-bottom: 0.35rem;">
+            <i class="fab fa-ethereum"></i> USDT (ERC-20 / Ethereum Network):
+          </label>
+          <input type="text" id="cfgUsdtErc20" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="0x94fC28e75e11A235D97E2596816D34Ac3E47A9">
+        </div>
+
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #fde68a; display: block; margin-bottom: 0.35rem;">
+            <i class="fab fa-bitcoin"></i> Bitcoin (BTC SegWit / Native):
+          </label>
+          <input type="text" id="cfgBtc" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq">
+        </div>
+
+        <div>
+          <label style="font-size: 0.74rem; font-weight: 700; color: #c084fc; display: block; margin-bottom: 0.35rem;">
+            <i class="fas fa-bolt"></i> Solana (SOL SPL Network):
+          </label>
+          <input type="text" id="cfgSol" class="input-mono" style="width: 100%; font-size: 0.78rem; padding: 0.55rem 0.7rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;" placeholder="7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU">
+        </div>
+      </div>
+      <div id="treasurySaveStatus" style="display: none; margin-top: 0.85rem; font-size: 0.82rem; color: var(--accent-green); font-weight: 600; background: rgba(0,245,155,0.1); border: 1px solid rgba(0,245,155,0.3); padding: 0.5rem 0.8rem; border-radius: 6px;">
+        <i class="fas fa-check-circle"></i> Receiving wallets updated successfully! Website checkout now displays these addresses.
+      </div>
+    </div>
+
+        <!-- ==================== 3. COMMUNICATIONS, SOCIAL HANDLES & VERIFICATION REGISTRY ==================== -->
+
+    <!-- 5. LOSS METRICS & FORENSIC ANALYTICS WORKSPACE -->
+    <div id="metricsWorkspaceWrapper" class="admin-section-pane" style="display: none; margin-bottom: 1.8rem;">
+      <div class="workspace-badge-strip" style="background: rgba(253, 230, 138, 0.15); color: #fde68a; border: 1px solid rgba(253, 230, 138, 0.3); margin-bottom: 1rem;">
+        <i class="fas fa-chart-line"></i> Workspace: Crime Loss Metrics &amp; Forensic Intelligence Analytics
+      </div>
+
+      <div class="admin-stats-grid" id="kpiSection">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Cataloged Cases</span>
+          <i class="fas fa-database kpi-icon"></i>
+        </div>
+        <div class="kpi-num" id="totalReportsKpi">140</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Documented Losses</span>
+          <i class="fas fa-money-bill-transfer kpi-icon" style="color: var(--accent-amber);"></i>
+        </div>
+        <div class="kpi-num" id="totalLossKpi" style="color: #fde68a;">$0</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Active Investigations</span>
+          <i class="fas fa-magnifying-glass-chart kpi-icon" style="color: #c084fc;"></i>
+        </div>
+        <div class="kpi-num" id="activeCasesKpi" style="color: #c084fc;">0</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Flagged Scammer Wallets</span>
+          <i class="fas fa-triangle-exclamation kpi-icon" style="color: var(--accent-rose);"></i>
+        </div>
+        <div class="kpi-num" id="scammersKpi" style="color: #fb7185;">0</div>
+      </div>
+    </div>
+
+      <!-- Institutional Forensic Analytics Summary Card -->
+      <div class="portal-card" style="padding: 1.6rem; border-color: rgba(253, 230, 138, 0.35); background: linear-gradient(135deg, rgba(20, 18, 10, 0.96), rgba(8, 12, 24, 0.98));">
+        <div class="card-header-row" style="margin-bottom: 1.2rem;">
+          <div class="card-title-group">
+            <h2 style="font-size: 1.2rem;"><i class="fas fa-diagram-project" style="color: #fde68a;"></i> Forensic Operations &amp; Intelligence Summary</h2>
+            <div class="card-subtitle">Real-time status overview of active blockchain traces and exchange forfeiture notices.</div>
+          </div>
+          <div style="display: flex; gap: 0.6rem;">
+            <button type="button" class="btn-primary" onclick="window.switchAdminView('cases')" style="padding: 0.45rem 0.95rem; font-size: 0.8rem;">
+              <i class="fas fa-arrow-right"></i> Open Case Queue
+            </button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.2rem;">
+          <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="font-size: 0.74rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 0.35rem;">Stage 1 &amp; 2: Intake &amp; Graphing</div>
+            <div style="font-size: 1.25rem; font-weight: 800; color: #38bdf8;" id="metricsStage1Count">0 Cases</div>
+            <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.25rem;">Initial telemetry &amp; node queries</div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="font-size: 0.74rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 0.35rem;">Stage 3: On-Chain Peeling</div>
+            <div style="font-size: 1.25rem; font-weight: 800; color: #c084fc;" id="metricsStage3Count">0 Cases</div>
+            <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.25rem;">Multi-hop UTXO &amp; pool tracing</div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="font-size: 0.74rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 0.35rem;">Stage 4: CEX Holds Served</div>
+            <div style="font-size: 1.25rem; font-weight: 800; color: #fde68a;" id="metricsStage4Count">0 Cases</div>
+            <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.25rem;">Statutory 48h emergency freezes</div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="font-size: 0.74rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 0.35rem;">Stage 5: Restitution Resolved</div>
+            <div style="font-size: 1.25rem; font-weight: 800; color: #34d399;" id="metricsStage5Count">0 Cases</div>
+            <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.25rem;">Assets preserved &amp; restituted</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
