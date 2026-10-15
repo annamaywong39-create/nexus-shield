@@ -650,6 +650,9 @@ function updateKpis(reports) {
   if (tabRecovered) tabRecovered.innerText = recoveredCount;
   if (tabHighValue) tabHighValue.innerText = highValueCount;
   if (tabOverdue) tabOverdue.innerText = overdueCount;
+  const tabClosed = document.getElementById('tabBadgeClosed');
+  const closedCount = reports.filter(r => r.status === 'failed' || r.status === 'closed' || r.status === 'archived').length;
+  if (tabClosed) tabClosed.innerText = closedCount;
 
   // Update Metrics Workspace Cards
   const mStage1 = document.getElementById('metricsStage1Count');
@@ -677,6 +680,7 @@ function applyFilters() {
     if (activeSmartTab === 'investigating' && r.status !== 'investigating' && r.status !== 'approved') return false;
     if (activeSmartTab === 'recovering1' && r.status !== 'recovering1' && r.status !== 'recovering2') return false;
     if (activeSmartTab === 'recovered' && r.status !== 'recovered') return false;
+    if (activeSmartTab === 'failed' && r.status !== 'failed' && r.status !== 'closed' && r.status !== 'archived') return false;
     if (activeSmartTab === 'highvalue' && (parseFloat(r.amount_lost) || 0) < 20000) return false;
     if (activeSmartTab === 'overdue') {
       const isClosed = r.status === 'recovered' || r.status === 'failed';
@@ -1508,6 +1512,36 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Save progress stage, mode, slider percent & custom note
+    // Quick Close: Restituted & Recovered (100%)
+  document.getElementById('quickCloseRecoveredBtn')?.addEventListener('click', async () => {
+    if (!selectedReportForDetail) return;
+    const ref = selectedReportForDetail.report_id || selectedReportForDetail.id;
+    if (!confirm(`Are you sure you want to CLOSE Case ${ref} as RESTITUTED & RECOVERED (100%)?`)) return;
+    const stageSelect = document.getElementById('detailStatusSelect');
+    if (stageSelect) stageSelect.value = 'recovered';
+    syncProgressSlider(100);
+    const customMsgInput = document.getElementById('detailCustomMessage');
+    const closeNote = 'Case closed: Restitution finalized and verified on-chain. Funds credited to safe recovery wallet.';
+    if (customMsgInput) customMsgInput.value = closeNote;
+    await updateReportProgress(selectedReportForDetail.id, 'recovered', closeNote, 'manual', 100);
+    showAdminEmailToast(`✅ Case ${ref} successfully marked as RESTITUTED & CLOSED!`);
+  });
+
+  // Quick Close: Archive / Done
+  document.getElementById('quickCloseArchivedBtn')?.addEventListener('click', async () => {
+    if (!selectedReportForDetail) return;
+    const ref = selectedReportForDetail.report_id || selectedReportForDetail.id;
+    if (!confirm(`Are you sure you want to CLOSE and ARCHIVE Case ${ref}?`)) return;
+    const stageSelect = document.getElementById('detailStatusSelect');
+    if (stageSelect) stageSelect.value = 'failed';
+    syncProgressSlider(100);
+    const customMsgInput = document.getElementById('detailCustomMessage');
+    const closeNote = 'Investigation concluded and officially archived: On-chain tracing hops completed.';
+    if (customMsgInput) customMsgInput.value = closeNote;
+    await updateReportProgress(selectedReportForDetail.id, 'failed', closeNote, 'manual', 100);
+    showAdminEmailToast(`📁 Case ${ref} marked as ARCHIVED & CLOSED.`);
+  });
+
   document.getElementById('saveDetailStatusBtn')?.addEventListener('click', async () => {
     if (!selectedReportForDetail) return;
     const newStatus = document.getElementById('detailStatusSelect').value;

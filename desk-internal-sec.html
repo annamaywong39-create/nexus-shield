@@ -190,6 +190,9 @@
         <button type="button" class="smart-tab-item" data-tab="recovered">
           <i class="fas fa-circle-check" style="color: var(--accent-green);"></i> Restituted <span class="tab-badge" id="tabBadgeRecovered">0</span>
         </button>
+        <button type="button" class="smart-tab-item" data-tab="failed">
+          <i class="fas fa-box-archive" style="color: #94a3b8;"></i> Closed / Done <span class="tab-badge" id="tabBadgeClosed">0</span>
+        </button>
         <button type="button" class="smart-tab-item" data-tab="highvalue">
           <i class="fas fa-gem" style="color: #fbbf24;"></i> High Value (&ge;$20k) <span class="tab-badge" id="tabBadgeHighValue">0</span>
         </button>
@@ -712,7 +715,15 @@
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding-top: 0.85rem; border-top: 1px solid rgba(255,255,255,0.08);">
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button type="button" id="quickCloseRecoveredBtn" class="btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.76rem; background: rgba(0, 245, 155, 0.12); border-color: rgba(0, 245, 155, 0.35); color: #00f59b; font-weight: 700;" title="Instantly close case with 100% restitution badge">
+            <i class="fas fa-circle-check"></i> Close: Restituted (100%)
+          </button>
+          <button type="button" id="quickCloseArchivedBtn" class="btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.76rem; background: rgba(148, 163, 184, 0.12); border-color: rgba(148, 163, 184, 0.3); color: #94a3b8; font-weight: 600;" title="Instantly close and archive case (done / exhausted)">
+            <i class="fas fa-box-archive"></i> Close: Archive / Done
+          </button>
+        </div>
         <button id="saveDetailStatusBtn" class="btn-primary" style="padding: 0.55rem 1.35rem; font-size: 0.86rem;">
           <i class="fas fa-floppy-disk"></i> Save Progress &amp; Update Client View
         </button>
