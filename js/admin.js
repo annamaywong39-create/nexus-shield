@@ -109,6 +109,7 @@ async function sha256Hex(str) {
 let allReports = [];
 let currentFilteredReports = [];
 let selectedReportForDetail = null;
+let selectedCaseIds = new Set();
 let activeSmartTab = 'all';
 
 window.copyWalletText = function(text, btn) {
@@ -651,7 +652,7 @@ function updateKpis(reports) {
   if (tabHighValue) tabHighValue.innerText = highValueCount;
   if (tabOverdue) tabOverdue.innerText = overdueCount;
   const tabClosed = document.getElementById('tabBadgeClosed');
-  const closedCount = reports.filter(r => r.status === 'failed' || r.status === 'closed' || r.status === 'archived').length;
+  const closedCount = reports.filter(r => r.status === 'failed' || r.status === 'recovered' || r.status === 'closed' || r.status === 'archived').length;
   if (tabClosed) tabClosed.innerText = closedCount;
 
   // Update Metrics Workspace Cards
@@ -680,6 +681,7 @@ function applyFilters() {
     if (activeSmartTab === 'investigating' && r.status !== 'investigating' && r.status !== 'approved') return false;
     if (activeSmartTab === 'recovering1' && r.status !== 'recovering1' && r.status !== 'recovering2') return false;
     if (activeSmartTab === 'recovered' && r.status !== 'recovered') return false;
+    if (activeSmartTab === 'closed' && r.status !== 'failed' && r.status !== 'recovered' && r.status !== 'closed' && r.status !== 'archived') return false;
     if (activeSmartTab === 'failed' && r.status !== 'failed' && r.status !== 'closed' && r.status !== 'archived') return false;
     if (activeSmartTab === 'highvalue' && (parseFloat(r.amount_lost) || 0) < 20000) return false;
     if (activeSmartTab === 'overdue') {
@@ -705,12 +707,37 @@ function applyFilters() {
   renderTable(currentFilteredReports);
 }
 
+
+function updateBatchDock() {
+  const dock = document.getElementById('batchActionsDock');
+  const countText = document.getElementById('batchSelectedCountText');
+  const selectAllBox = document.getElementById('selectAllCasesCheckbox');
+  const count = selectedCaseIds.size;
+
+  if (dock && countText) {
+    if (count > 0) {
+      dock.style.display = 'block';
+      countText.innerHTML = `<strong>${count}</strong> case${count === 1 ? '' : 's'} selected`;
+    } else {
+      dock.style.display = 'none';
+    }
+  }
+
+  if (selectAllBox && currentFilteredReports.length > 0) {
+    const allVisibleSelected = currentFilteredReports.every(r => selectedCaseIds.has(String(r.id)) || (r.report_id && selectedCaseIds.has(r.report_id)));
+    selectAllBox.checked = allVisibleSelected;
+  } else if (selectAllBox) {
+    selectAllBox.checked = false;
+  }
+}
+
 function renderTable(reports) {
   const tbody = document.getElementById('reportsTableBody');
   if (!tbody) return;
 
   if (!reports.length) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No matching forensic records found.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No matching forensic records found.</td></tr>';
+    updateBatchDock();
     return;
   }
 
@@ -720,6 +747,10 @@ function renderTable(reports) {
       formattedDate = new Date(r.timestamp).toLocaleDateString();
     }
 
+    const key = String(r.id);
+    const refKey = r.report_id || '';
+    const isSelected = selectedCaseIds.has(key) || (refKey && selectedCaseIds.has(refKey));
+
     const statusBadgeClass = `status-pill status-${r.status || 'pending'}`;
     const reportRef = r.report_id ? (r.report_id.length > 18 ? r.report_id.substring(0, 18) + '...' : r.report_id) : `#${r.id}`;
     const hasAlert = r.clientAlert && r.clientAlert.active;
@@ -727,7 +758,10 @@ function renderTable(reports) {
     const slaBadge = getSlaBadge(r.timestamp);
 
     return `
-      <tr>
+      <tr class="${isSelected ? 'row-selected' : ''}" style="${isSelected ? 'background: rgba(0, 245, 155, 0.08);' : ''}">
+        <td style="text-align: center; vertical-align: middle;">
+          <input type="checkbox" class="case-select-checkbox" data-id="${r.id}" data-ref="${r.report_id || r.id}" ${isSelected ? 'checked' : ''} style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary-light);">
+        </td>
         <td class="mono" style="font-size: 0.82rem; color: var(--accent-cyan); font-weight: 600;">
           <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 400;">#${r.id}</div>
           <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
@@ -764,6 +798,47 @@ function renderTable(reports) {
     `;
   }).join('');
 
+  // Row selection checkboxes
+  document.querySelectorAll('.case-select-checkbox').forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      const id = String(e.target.dataset.id);
+      const ref = e.target.dataset.ref;
+      if (e.target.checked) {
+        selectedCaseIds.add(id);
+        if (ref) selectedCaseIds.add(ref);
+      } else {
+        selectedCaseIds.delete(id);
+        if (ref) selectedCaseIds.delete(ref);
+      }
+      updateBatchDock();
+      // Highlight row
+      const tr = e.target.closest('tr');
+      if (tr) {
+        if (e.target.checked) tr.classList.add('row-selected');
+        else tr.classList.remove('row-selected');
+      }
+    });
+  });
+
+  // Select All visible cases checkbox
+  const selectAll = document.getElementById('selectAllCasesCheckbox');
+  if (selectAll) {
+    selectAll.onchange = (e) => {
+      if (e.target.checked) {
+        reports.forEach(r => {
+          selectedCaseIds.add(String(r.id));
+          if (r.report_id) selectedCaseIds.add(r.report_id);
+        });
+      } else {
+        reports.forEach(r => {
+          selectedCaseIds.delete(String(r.id));
+          if (r.report_id) selectedCaseIds.delete(r.report_id);
+        });
+      }
+      renderTable(reports);
+    };
+  }
+
   document.querySelectorAll('.view-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const id = btn.dataset.id;
@@ -772,6 +847,8 @@ function renderTable(reports) {
       if (report) openDetailModal(report);
     });
   });
+
+  updateBatchDock();
 }
 
 // Update case progress with dual manual/auto support
@@ -1435,6 +1512,69 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
 
   // Filters & exports
+  
+  // Batch Close as Restituted (100%)
+  document.getElementById('batchCloseRecoveredBtn')?.addEventListener('click', async () => {
+    const count = selectedCaseIds.size;
+    if (count === 0) return;
+    if (!confirm(`Are you sure you want to CLOSE ${count} selected case(s) as RESTITUTED & RECOVERED (100%)?`)) return;
+
+    const idsToClose = Array.from(selectedCaseIds);
+    const closeNote = 'Case closed: Restitution finalized and verified on-chain. Funds credited to safe recovery wallet.';
+
+    for (const id of idsToClose) {
+      await updateReportProgress(id, 'recovered', closeNote, 'manual', 100);
+    }
+
+    selectedCaseIds.clear();
+    updateBatchDock();
+    applyFilters();
+    showAdminEmailToast(`✅ ${count} case(s) successfully marked as RESTITUTED & CLOSED!`);
+  });
+
+  // Batch Close & Archive
+  document.getElementById('batchCloseArchivedBtn')?.addEventListener('click', async () => {
+    const count = selectedCaseIds.size;
+    if (count === 0) return;
+    if (!confirm(`Are you sure you want to CLOSE and ARCHIVE ${count} selected case(s)?`)) return;
+
+    const idsToClose = Array.from(selectedCaseIds);
+    const closeNote = 'Investigation concluded and officially archived: On-chain tracing hops completed.';
+
+    for (const id of idsToClose) {
+      await updateReportProgress(id, 'failed', closeNote, 'manual', 100);
+    }
+
+    selectedCaseIds.clear();
+    updateBatchDock();
+    applyFilters();
+    showAdminEmailToast(`📁 ${count} case(s) marked as ARCHIVED & CLOSED.`);
+  });
+
+  // Batch Clear Selection
+  document.getElementById('batchClearSelectionBtn')?.addEventListener('click', () => {
+    selectedCaseIds.clear();
+    updateBatchDock();
+    renderTable(currentFilteredReports);
+  });
+
+  // SLA Explainer Modal
+  const slaModal = document.getElementById('slaExplainerModal');
+  document.getElementById('openSlaExplainerBtn')?.addEventListener('click', () => {
+    if (slaModal) slaModal.style.display = 'flex';
+  });
+  document.getElementById('closeSlaExplainerBtn')?.addEventListener('click', () => {
+    if (slaModal) slaModal.style.display = 'none';
+  });
+  document.getElementById('dismissSlaExplainerBtn')?.addEventListener('click', () => {
+    if (slaModal) slaModal.style.display = 'none';
+  });
+  if (slaModal) {
+    slaModal.addEventListener('click', (e) => {
+      if (e.target === slaModal) slaModal.style.display = 'none';
+    });
+  }
+
   document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
   document.getElementById('resetFiltersBtn')?.addEventListener('click', () => {
     document.getElementById('filterStatus').value = '';

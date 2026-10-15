@@ -4,7 +4,7 @@ const translations = {
     site_name: "NEXUS SHIELD",
     subhead: "CRYPTO ASSET RECOVERY & FORENSICS",
     nav_home: "Report Loss",
-    nav_about: "How We Work",
+    nav_about: "About Us",
     nav_partners: "Partners & Alliances",
     nav_explorer: "ChainExplorer",
     reports_secured: "cases registered",
