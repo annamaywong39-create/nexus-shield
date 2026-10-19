@@ -35,16 +35,13 @@
 
     <!-- Clean Public Navbar with Dedicated Tabs -->
     <nav class="nav-links">
-      <a href="index.html" class="nav-link"><i class="fas fa-shield-halved"></i> Report Loss</a>
-      <a href="methodology.html" class="nav-link"><i class="fas fa-network-wired"></i> Methodology</a>
-      <a href="cases.html" class="nav-link"><i class="fas fa-folder-open"></i> Case Studies</a>
-      <a href="intelligence.html" class="nav-link"><i class="fas fa-passport"></i> Sanctions &amp; Risk</a>
-      <a href="about.html" class="nav-link active" style="white-space: nowrap !important;"><i class="fas fa-circle-info"></i> About Us</a>
-      <a href="partners.html" class="nav-link"><i class="fas fa-handshake"></i> Partners</a>
-      <a href="mailto:support@nexusshield.org" class="nav-link"><i class="fas fa-envelope"></i> Support</a>
-      <a href="https://x.com/NEXUSSHIELDhq" target="_blank" rel="noopener noreferrer" class="nav-link nav-icon-link" aria-label="Nexus Shield on X" title="Nexus Shield on X (@NEXUSSHIELDhq)"><i class="fa-brands fa-x-twitter"></i></a>
-      <a href="index.html#statusReportId" class="nav-link mobile-only-track"><i class="fas fa-magnifying-glass"></i> Track Case Status</a>
-      <button type="button" class="nav-link mobile-only-spin" id="mobileSpinTrigger"><i class="fas fa-rotate"></i> 360° Orbit</button>
+      <a href="index.html" class="nav-link" data-i18n="nav_home">Report Loss</a>
+      <a href="methodology.html" class="nav-link">Methodology</a>
+      <a href="cases.html" class="nav-link">Case Studies</a>
+      <a href="intelligence.html" class="nav-link">Sanctions &amp; Risk</a>
+      <a href="about.html" class="nav-link active" data-i18n="nav_about">About Us</a>
+      <a href="partners.html" class="nav-link" data-i18n="nav_partners">Partners</a>
+      <a href="index.html#statusReportId" class="nav-link mobile-only-track">Track Case</a>
     </nav>
 
     <div class="header-actions">
@@ -403,7 +400,7 @@
 
 <!-- Footer -->
 <footer class="footer">
-  <div class="footer-bottom">
+  <div style="max-width: 1360px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
     <div>
       <img src="assets/icons/favicon-32x32.png" alt="Nexus Shield" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem; display: inline-block;">
       <span data-i18n="footer_text">NEXUS SHIELD — Crypto Asset Recovery &amp; Blockchain Forensics | Emergency Exchange Freezes &amp; Restitution</span>
@@ -412,9 +409,10 @@
       <a href="mailto:support@nexusshield.org" style="color: var(--accent-cyan); font-weight: 600;"><i class="fas fa-envelope"></i> support@nexusshield.org</a>
       <a href="https://x.com/NEXUSSHIELDhq" target="_blank" rel="noopener noreferrer" class="footer-x-link" style="color: #cbd5e1; font-size: 1.1rem; display: inline-flex; align-items: center; text-decoration: none;" aria-label="Nexus Shield on X" title="Nexus Shield on X (@NEXUSSHIELDhq)"><i class="fa-brands fa-x-twitter"></i></a>
       <a href="index.html">Report Loss</a>
-      <a href="about.html" style="color: var(--accent-cyan);">How We Work</a>
+      <a href="about.html">About Us</a>
       <a href="partners.html">Partners &amp; Alliances</a>
       <a href="chainexplorer.html">ChainExplorer</a>
+      <a href="index.html#verifyAgent" style="color: var(--accent-green); font-weight: 600;"><i class="fas fa-user-shield"></i> Verify Agent</a>
       <a href="https://ic3.gov" target="_blank" rel="noopener noreferrer">IC3 Referral</a>
     </div>
   </div>

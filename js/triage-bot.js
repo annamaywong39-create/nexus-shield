@@ -145,6 +145,13 @@
     footerBtn?.addEventListener('click', window.openAgentVerifyModal);
     closeBtn?.addEventListener('click', window.closeAgentVerifyModal);
 
+    // Auto-open modal if navigated from another page via #verifyAgent or ?verify=1
+    if (window.location.hash === '#verifyAgent' || window.location.hash === '#agentVerificationModal' || window.location.search.includes('verify=1')) {
+      setTimeout(() => {
+        window.openAgentVerifyModal();
+      }, 350);
+    }
+
     modal?.addEventListener('click', (e) => {
       if (e.target === modal) window.closeAgentVerifyModal();
     });
