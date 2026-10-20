@@ -252,6 +252,29 @@
 
       
 
+            <!-- Inline Batch Actions Bar (Sticky Directly Above Table) -->
+      <div id="inlineBatchBar" class="inline-batch-bar" style="display: none;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(0, 245, 155, 0.15); color: var(--accent-green); font-size: 0.8rem; font-weight: 700;">
+              <i class="fas fa-check"></i>
+            </span>
+            <span id="inlineBatchSelectedCount" style="font-size: 0.88rem; font-weight: 700; color: #fff;">0 cases selected</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" id="inlineBatchDoneBtn" class="btn-primary" style="background: linear-gradient(135deg, #00f59b, #00b875); border: none; color: #080d1a; font-weight: 700; padding: 0.5rem 1.15rem; font-size: 0.82rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+              <i class="fas fa-circle-check"></i> Mark Done (100% Restituted)
+            </button>
+            <button type="button" id="inlineBatchEndBtn" class="btn-secondary" style="background: rgba(148, 163, 184, 0.15); border: 1px solid rgba(148, 163, 184, 0.35); color: #e2e8f0; font-weight: 600; padding: 0.5rem 1.15rem; font-size: 0.82rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+              <i class="fas fa-box-archive"></i> End / Archive Case
+            </button>
+            <button type="button" id="inlineBatchClearBtn" class="btn-secondary" style="background: none; border: 1px solid rgba(255,255,255,0.18); color: #94a3b8; padding: 0.5rem 0.85rem; font-size: 0.82rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
+              <i class="fas fa-xmark"></i> Deselect
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Responsive Table -->
       <div class="admin-table-wrapper" id="reportsTableWrapper">
         <table class="admin-table" id="reportsTable">
@@ -711,12 +734,15 @@
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding-top: 0.85rem; border-top: 1px solid rgba(255,255,255,0.08);">
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <button type="button" id="quickCloseRecoveredBtn" class="btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.76rem; background: rgba(0, 245, 155, 0.12); border-color: rgba(0, 245, 155, 0.35); color: #00f59b; font-weight: 700;" title="Instantly close case with 100% restitution badge">
-            <i class="fas fa-circle-check"></i> Close: Restituted (100%)
+            <i class="fas fa-circle-check"></i> Mark Done (100%)
           </button>
           <button type="button" id="quickCloseArchivedBtn" class="btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.76rem; background: rgba(148, 163, 184, 0.12); border-color: rgba(148, 163, 184, 0.3); color: #94a3b8; font-weight: 600;" title="Instantly close and archive case (done / exhausted)">
-            <i class="fas fa-box-archive"></i> Close: Archive / Done
+            <i class="fas fa-box-archive"></i> End / Archive Case
+          </button>
+          <button type="button" id="reopenCaseModalBtn" class="btn-secondary" style="display: none; padding: 0.45rem 0.85rem; font-size: 0.76rem; background: rgba(96, 165, 250, 0.12); border-color: rgba(96, 165, 250, 0.35); color: #93c5fd; font-weight: 600;" title="Reopen closed case back to active investigation">
+            <i class="fas fa-rotate-left"></i> Reopen Case
           </button>
         </div>
         <button id="saveDetailStatusBtn" class="btn-primary" style="padding: 0.55rem 1.35rem; font-size: 0.86rem;">
@@ -1068,11 +1094,11 @@
       <span id="batchSelectedCountText"><strong>0</strong> cases selected</span>
     </div>
     <div class="batch-dock-actions">
-      <button type="button" id="batchCloseRecoveredBtn" class="btn-primary" style="background: linear-gradient(135deg, #00f59b, #00b875); border: none; color: #080d1a; font-weight: 700; padding: 0.45rem 1rem; font-size: 0.8rem; cursor: pointer; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.35rem;">
-        <i class="fas fa-circle-check"></i> Close: Restituted (100%)
+      <button type="button" id="batchDoneBtn" class="btn-primary" style="background: linear-gradient(135deg, #00f59b, #00b875); border: none; color: #080d1a; font-weight: 700; padding: 0.45rem 1rem; font-size: 0.8rem; cursor: pointer; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.35rem;">
+        <i class="fas fa-circle-check"></i> Mark Done (100%)
       </button>
-      <button type="button" id="batchCloseArchivedBtn" class="btn-secondary" style="background: rgba(148, 163, 184, 0.15); border: 1px solid rgba(148, 163, 184, 0.35); color: #cbd5e1; font-weight: 600; padding: 0.45rem 1rem; font-size: 0.8rem; cursor: pointer; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.35rem;">
-        <i class="fas fa-box-archive"></i> Close: Archive / Done
+      <button type="button" id="batchEndBtn" class="btn-secondary" style="background: rgba(148, 163, 184, 0.15); border: 1px solid rgba(148, 163, 184, 0.35); color: #cbd5e1; font-weight: 600; padding: 0.45rem 1rem; font-size: 0.8rem; cursor: pointer; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.35rem;">
+        <i class="fas fa-box-archive"></i> End / Archive
       </button>
       <button type="button" id="batchClearSelectionBtn" class="btn-secondary" style="background: none; border: 1px solid rgba(255,255,255,0.18); color: #94a3b8; padding: 0.45rem 0.8rem; font-size: 0.8rem; cursor: pointer; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.35rem;" title="Deselect all">
         <i class="fas fa-xmark"></i> Deselect

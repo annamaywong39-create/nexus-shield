@@ -6541,3 +6541,38 @@ body.nav-drawer-open .header {
 .sla-fresh { background: rgba(0, 245, 155, 0.12); color: #00f59b; border: 1px solid rgba(0, 245, 155, 0.3); }
 .sla-warning { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
 .sla-overdue { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+/* Inline Batch Actions Command Bar (Sticky directly above case queue) */
+.inline-batch-bar {
+  display: none;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1.15rem;
+  background: rgba(13, 21, 39, 0.95);
+  border: 1px solid rgba(0, 245, 155, 0.45);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 15px rgba(0, 245, 155, 0.12);
+  animation: slideDownBatch 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDownBatch {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.quick-row-done-btn:hover {
+  background: rgba(0, 245, 155, 0.2) !important;
+  color: #00f59b !important;
+  border-color: #00f59b !important;
+}
+
+.quick-row-end-btn:hover {
+  background: rgba(148, 163, 184, 0.25) !important;
+  color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+.quick-row-reopen-btn:hover {
+  background: rgba(96, 165, 250, 0.25) !important;
+  color: #93c5fd !important;
+  border-color: #93c5fd !important;
+}
