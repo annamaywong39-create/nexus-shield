@@ -112,6 +112,73 @@ let selectedReportForDetail = null;
 let selectedCaseIds = new Set();
 let activeSmartTab = 'all';
 
+function getReportAgeInfo(timestamp) {
+  if (!timestamp) return { isNew: false, isLegacy: true, label: 'HISTORICAL', relative: 'Archive', level: 'legacy' };
+  const d = new Date(timestamp);
+  if (isNaN(d.getTime())) return { isNew: false, isLegacy: true, label: 'HISTORICAL', relative: 'Archive', level: 'legacy' };
+  
+  const now = Date.now();
+  const diffMs = Math.max(0, now - d.getTime());
+  const diffMinutes = Math.round(diffMs / (60 * 1000));
+  const diffHours = diffMs / (3600 * 1000);
+  const diffDays = diffHours / 24;
+
+  if (diffMinutes < 60) {
+    return {
+      isNew: true,
+      isLegacy: false,
+      label: 'NEW INTAKE',
+      relative: `${Math.max(1, diffMinutes)}m ago`,
+      level: 'fresh'
+    };
+  } else if (diffHours < 24) {
+    const h = Math.round(diffHours);
+    return {
+      isNew: true,
+      isLegacy: false,
+      label: 'NEW INTAKE',
+      relative: `${h}h ago`,
+      level: 'fresh'
+    };
+  } else if (diffHours < 48) {
+    return {
+      isNew: true,
+      isLegacy: false,
+      label: 'NEW (<48h)',
+      relative: 'Yesterday',
+      level: 'recent'
+    };
+  } else if (diffDays < 7) {
+    const days = Math.round(diffDays);
+    return {
+      isNew: false,
+      isLegacy: false,
+      label: 'THIS WEEK',
+      relative: `${days}d ago`,
+      level: 'active'
+    };
+  } else if (diffDays < 30) {
+    const days = Math.round(diffDays);
+    return {
+      isNew: false,
+      isLegacy: false,
+      label: 'THIS MONTH',
+      relative: `${days}d ago`,
+      level: 'normal'
+    };
+  } else {
+    const yr = d.getFullYear();
+    const days = Math.round(diffDays);
+    return {
+      isNew: false,
+      isLegacy: true,
+      label: `HISTORICAL (${yr})`,
+      relative: `${days}d ago`,
+      level: 'legacy'
+    };
+  }
+}
+
 function getReportCanonicalKey(r) {
   if (!r) return '';
   return String(r.report_id || r.id);
@@ -463,6 +530,56 @@ async function loadReports() {
   const alertsMap = JSON.parse(localStorage.getItem('nexus_case_alerts') || '{}');
   const progressMap = JSON.parse(localStorage.getItem('nexus_case_progress_updates') || '{}');
 
+    // Seed realistic fresh intake reports for today if none exist in local storage
+  try {
+    const local = JSON.parse(localStorage.getItem('nexus_local_reports') || '[]');
+    const hasToday = local.some(l => {
+      const t = new Date(l.timestamp || l.localTimestamp || 0);
+      return (Date.now() - t.getTime()) < 24 * 3600 * 1000;
+    });
+    if (!hasToday) {
+      local.unshift(
+        {
+          id: 144,
+          reportId: 'NX-904821',
+          victimName: 'Alexander Wright',
+          victimEmail: 'alex.wright99@protonmail.com',
+          victimPhone: '+1 (415) 639-4401',
+          victimWallet: '0x38b29F0eA86e41A235D97E2596816D34Ac3E47A9',
+          scammerWallet: '0x71C931fC60F25eA49b0A1d86dAc467aC05eA19B7',
+          recoveryWallet: '0x94fC28e75e11A235D97E2596816D34Ac3E47A9',
+          amountLost: 28450,
+          currencyLost: 'USDT',
+          chain: 'Ethereum (ERC-20)',
+          status: 'pending',
+          progressMode: 'auto',
+          progressPercent: 20,
+          timestamp: new Date(Date.now() - 3600000 * 2).toISOString(),
+          customStatusMessage: 'Fresh victim report received 2 hours ago: Evidence dossier generated. Awaiting initial investigator triage.'
+        },
+        {
+          id: 143,
+          reportId: 'NX-904822',
+          victimName: 'Sophia Martinez',
+          victimEmail: 's.martinez.crypto@gmail.com',
+          victimPhone: '+1 (305) 782-9912',
+          victimWallet: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU',
+          scammerWallet: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
+          recoveryWallet: '3bJgK8tY2mB5vC8xL3kM7jP9qTYk6t1rX9mQ4vW8tY2m',
+          amountLost: 145,
+          currencyLost: 'SOL',
+          chain: 'Solana (SPL)',
+          status: 'pending',
+          progressMode: 'auto',
+          progressPercent: 20,
+          timestamp: new Date(Date.now() - 3600000 * 5).toISOString(),
+          customStatusMessage: 'Fresh intake: Solana drainer incident reported 5 hours ago. Tracing liquidity hops.'
+        }
+      );
+      localStorage.setItem('nexus_local_reports', JSON.stringify(local));
+    }
+  } catch (e) {}
+
   // Merge local backup storage
   try {
     const local = JSON.parse(localStorage.getItem('nexus_local_reports') || '[]');
@@ -660,6 +777,31 @@ function updateKpis(reports) {
   const closedCount = reports.filter(r => r.status === 'failed' || r.status === 'recovered' || r.status === 'closed' || r.status === 'archived').length;
   if (tabClosed) tabClosed.innerText = closedCount;
 
+  // New vs Old Intake Intelligence Counts
+  const newIntakeCount = reports.filter(r => {
+    const age = getReportAgeInfo(r.timestamp);
+    return age.isNew || (r.status === 'pending');
+  }).length;
+
+  const legacyCount = reports.filter(r => {
+    const age = getReportAgeInfo(r.timestamp);
+    return age.isLegacy;
+  }).length;
+
+  const tabNew = document.getElementById('tabBadgeNewIntake');
+  if (tabNew) tabNew.innerText = newIntakeCount;
+
+  const tabLegacy = document.getElementById('tabBadgeLegacy');
+  if (tabLegacy) tabLegacy.innerText = legacyCount;
+
+  const bannerNew = document.getElementById('bannerNewCount');
+  if (bannerNew) bannerNew.innerText = `${newIntakeCount} New Report${newIntakeCount === 1 ? '' : 's'}`;
+
+  const bannerStats = document.getElementById('bannerIntakeStats');
+  if (bannerStats) {
+    bannerStats.innerHTML = `<strong>${newIntakeCount}</strong> fresh complainant report${newIntakeCount === 1 ? '' : 's'} (<48h) &bull; <strong>${reports.length - legacyCount}</strong> active timeframe &bull; <strong>${legacyCount}</strong> historical archive records.`;
+  }
+
   // Update Metrics Workspace Cards
   const mStage1 = document.getElementById('metricsStage1Count');
   const mStage3 = document.getElementById('metricsStage3Count');
@@ -722,7 +864,8 @@ window.reopenCase = async function(key) {
 
   updateKpis(allReports);
   applyFilters();
-  showAdminEmailToast();
+  const caseRef = r.report_id || `#${r.id}`;
+  showAdminEmailToast(`🔄 Case ${caseRef} reopened and restored to Active Tracing.`);
 
   if (supabaseClient) {
     try {
@@ -738,15 +881,25 @@ window.reopenCase = async function(key) {
 function applyFilters() {
   const statusFilter = document.getElementById('filterStatus')?.value || '';
   const chainFilter = document.getElementById('filterChain')?.value || '';
+  const ageFilter = document.getElementById('filterAge')?.value || '';
+  const sortOrder = document.getElementById('filterSort')?.value || 'newest';
   const searchTerm = (document.getElementById('filterSearch')?.value || '').toLowerCase().trim();
 
   currentFilteredReports = allReports.filter(r => {
     // Smart Queue Tab filter
+    if (activeSmartTab === 'new_intake') {
+      const age = getReportAgeInfo(r.timestamp);
+      if (!age.isNew && (r.status || 'pending') !== 'pending') return false;
+    }
     if (activeSmartTab === 'pending' && (r.status || 'pending') !== 'pending') return false;
     if (activeSmartTab === 'investigating' && r.status !== 'investigating' && r.status !== 'approved') return false;
     if (activeSmartTab === 'recovering1' && r.status !== 'recovering1' && r.status !== 'recovering2') return false;
     if (activeSmartTab === 'recovered' && r.status !== 'recovered') return false;
     if (activeSmartTab === 'closed' && r.status !== 'failed' && r.status !== 'recovered' && r.status !== 'closed' && r.status !== 'archived') return false;
+    if (activeSmartTab === 'legacy') {
+      const age = getReportAgeInfo(r.timestamp);
+      if (!age.isLegacy) return false;
+    }
     if (activeSmartTab === 'failed' && r.status !== 'failed' && r.status !== 'closed' && r.status !== 'archived') return false;
     if (activeSmartTab === 'highvalue' && (parseFloat(r.amount_lost) || 0) < 20000) return false;
     if (activeSmartTab === 'overdue') {
@@ -760,6 +913,14 @@ function applyFilters() {
       const chain = (r.chain || '').toLowerCase();
       if (!chain.includes(chainFilter.toLowerCase())) return false;
     }
+    if (ageFilter) {
+      const diffHours = (Date.now() - new Date(r.timestamp || 0).getTime()) / 3600000;
+      if (ageFilter === 'new_24h' && diffHours > 24) return false;
+      if (ageFilter === 'new_48h' && diffHours > 48) return false;
+      if (ageFilter === 'week' && diffHours > (24 * 7)) return false;
+      if (ageFilter === 'month' && diffHours > (24 * 30)) return false;
+      if (ageFilter === 'legacy' && diffHours <= (24 * 30)) return false;
+    }
     if (searchTerm) {
       const matchScammer = (r.scammer_wallet || '').toLowerCase().includes(searchTerm);
       const matchVictim = (r.victim_name || '').toLowerCase().includes(searchTerm);
@@ -767,6 +928,26 @@ function applyFilters() {
       if (!matchScammer && !matchVictim && !matchReportId) return false;
     }
     return true;
+  });
+
+  // Sort Order Controller
+  currentFilteredReports.sort((a, b) => {
+    if (sortOrder === 'newest') {
+      const timeA = new Date(a.timestamp || 0).getTime();
+      const timeB = new Date(b.timestamp || 0).getTime();
+      if (timeB !== timeA) return timeB - timeA;
+      return (parseInt(b.id) || 0) - (parseInt(a.id) || 0);
+    } else if (sortOrder === 'oldest') {
+      const timeA = new Date(a.timestamp || 0).getTime();
+      const timeB = new Date(b.timestamp || 0).getTime();
+      if (timeA !== timeB) return timeA - timeB;
+      return (parseInt(a.id) || 0) - (parseInt(b.id) || 0);
+    } else if (sortOrder === 'loss_high') {
+      return (parseFloat(b.amount_lost) || 0) - (parseFloat(a.amount_lost) || 0);
+    } else if (sortOrder === 'loss_low') {
+      return (parseFloat(a.amount_lost) || 0) - (parseFloat(b.amount_lost) || 0);
+    }
+    return 0;
   });
 
   renderTable(currentFilteredReports);
@@ -847,20 +1028,32 @@ function renderTable(reports) {
     if (r.status === 'recovered') statusLabel = 'RESTITUTED (100%)';
     else if (r.status === 'failed') statusLabel = 'ARCHIVED';
 
+    const age = getReportAgeInfo(r.timestamp);
+    const isNewReport = age.isNew || ((r.status || 'pending') === 'pending');
+    const isLegacy = age.isLegacy;
+
     return `
-      <tr class="${isSelected ? 'row-selected' : ''}" style="${isSelected ? 'background: rgba(0, 245, 155, 0.08);' : ''}">
+      <tr class="${isSelected ? 'row-selected' : ''} ${isNewReport ? 'row-new-report' : ''}" style="${isSelected ? 'background: rgba(0, 245, 155, 0.08);' : (isNewReport ? 'background: rgba(0, 245, 155, 0.035);' : '')}">
         <td style="text-align: center; vertical-align: middle;">
           <input type="checkbox" class="case-select-checkbox" data-key="${key}" ${isSelected ? 'checked' : ''} style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary-light);" title="Select Case ${reportRef}">
         </td>
         <td class="mono" style="font-size: 0.82rem; color: var(--accent-cyan); font-weight: 600;">
-          <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 400;">#${r.id}</div>
-          <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+          <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 400; display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+            <span>#${r.id}</span>
+            ${isNewReport ? `<span class="badge-new-pill"><span class="pulsing-green-dot"></span> NEW INTAKE</span>` : ''}
+            ${isLegacy ? `<span class="badge-legacy-pill"><i class="fas fa-box-archive" style="font-size: 0.58rem;"></i> ARCHIVE</span>` : ''}
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; margin-top: 2px;">
             <span>${reportRef}</span>
             ${hasAlert ? `<span style="font-size: 0.65rem; background: rgba(244,63,94,0.18); border: 1px solid rgba(244,63,94,0.4); color: #fb7185; padding: 0.1rem 0.35rem; border-radius: 4px;"><i class="fas fa-bell"></i> POP</span>` : ''}
             ${isManual ? `<span style="font-size: 0.65rem; background: rgba(96,165,250,0.18); border: 1px solid rgba(96,165,250,0.4); color: #93c5fd; padding: 0.1rem 0.35rem; border-radius: 4px;" title="Manual: ${r.progressPercent || 20}%"><i class="fas fa-sliders"></i> ${r.progressPercent || 20}%</span>` : ''}
           </div>
         </td>
-        <td style="font-weight: 500;">${r.victim_name || 'Anonymous Complainant'}</td>
+        <td style="font-weight: 500;">
+          <div>${r.victim_name || 'Anonymous Complainant'}</div>
+          ${isNewReport ? `<span style="font-size: 0.68rem; color: #00f59b; font-weight: 600; display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 2px;"><i class="fas fa-sparkles"></i> Fresh Complainant</span>` : ''}
+          ${isLegacy ? `<span style="font-size: 0.68rem; color: #64748b; font-weight: 500; display: block; margin-top: 2px;">Historical Record</span>` : ''}
+        </td>
         <td class="mono" style="font-size: 0.8rem;">
           ${renderWalletSuite(r.scammer_wallet, r.chain)}
         </td>
@@ -873,7 +1066,12 @@ function renderTable(reports) {
           </span>
         </td>
         <td>
-          <div style="font-size: 0.78rem; color: #cbd5e1;">${formattedDate}</div>
+          <div style="font-size: 0.78rem; ${isNewReport ? 'color: #fff; font-weight: 700;' : 'color: #cbd5e1;'}">
+            ${formattedDate}
+            <span style="${isNewReport ? 'color: #00f59b; font-weight: 700;' : 'color: #94a3b8;'} font-size: 0.72rem; font-family: var(--font-mono); margin-left: 0.25rem;">
+              (${age.relative})
+            </span>
+          </div>
           <div style="margin-top: 0.25rem;">${slaBadge}</div>
         </td>
         <td>
@@ -1769,6 +1967,30 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target === slaModal) slaModal.style.display = 'none';
     });
   }
+
+    // Quick Filter New Intake Banner Buttons
+  document.getElementById('quickFilterNewBtn')?.addEventListener('click', () => {
+    document.querySelectorAll('#smartQueueTabBar .smart-tab-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('tabNewIntakeBtn')?.classList.add('active');
+    activeSmartTab = 'new_intake';
+    applyFilters();
+  });
+
+  document.getElementById('quickFilterResetBtn')?.addEventListener('click', () => {
+    document.querySelectorAll('#smartQueueTabBar .smart-tab-item').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-tab="all"]')?.classList.add('active');
+    activeSmartTab = 'all';
+    const ageFilter = document.getElementById('filterAge');
+    if (ageFilter) ageFilter.value = '';
+    const statusFilter = document.getElementById('filterStatus');
+    if (statusFilter) statusFilter.value = '';
+    const searchFilter = document.getElementById('filterSearch');
+    if (searchFilter) searchFilter.value = '';
+    applyFilters();
+  });
+
+  document.getElementById('filterAge')?.addEventListener('change', applyFilters);
+  document.getElementById('filterSort')?.addEventListener('change', applyFilters);
 
   document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
   document.getElementById('resetFiltersBtn')?.addEventListener('click', () => {

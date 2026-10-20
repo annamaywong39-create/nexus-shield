@@ -160,10 +160,33 @@
         </div>
       </div>
 
+            <!-- Live Intake Intelligence Banner (Quick New Case Summary) -->
+      <div class="intake-summary-banner" id="intakeSummaryBanner" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; background: rgba(0, 245, 155, 0.06); border: 1px solid rgba(0, 245, 155, 0.28); border-radius: var(--radius-md); padding: 0.65rem 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <span style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 700; color: #00f59b; background: rgba(0, 245, 155, 0.15); padding: 0.25rem 0.65rem; border-radius: 999px;">
+            <span class="pulsing-green-dot"></span> <span id="bannerNewCount">0 New Cases</span>
+          </span>
+          <span style="font-size: 0.82rem; color: #cbd5e1;" id="bannerIntakeStats">
+            Loading intake timeframe analysis...
+          </span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <button type="button" id="quickFilterNewBtn" class="btn-secondary" style="font-size: 0.76rem; padding: 0.32rem 0.75rem; color: #00f59b; border-color: rgba(0,245,155,0.4); background: rgba(0,245,155,0.1); cursor: pointer; border-radius: 4px; font-weight: 700;">
+            <i class="fas fa-sparkles"></i> Show New Only
+          </button>
+          <button type="button" id="quickFilterResetBtn" class="btn-secondary" style="font-size: 0.76rem; padding: 0.32rem 0.75rem; color: #94a3b8; border-color: rgba(255,255,255,0.12); cursor: pointer; border-radius: 4px;">
+            View All
+          </button>
+        </div>
+      </div>
+
       <!-- Pre-Set Smart Filter Tabs (Queue Management) -->
       <div class="smart-tab-bar" id="smartQueueTabBar">
         <button type="button" class="smart-tab-item active" data-tab="all">
           <i class="fas fa-layer-group"></i> All Cases <span class="tab-badge" id="tabBadgeAll">0</span>
+        </button>
+        <button type="button" class="smart-tab-item" data-tab="new_intake" id="tabNewIntakeBtn" style="border-color: rgba(0, 245, 155, 0.4); color: #00f59b;">
+          <i class="fas fa-sparkles" style="color: #00f59b;"></i> New Reports (<48h) <span class="tab-badge badge-fresh" id="tabBadgeNewIntake">0</span>
         </button>
         <button type="button" class="smart-tab-item" data-tab="pending">
           <i class="fas fa-hourglass-start" style="color: var(--accent-amber);"></i> Pending Review <span class="tab-badge" id="tabBadgePending">0</span>
@@ -180,6 +203,9 @@
         <button type="button" class="smart-tab-item" data-tab="closed" id="tabClosedBtn">
           <i class="fas fa-box-archive" style="color: #94a3b8;"></i> Closed Cases <span class="tab-badge" id="tabBadgeClosed">0</span>
         </button>
+        <button type="button" class="smart-tab-item" data-tab="legacy" id="tabLegacyBtn">
+          <i class="fas fa-box" style="color: #64748b;"></i> Historical Archive <span class="tab-badge" id="tabBadgeLegacy">0</span>
+        </button>
         <button type="button" class="smart-tab-item" data-tab="highvalue">
           <i class="fas fa-gem" style="color: #fbbf24;"></i> High Value (&ge;$20k) <span class="tab-badge" id="tabBadgeHighValue">0</span>
         </button>
@@ -191,9 +217,9 @@
         </button>
       </div>
 
-      <!-- Filter & Search Toolbar -->
+            <!-- Filter & Search Toolbar -->
       <div style="display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; background: var(--bg-card-subtle); padding: 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 1.2rem;">
-        <select id="filterStatus" style="width: auto; min-width: 160px; font-size: 0.84rem; padding: 0.5rem 0.8rem;">
+        <select id="filterStatus" style="width: auto; min-width: 150px; font-size: 0.84rem; padding: 0.5rem 0.8rem;">
           <option value="">All Statuses</option>
           <option value="pending">Stage 1: Pending Intake</option>
           <option value="approved">Stage 2: Approved &amp; Verified</option>
@@ -204,7 +230,23 @@
           <option value="failed">Stage 7: Failed / Archived</option>
         </select>
 
-        <select id="filterChain" style="width: auto; min-width: 150px; font-size: 0.84rem; padding: 0.5rem 0.8rem;">
+        <select id="filterAge" style="width: auto; min-width: 160px; font-size: 0.84rem; padding: 0.5rem 0.8rem;">
+          <option value="">All Timeframes</option>
+          <option value="new_24h">★ Fresh (&lt; 24h)</option>
+          <option value="new_48h">★ New (&lt; 48h)</option>
+          <option value="week">Past 7 Days</option>
+          <option value="month">Past 30 Days</option>
+          <option value="legacy">Historical Archive (&gt;30d)</option>
+        </select>
+
+        <select id="filterSort" style="width: auto; min-width: 160px; font-size: 0.84rem; padding: 0.5rem 0.8rem;">
+          <option value="newest">Sort: Newest First ↓</option>
+          <option value="oldest">Sort: Oldest First ↑</option>
+          <option value="loss_high">Sort: Highest Loss ($) ↓</option>
+          <option value="loss_low">Sort: Lowest Loss ($) ↑</option>
+        </select>
+
+        <select id="filterChain" style="width: auto; min-width: 140px; font-size: 0.84rem; padding: 0.5rem 0.8rem;">
           <option value="">All Blockchains</option>
           <option value="Ethereum">Ethereum (ETH)</option>
           <option value="Bitcoin">Bitcoin (BTC)</option>
@@ -215,7 +257,7 @@
           <option value="Dogecoin">Dogecoin</option>
         </select>
 
-        <input type="text" id="filterSearch" placeholder="Filter by address, complainant, or Case ID..." style="flex: 2; min-width: 240px; font-size: 0.84rem; padding: 0.5rem 0.85rem;">
+        <input type="text" id="filterSearch" placeholder="Filter by address, complainant, or Case ID..." style="flex: 2; min-width: 220px; font-size: 0.84rem; padding: 0.5rem 0.85rem;">
 
         <button id="applyFiltersBtn" class="btn-secondary" style="padding: 0.5rem 0.95rem; font-size: 0.82rem;">
           <i class="fas fa-filter"></i> Apply
