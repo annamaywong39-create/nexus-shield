@@ -6541,3 +6541,111 @@ body.nav-drawer-open .header {
 .sla-fresh { background: rgba(0, 245, 155, 0.12); color: #00f59b; border: 1px solid rgba(0, 245, 155, 0.3); }
 .sla-warning { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
 .sla-overdue { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+/* Inline Batch Actions Command Bar (Sticky directly above case queue) */
+.inline-batch-bar {
+  display: none;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1.15rem;
+  background: rgba(13, 21, 39, 0.95);
+  border: 1px solid rgba(0, 245, 155, 0.45);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 15px rgba(0, 245, 155, 0.12);
+  animation: slideDownBatch 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDownBatch {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.quick-row-done-btn:hover {
+  background: rgba(0, 245, 155, 0.2) !important;
+  color: #00f59b !important;
+  border-color: #00f59b !important;
+}
+
+.quick-row-end-btn:hover {
+  background: rgba(148, 163, 184, 0.25) !important;
+  color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+.quick-row-reopen-btn:hover {
+  background: rgba(96, 165, 250, 0.25) !important;
+  color: #93c5fd !important;
+  border-color: #93c5fd !important;
+}
+
+/* ========================================================
+   NEW VS OLD REPORT DIFFERENTIATION STYLING
+   ======================================================== */
+.pulsing-green-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00f59b;
+  display: inline-block;
+  box-shadow: 0 0 0 0 rgba(0, 245, 155, 0.7);
+  animation: pulseGreenDot 1.8s infinite;
+  vertical-align: middle;
+}
+
+@keyframes pulseGreenDot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 245, 155, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(0, 245, 155, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 245, 155, 0); }
+}
+
+.badge-new-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(0, 245, 155, 0.18);
+  border: 1px solid rgba(0, 245, 155, 0.45);
+  color: #00f59b;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.badge-legacy-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #94a3b8;
+  font-size: 0.63rem;
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+
+.row-new-report {
+  border-left: 3px solid #00f59b !important;
+  background: rgba(0, 245, 155, 0.035) !important;
+}
+
+.row-new-report:hover {
+  background: rgba(0, 245, 155, 0.06) !important;
+}
+
+.badge-fresh {
+  background: #00f59b !important;
+  color: #080d1a !important;
+  font-weight: 800 !important;
+}
+
+.intake-summary-banner {
+  animation: fadeInBanner 0.25s ease-out;
+}
+
+@keyframes fadeInBanner {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -35,19 +35,13 @@
 
     <!-- Clean Public Navbar with Dedicated Tabs -->
     <nav class="nav-links">
-      <a href="index.html" class="nav-link active" data-i18n="nav_home"><i class="fas fa-shield-halved"></i> Report Loss</a>
-      <a href="methodology.html" class="nav-link"><i class="fas fa-network-wired"></i> Methodology</a>
-      <a href="cases.html" class="nav-link"><i class="fas fa-folder-open"></i> Case Studies</a>
-      <a href="intelligence.html" class="nav-link"><i class="fas fa-passport"></i> Sanctions &amp; Risk</a>
-      <a href="about.html" class="nav-link" data-i18n="nav_about" style="white-space: nowrap !important;"><i class="fas fa-circle-info"></i> About Us</a>
-      <a href="partners.html" class="nav-link" data-i18n="nav_partners"><i class="fas fa-handshake"></i> Partners</a>
-      <button type="button" class="nav-link" id="openVerifyAgentModalBtn" style="background: none; border: none; cursor: pointer; color: var(--accent-green); font-weight: 600;">
-        <i class="fas fa-user-shield"></i> <span>Verify Agent</span>
-      </button>
-      <a href="mailto:support@nexusshield.org" class="nav-link"><i class="fas fa-envelope"></i> Support</a>
-      <a href="https://x.com/NEXUSSHIELDhq" target="_blank" rel="noopener noreferrer" class="nav-link nav-icon-link" aria-label="Nexus Shield on X" title="Nexus Shield on X (@NEXUSSHIELDhq)"><i class="fa-brands fa-x-twitter"></i></a>
-      <a href="index.html#statusReportId" class="nav-link mobile-only-track"><i class="fas fa-magnifying-glass"></i> Track Case Status</a>
-      <button type="button" class="nav-link mobile-only-spin" id="mobileSpinTrigger"><i class="fas fa-rotate"></i> 360° Orbit</button>
+      <a href="index.html" class="nav-link active" data-i18n="nav_home">Report Loss</a>
+      <a href="methodology.html" class="nav-link">Methodology</a>
+      <a href="cases.html" class="nav-link">Case Studies</a>
+      <a href="intelligence.html" class="nav-link">Sanctions &amp; Risk</a>
+      <a href="about.html" class="nav-link" data-i18n="nav_about">About Us</a>
+      <a href="partners.html" class="nav-link" data-i18n="nav_partners">Partners</a>
+      <a href="index.html#statusReportId" class="nav-link mobile-only-track">Track Case</a>
     </nav>
 
     <div class="header-actions">
@@ -568,26 +562,19 @@ STATEMENT OF SWORN FACTS:
             </span>
           </div>
 
-          <!-- Revoke.cash Safety Guarantee Note -->
-          <div style="margin-top: 0.65rem; padding: 0.55rem 0.85rem; background: rgba(0, 0, 0, 0.3); border-radius: 6px; border-left: 3px solid #00F59B; font-size: 0.75rem; color: #cbd5e1; line-height: 1.45;">
-            <strong style="color: #00F59B;"><i class="fas fa-shield-halved"></i> Why Revoke.cash is Safe:</strong> 
-            Revoke.cash is the verified, open-source security tool recommended across the cryptocurrency industry. Unlike phishing websites, it will <strong>NEVER ask for your 12-word seed phrase, passwords, or transfer permissions</strong>—it only disconnects permissions you previously granted to attackers.
-          </div>
+          <!-- Expandable Know More Toggle for Revoke.cash Safety (Uncluttered) -->
+          <details style="margin-top: 0.75rem; cursor: pointer;">
+            <summary style="list-style: none; display: inline-flex; align-items: center; gap: 0.4rem; color: #00F59B; font-size: 0.76rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 4px; background: rgba(0, 245, 155, 0.08); border: 1px solid rgba(0, 245, 155, 0.25); user-select: none; transition: background 0.15s; outline: none;">
+              <i class="fas fa-circle-info"></i> Why Revoke.cash is Safe &bull; <u>Click to Know More</u>
+            </summary>
+            <div style="margin-top: 0.55rem; padding: 0.65rem 0.85rem; background: rgba(0, 0, 0, 0.4); border-radius: 6px; border-left: 3px solid #00F59B; font-size: 0.76rem; color: #cbd5e1; line-height: 1.5;">
+              <strong style="color: #00F59B;">Why Revoke.cash is Safe:</strong> Revoke.cash is the verified, open-source security tool recommended across the cryptocurrency industry. Unlike phishing websites, it will <strong>NEVER ask for your 12-word seed phrase, passwords, or transfer permissions</strong>&mdash;it only disconnects permissions you previously granted to attackers.
+            </div>
+          </details>
         </div>
       </div>
 
-        <!-- The 2-Second Laundering Window Callout (Global Ledger Velocity Principle) -->
-      <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.28); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1rem; display: flex; gap: 0.85rem; align-items: flex-start;">
-        <div style="color: var(--accent-rose); font-size: 1.2rem; flex-shrink: 0; margin-top: 0.1rem;">
-          <i class="fas fa-stopwatch-20"></i>
-        </div>
-        <div style="font-size: 0.78rem; line-height: 1.45; color: #fecdd3;">
-          <strong style="color: #fff; display: block; margin-bottom: 0.15rem; font-size: 0.82rem;">
-            The Rapid Laundering Window: 84.6% of stolen assets move before public disclosure
-          </strong>
-          Global blockchain forensics indicates that illicit actors rapidly split stolen funds across peel-chains, mixers, and bridges within hours of theft. Submitting your transaction hashes immediately allows NexusShield's investigative team to trace the hops and deliver emergency freeze notices to exchange compliance desks before off-ramps are reached.
-        </div>
-      </div>
+
 
         <!-- Primary Submission Action -->
         <div style="margin-top: 1.8rem;">
@@ -604,6 +591,23 @@ STATEMENT OF SWORN FACTS:
 
     <!-- Right Column: Clean & Uncluttered Sidebar -->
     <aside class="sidebar-col">
+      <!-- The Rapid Laundering Window (Side of Website) -->
+      <div class="intel-card" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(13, 21, 39, 0.95)); border: 1px solid rgba(239, 68, 68, 0.32); border-left: 4px solid #f43f5e; box-shadow: 0 4px 20px rgba(244, 63, 94, 0.06); margin-bottom: 1.25rem;">
+        <div style="display: flex; align-items: flex-start; gap: 0.65rem; margin-bottom: 0.65rem;">
+          <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(244, 63, 94, 0.18); display: flex; align-items: center; justify-content: center; color: #fb7185; font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem;">
+            <i class="fas fa-stopwatch-20"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 0.88rem; color: #ffffff; line-height: 1.35; font-weight: 700;">
+              The Rapid Laundering Window: <span style="color: #fb7185;">84.6% of stolen assets move before public disclosure</span>
+            </h3>
+          </div>
+        </div>
+        <p style="font-size: 0.79rem; color: #cbd5e1; line-height: 1.55; margin: 0;">
+          Global blockchain forensics indicates that illicit actors rapidly split stolen funds across peel-chains, mixers, and bridges within hours of theft. Submitting your transaction hashes immediately allows NexusShield's investigative team to trace the hops and deliver emergency freeze notices to exchange compliance desks before off-ramps are reached.
+        </p>
+      </div>
+
       <!-- Quick Case Progress Lookup -->
       <div class="intel-card">
         <h3><i class="fas fa-magnifying-glass"></i> <span data-i18n="status_title">Track Case Investigation</span></h3>
@@ -1764,7 +1768,7 @@ STATEMENT OF SWORN FACTS:
       <a href="mailto:support@nexusshield.org" style="color: var(--accent-cyan); font-weight: 600;"><i class="fas fa-envelope"></i> support@nexusshield.org</a>
       <a href="https://x.com/NEXUSSHIELDhq" target="_blank" rel="noopener noreferrer" class="footer-x-link" style="color: #cbd5e1; font-size: 1.1rem; display: inline-flex; align-items: center; text-decoration: none;" aria-label="Nexus Shield on X" title="Nexus Shield on X (@NEXUSSHIELDhq)"><i class="fa-brands fa-x-twitter"></i></a>
       <a href="index.html">Report Loss</a>
-      <a href="about.html">How We Work</a>
+      <a href="about.html">About Us</a>
       <a href="partners.html">Partners &amp; Alliances</a>
       <a href="chainexplorer.html">ChainExplorer</a>
       <a href="javascript:void(0)" id="footerVerifyAgentBtn" style="color: var(--accent-green); font-weight: 600;"><i class="fas fa-user-shield"></i> Verify Agent</a>

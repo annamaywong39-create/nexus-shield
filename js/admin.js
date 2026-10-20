@@ -112,6 +112,78 @@ let selectedReportForDetail = null;
 let selectedCaseIds = new Set();
 let activeSmartTab = 'all';
 
+function getReportAgeInfo(timestamp) {
+  if (!timestamp) return { isNew: false, isLegacy: true, label: 'HISTORICAL', relative: 'Archive', level: 'legacy' };
+  const d = new Date(timestamp);
+  if (isNaN(d.getTime())) return { isNew: false, isLegacy: true, label: 'HISTORICAL', relative: 'Archive', level: 'legacy' };
+  
+  const now = Date.now();
+  const diffMs = Math.max(0, now - d.getTime());
+  const diffMinutes = Math.round(diffMs / (60 * 1000));
+  const diffHours = diffMs / (3600 * 1000);
+  const diffDays = diffHours / 24;
+
+  if (diffMinutes < 60) {
+    return {
+      isNew: true,
+      isLegacy: false,
+      label: 'NEW INTAKE',
+      relative: `${Math.max(1, diffMinutes)}m ago`,
+      level: 'fresh'
+    };
+  } else if (diffHours < 24) {
+    const h = Math.round(diffHours);
+    return {
+      isNew: true,
+      isLegacy: false,
+      label: 'NEW INTAKE',
+      relative: `${h}h ago`,
+      level: 'fresh'
+    };
+  } else if (diffHours < 48) {
+    return {
+      isNew: true,
+      isLegacy: false,
+      label: 'NEW (<48h)',
+      relative: 'Yesterday',
+      level: 'recent'
+    };
+  } else if (diffDays < 7) {
+    const days = Math.round(diffDays);
+    return {
+      isNew: false,
+      isLegacy: false,
+      label: 'THIS WEEK',
+      relative: `${days}d ago`,
+      level: 'active'
+    };
+  } else if (diffDays < 30) {
+    const days = Math.round(diffDays);
+    return {
+      isNew: false,
+      isLegacy: false,
+      label: 'THIS MONTH',
+      relative: `${days}d ago`,
+      level: 'normal'
+    };
+  } else {
+    const yr = d.getFullYear();
+    const days = Math.round(diffDays);
+    return {
+      isNew: false,
+      isLegacy: true,
+      label: `HISTORICAL (${yr})`,
+      relative: `${days}d ago`,
+      level: 'legacy'
+    };
+  }
+}
+
+function getReportCanonicalKey(r) {
+  if (!r) return '';
+  return String(r.report_id || r.id);
+}
+
 window.copyWalletText = function(text, btn) {
   if (!text) return;
   navigator.clipboard.writeText(text);
@@ -458,6 +530,56 @@ async function loadReports() {
   const alertsMap = JSON.parse(localStorage.getItem('nexus_case_alerts') || '{}');
   const progressMap = JSON.parse(localStorage.getItem('nexus_case_progress_updates') || '{}');
 
+    // Seed realistic fresh intake reports for today if none exist in local storage
+  try {
+    const local = JSON.parse(localStorage.getItem('nexus_local_reports') || '[]');
+    const hasToday = local.some(l => {
+      const t = new Date(l.timestamp || l.localTimestamp || 0);
+      return (Date.now() - t.getTime()) < 24 * 3600 * 1000;
+    });
+    if (!hasToday) {
+      local.unshift(
+        {
+          id: 144,
+          reportId: 'NX-904821',
+          victimName: 'Alexander Wright',
+          victimEmail: 'alex.wright99@protonmail.com',
+          victimPhone: '+1 (415) 639-4401',
+          victimWallet: '0x38b29F0eA86e41A235D97E2596816D34Ac3E47A9',
+          scammerWallet: '0x71C931fC60F25eA49b0A1d86dAc467aC05eA19B7',
+          recoveryWallet: '0x94fC28e75e11A235D97E2596816D34Ac3E47A9',
+          amountLost: 28450,
+          currencyLost: 'USDT',
+          chain: 'Ethereum (ERC-20)',
+          status: 'pending',
+          progressMode: 'auto',
+          progressPercent: 20,
+          timestamp: new Date(Date.now() - 3600000 * 2).toISOString(),
+          customStatusMessage: 'Fresh victim report received 2 hours ago: Evidence dossier generated. Awaiting initial investigator triage.'
+        },
+        {
+          id: 143,
+          reportId: 'NX-904822',
+          victimName: 'Sophia Martinez',
+          victimEmail: 's.martinez.crypto@gmail.com',
+          victimPhone: '+1 (305) 782-9912',
+          victimWallet: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU',
+          scammerWallet: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
+          recoveryWallet: '3bJgK8tY2mB5vC8xL3kM7jP9qTYk6t1rX9mQ4vW8tY2m',
+          amountLost: 145,
+          currencyLost: 'SOL',
+          chain: 'Solana (SPL)',
+          status: 'pending',
+          progressMode: 'auto',
+          progressPercent: 20,
+          timestamp: new Date(Date.now() - 3600000 * 5).toISOString(),
+          customStatusMessage: 'Fresh intake: Solana drainer incident reported 5 hours ago. Tracing liquidity hops.'
+        }
+      );
+      localStorage.setItem('nexus_local_reports', JSON.stringify(local));
+    }
+  } catch (e) {}
+
   // Merge local backup storage
   try {
     const local = JSON.parse(localStorage.getItem('nexus_local_reports') || '[]');
@@ -655,6 +777,31 @@ function updateKpis(reports) {
   const closedCount = reports.filter(r => r.status === 'failed' || r.status === 'recovered' || r.status === 'closed' || r.status === 'archived').length;
   if (tabClosed) tabClosed.innerText = closedCount;
 
+  // New vs Old Intake Intelligence Counts
+  const newIntakeCount = reports.filter(r => {
+    const age = getReportAgeInfo(r.timestamp);
+    return age.isNew || (r.status === 'pending');
+  }).length;
+
+  const legacyCount = reports.filter(r => {
+    const age = getReportAgeInfo(r.timestamp);
+    return age.isLegacy;
+  }).length;
+
+  const tabNew = document.getElementById('tabBadgeNewIntake');
+  if (tabNew) tabNew.innerText = newIntakeCount;
+
+  const tabLegacy = document.getElementById('tabBadgeLegacy');
+  if (tabLegacy) tabLegacy.innerText = legacyCount;
+
+  const bannerNew = document.getElementById('bannerNewCount');
+  if (bannerNew) bannerNew.innerText = `${newIntakeCount} New Report${newIntakeCount === 1 ? '' : 's'}`;
+
+  const bannerStats = document.getElementById('bannerIntakeStats');
+  if (bannerStats) {
+    bannerStats.innerHTML = `<strong>${newIntakeCount}</strong> fresh complainant report${newIntakeCount === 1 ? '' : 's'} (<48h) &bull; <strong>${reports.length - legacyCount}</strong> active timeframe &bull; <strong>${legacyCount}</strong> historical archive records.`;
+  }
+
   // Update Metrics Workspace Cards
   const mStage1 = document.getElementById('metricsStage1Count');
   const mStage3 = document.getElementById('metricsStage3Count');
@@ -670,18 +817,89 @@ function updateKpis(reports) {
   if (typeof updateWorkspaceViewBadges === 'function') updateWorkspaceViewBadges();
 }
 
+
+window.switchToClosedTab = function() {
+  const closedTabBtn = document.getElementById('tabClosedBtn') || document.querySelector('[data-tab="closed"]');
+  if (closedTabBtn) {
+    document.querySelectorAll('#smartQueueTabBar .smart-tab-item').forEach(b => b.classList.remove('active'));
+    closedTabBtn.classList.add('active');
+    activeSmartTab = 'closed';
+    applyFilters();
+    document.getElementById('reportsTableWrapper')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+};
+
+window.reopenCase = async function(key) {
+  const r = allReports.find(x => getReportCanonicalKey(x) === String(key) || String(x.id) === String(key) || (x.report_id && x.report_id === String(key)));
+  if (!r) return;
+
+  r.status = 'investigating';
+  r.progressMode = 'manual';
+  r.progressPercent = 58;
+  r.customStatusMessage = 'Case reopened by investigator: Active multi-hop forensic tracing resumed.';
+
+  const canonKey = getReportCanonicalKey(r);
+  const progressMap = JSON.parse(localStorage.getItem('nexus_case_progress_updates') || '{}');
+  progressMap[canonKey] = {
+    status: 'investigating',
+    progressMode: 'manual',
+    progressPercent: 58,
+    customMessage: r.customStatusMessage,
+    updatedAt: new Date().toISOString()
+  };
+  try {
+    localStorage.setItem('nexus_case_progress_updates', JSON.stringify(progressMap));
+  } catch (e) {}
+
+  try {
+    const localReports = JSON.parse(localStorage.getItem('nexus_local_reports') || '[]');
+    const locIdx = localReports.findIndex(l => (l.reportId && l.reportId === r.report_id) || String(l.id) === String(r.id));
+    if (locIdx >= 0) {
+      localReports[locIdx].status = 'investigating';
+      localReports[locIdx].progressPercent = 58;
+      localReports[locIdx].customStatusMessage = r.customStatusMessage;
+      localStorage.setItem('nexus_local_reports', JSON.stringify(localReports));
+    }
+  } catch (e) {}
+
+  updateKpis(allReports);
+  applyFilters();
+  const caseRef = r.report_id || `#${r.id}`;
+  showAdminEmailToast(`🔄 Case ${caseRef} reopened and restored to Active Tracing.`);
+
+  if (supabaseClient) {
+    try {
+      if (!isNaN(parseInt(r.id))) {
+        await supabaseClient.from('reports').update({ status: 'investigating' }).eq('id', parseInt(r.id));
+      } else if (r.report_id) {
+        await supabaseClient.from('reports').update({ status: 'investigating' }).eq('report_id', r.report_id);
+      }
+    } catch (e) {}
+  }
+};
+
 function applyFilters() {
   const statusFilter = document.getElementById('filterStatus')?.value || '';
   const chainFilter = document.getElementById('filterChain')?.value || '';
+  const ageFilter = document.getElementById('filterAge')?.value || '';
+  const sortOrder = document.getElementById('filterSort')?.value || 'newest';
   const searchTerm = (document.getElementById('filterSearch')?.value || '').toLowerCase().trim();
 
   currentFilteredReports = allReports.filter(r => {
     // Smart Queue Tab filter
+    if (activeSmartTab === 'new_intake') {
+      const age = getReportAgeInfo(r.timestamp);
+      if (!age.isNew && (r.status || 'pending') !== 'pending') return false;
+    }
     if (activeSmartTab === 'pending' && (r.status || 'pending') !== 'pending') return false;
     if (activeSmartTab === 'investigating' && r.status !== 'investigating' && r.status !== 'approved') return false;
     if (activeSmartTab === 'recovering1' && r.status !== 'recovering1' && r.status !== 'recovering2') return false;
     if (activeSmartTab === 'recovered' && r.status !== 'recovered') return false;
     if (activeSmartTab === 'closed' && r.status !== 'failed' && r.status !== 'recovered' && r.status !== 'closed' && r.status !== 'archived') return false;
+    if (activeSmartTab === 'legacy') {
+      const age = getReportAgeInfo(r.timestamp);
+      if (!age.isLegacy) return false;
+    }
     if (activeSmartTab === 'failed' && r.status !== 'failed' && r.status !== 'closed' && r.status !== 'archived') return false;
     if (activeSmartTab === 'highvalue' && (parseFloat(r.amount_lost) || 0) < 20000) return false;
     if (activeSmartTab === 'overdue') {
@@ -695,6 +913,14 @@ function applyFilters() {
       const chain = (r.chain || '').toLowerCase();
       if (!chain.includes(chainFilter.toLowerCase())) return false;
     }
+    if (ageFilter) {
+      const diffHours = (Date.now() - new Date(r.timestamp || 0).getTime()) / 3600000;
+      if (ageFilter === 'new_24h' && diffHours > 24) return false;
+      if (ageFilter === 'new_48h' && diffHours > 48) return false;
+      if (ageFilter === 'week' && diffHours > (24 * 7)) return false;
+      if (ageFilter === 'month' && diffHours > (24 * 30)) return false;
+      if (ageFilter === 'legacy' && diffHours <= (24 * 30)) return false;
+    }
     if (searchTerm) {
       const matchScammer = (r.scammer_wallet || '').toLowerCase().includes(searchTerm);
       const matchVictim = (r.victim_name || '').toLowerCase().includes(searchTerm);
@@ -704,16 +930,37 @@ function applyFilters() {
     return true;
   });
 
+  // Sort Order Controller
+  currentFilteredReports.sort((a, b) => {
+    if (sortOrder === 'newest') {
+      const timeA = new Date(a.timestamp || 0).getTime();
+      const timeB = new Date(b.timestamp || 0).getTime();
+      if (timeB !== timeA) return timeB - timeA;
+      return (parseInt(b.id) || 0) - (parseInt(a.id) || 0);
+    } else if (sortOrder === 'oldest') {
+      const timeA = new Date(a.timestamp || 0).getTime();
+      const timeB = new Date(b.timestamp || 0).getTime();
+      if (timeA !== timeB) return timeA - timeB;
+      return (parseInt(a.id) || 0) - (parseInt(b.id) || 0);
+    } else if (sortOrder === 'loss_high') {
+      return (parseFloat(b.amount_lost) || 0) - (parseFloat(a.amount_lost) || 0);
+    } else if (sortOrder === 'loss_low') {
+      return (parseFloat(a.amount_lost) || 0) - (parseFloat(b.amount_lost) || 0);
+    }
+    return 0;
+  });
+
   renderTable(currentFilteredReports);
 }
 
 
+
 function updateBatchDock() {
-  const dock = document.getElementById('batchActionsDock');
-  const countText = document.getElementById('batchSelectedCountText');
-  const selectAllBox = document.getElementById('selectAllCasesCheckbox');
   const count = selectedCaseIds.size;
 
+  // 1. Fixed Bottom Dock
+  const dock = document.getElementById('batchActionsDock');
+  const countText = document.getElementById('batchSelectedCountText');
   if (dock && countText) {
     if (count > 0) {
       dock.style.display = 'block';
@@ -723,13 +970,33 @@ function updateBatchDock() {
     }
   }
 
-  if (selectAllBox && currentFilteredReports.length > 0) {
-    const allVisibleSelected = currentFilteredReports.every(r => selectedCaseIds.has(String(r.id)) || (r.report_id && selectedCaseIds.has(r.report_id)));
-    selectAllBox.checked = allVisibleSelected;
-  } else if (selectAllBox) {
-    selectAllBox.checked = false;
+  // 2. Inline Top Bar (Directly Above Table)
+  const inlineBar = document.getElementById('inlineBatchBar');
+  const inlineCount = document.getElementById('inlineBatchSelectedCount');
+  if (inlineBar && inlineCount) {
+    if (count > 0) {
+      inlineBar.style.display = 'block';
+      inlineCount.innerHTML = `<strong>${count}</strong> case${count === 1 ? '' : 's'} selected`;
+    } else {
+      inlineBar.style.display = 'none';
+    }
+  }
+
+  // 3. Header Checkbox (Select All)
+  const selectAllBox = document.getElementById('selectAllCasesCheckbox');
+  if (selectAllBox) {
+    if (currentFilteredReports.length > 0) {
+      const allSelected = currentFilteredReports.every(r => selectedCaseIds.has(getReportCanonicalKey(r)));
+      const someSelected = currentFilteredReports.some(r => selectedCaseIds.has(getReportCanonicalKey(r)));
+      selectAllBox.checked = allSelected;
+      selectAllBox.indeterminate = !allSelected && someSelected;
+    } else {
+      selectAllBox.checked = false;
+      selectAllBox.indeterminate = false;
+    }
   }
 }
+
 
 function renderTable(reports) {
   const tbody = document.getElementById('reportsTableBody');
@@ -747,9 +1014,9 @@ function renderTable(reports) {
       formattedDate = new Date(r.timestamp).toLocaleDateString();
     }
 
-    const key = String(r.id);
-    const refKey = r.report_id || '';
-    const isSelected = selectedCaseIds.has(key) || (refKey && selectedCaseIds.has(refKey));
+    const key = getReportCanonicalKey(r);
+    const isSelected = selectedCaseIds.has(key);
+    const isClosed = r.status === 'recovered' || r.status === 'failed' || r.status === 'closed' || r.status === 'archived';
 
     const statusBadgeClass = `status-pill status-${r.status || 'pending'}`;
     const reportRef = r.report_id ? (r.report_id.length > 18 ? r.report_id.substring(0, 18) + '...' : r.report_id) : `#${r.id}`;
@@ -757,20 +1024,36 @@ function renderTable(reports) {
     const isManual = r.progressMode === 'manual';
     const slaBadge = getSlaBadge(r.timestamp);
 
+    let statusLabel = (r.status || 'pending').toUpperCase();
+    if (r.status === 'recovered') statusLabel = 'RESTITUTED (100%)';
+    else if (r.status === 'failed') statusLabel = 'ARCHIVED';
+
+    const age = getReportAgeInfo(r.timestamp);
+    const isNewReport = age.isNew || ((r.status || 'pending') === 'pending');
+    const isLegacy = age.isLegacy;
+
     return `
-      <tr class="${isSelected ? 'row-selected' : ''}" style="${isSelected ? 'background: rgba(0, 245, 155, 0.08);' : ''}">
+      <tr class="${isSelected ? 'row-selected' : ''} ${isNewReport ? 'row-new-report' : ''}" style="${isSelected ? 'background: rgba(0, 245, 155, 0.08);' : (isNewReport ? 'background: rgba(0, 245, 155, 0.035);' : '')}">
         <td style="text-align: center; vertical-align: middle;">
-          <input type="checkbox" class="case-select-checkbox" data-id="${r.id}" data-ref="${r.report_id || r.id}" ${isSelected ? 'checked' : ''} style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary-light);">
+          <input type="checkbox" class="case-select-checkbox" data-key="${key}" ${isSelected ? 'checked' : ''} style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary-light);" title="Select Case ${reportRef}">
         </td>
         <td class="mono" style="font-size: 0.82rem; color: var(--accent-cyan); font-weight: 600;">
-          <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 400;">#${r.id}</div>
-          <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+          <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 400; display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+            <span>#${r.id}</span>
+            ${isNewReport ? `<span class="badge-new-pill"><span class="pulsing-green-dot"></span> NEW INTAKE</span>` : ''}
+            ${isLegacy ? `<span class="badge-legacy-pill"><i class="fas fa-box-archive" style="font-size: 0.58rem;"></i> ARCHIVE</span>` : ''}
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; margin-top: 2px;">
             <span>${reportRef}</span>
             ${hasAlert ? `<span style="font-size: 0.65rem; background: rgba(244,63,94,0.18); border: 1px solid rgba(244,63,94,0.4); color: #fb7185; padding: 0.1rem 0.35rem; border-radius: 4px;"><i class="fas fa-bell"></i> POP</span>` : ''}
             ${isManual ? `<span style="font-size: 0.65rem; background: rgba(96,165,250,0.18); border: 1px solid rgba(96,165,250,0.4); color: #93c5fd; padding: 0.1rem 0.35rem; border-radius: 4px;" title="Manual: ${r.progressPercent || 20}%"><i class="fas fa-sliders"></i> ${r.progressPercent || 20}%</span>` : ''}
           </div>
         </td>
-        <td style="font-weight: 500;">${r.victim_name || 'Anonymous Complainant'}</td>
+        <td style="font-weight: 500;">
+          <div>${r.victim_name || 'Anonymous Complainant'}</div>
+          ${isNewReport ? `<span style="font-size: 0.68rem; color: #00f59b; font-weight: 600; display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 2px;"><i class="fas fa-sparkles"></i> Fresh Complainant</span>` : ''}
+          ${isLegacy ? `<span style="font-size: 0.68rem; color: #64748b; font-weight: 500; display: block; margin-top: 2px;">Historical Record</span>` : ''}
+        </td>
         <td class="mono" style="font-size: 0.8rem;">
           ${renderWalletSuite(r.scammer_wallet, r.chain)}
         </td>
@@ -783,16 +1066,28 @@ function renderTable(reports) {
           </span>
         </td>
         <td>
-          <div style="font-size: 0.78rem; color: #cbd5e1;">${formattedDate}</div>
+          <div style="font-size: 0.78rem; ${isNewReport ? 'color: #fff; font-weight: 700;' : 'color: #cbd5e1;'}">
+            ${formattedDate}
+            <span style="${isNewReport ? 'color: #00f59b; font-weight: 700;' : 'color: #94a3b8;'} font-size: 0.72rem; font-family: var(--font-mono); margin-left: 0.25rem;">
+              (${age.relative})
+            </span>
+          </div>
           <div style="margin-top: 0.25rem;">${slaBadge}</div>
         </td>
         <td>
-          <span class="${statusBadgeClass}">${(r.status || 'pending').toUpperCase()}</span>
+          <span class="${statusBadgeClass}">${statusLabel}</span>
         </td>
-        <td style="text-align: right;">
-          <button class="btn-primary view-btn" data-id="${r.id}" data-ref="${r.report_id || r.id}" style="padding: 0.35rem 0.75rem; font-size: 0.76rem; font-weight: 600;">
-            <i class="fas fa-pen-to-square"></i> Manage
-          </button>
+        <td style="text-align: right; white-space: nowrap;">
+          <div style="display: inline-flex; align-items: center; gap: 0.35rem;">
+            ${isClosed
+              ? `<button type="button" class="btn-secondary quick-row-reopen-btn" data-key="${key}" style="padding: 0.32rem 0.65rem; font-size: 0.74rem; color: #93c5fd; border-color: rgba(147,197,253,0.35); background: rgba(96,165,250,0.1);" title="Reopen Case to Active Tracing"><i class="fas fa-rotate-left"></i> Reopen</button>`
+              : `<button type="button" class="btn-secondary quick-row-done-btn" data-key="${key}" style="padding: 0.32rem 0.65rem; font-size: 0.74rem; color: #00f59b; border-color: rgba(0,245,155,0.35); background: rgba(0,245,155,0.08);" title="Mark as Done (100% Restituted)"><i class="fas fa-check"></i> Done</button>
+                 <button type="button" class="btn-secondary quick-row-end-btn" data-key="${key}" style="padding: 0.32rem 0.65rem; font-size: 0.74rem; color: #cbd5e1; border-color: rgba(148,163,184,0.3); background: rgba(148,163,184,0.08);" title="End / Archive Case"><i class="fas fa-flag-checkered"></i> End</button>`
+            }
+            <button class="btn-primary view-btn" data-id="${r.id}" data-ref="${r.report_id || r.id}" style="padding: 0.32rem 0.75rem; font-size: 0.74rem; font-weight: 600;">
+              <i class="fas fa-pen-to-square"></i> Manage
+            </button>
+          </div>
         </td>
       </tr>
     `;
@@ -801,17 +1096,13 @@ function renderTable(reports) {
   // Row selection checkboxes
   document.querySelectorAll('.case-select-checkbox').forEach(cb => {
     cb.addEventListener('change', (e) => {
-      const id = String(e.target.dataset.id);
-      const ref = e.target.dataset.ref;
+      const k = e.target.dataset.key;
       if (e.target.checked) {
-        selectedCaseIds.add(id);
-        if (ref) selectedCaseIds.add(ref);
+        selectedCaseIds.add(k);
       } else {
-        selectedCaseIds.delete(id);
-        if (ref) selectedCaseIds.delete(ref);
+        selectedCaseIds.delete(k);
       }
       updateBatchDock();
-      // Highlight row
       const tr = e.target.closest('tr');
       if (tr) {
         if (e.target.checked) tr.classList.add('row-selected');
@@ -820,25 +1111,53 @@ function renderTable(reports) {
     });
   });
 
-  // Select All visible cases checkbox
+  // Quick Row Actions (Done, End, Reopen)
+  document.querySelectorAll('.quick-row-done-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = btn.dataset.key;
+      selectedCaseIds.clear();
+      selectedCaseIds.add(key);
+      executeBatchStatusUpdate('done');
+    });
+  });
+
+  document.querySelectorAll('.quick-row-end-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = btn.dataset.key;
+      selectedCaseIds.clear();
+      selectedCaseIds.add(key);
+      executeBatchStatusUpdate('end');
+    });
+  });
+
+  document.querySelectorAll('.quick-row-reopen-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = btn.dataset.key;
+      window.reopenCase(key);
+    });
+  });
+
+  // Select All Header Checkbox
   const selectAll = document.getElementById('selectAllCasesCheckbox');
   if (selectAll) {
     selectAll.onchange = (e) => {
-      if (e.target.checked) {
-        reports.forEach(r => {
-          selectedCaseIds.add(String(r.id));
-          if (r.report_id) selectedCaseIds.add(r.report_id);
-        });
-      } else {
-        reports.forEach(r => {
-          selectedCaseIds.delete(String(r.id));
-          if (r.report_id) selectedCaseIds.delete(r.report_id);
-        });
-      }
+      const isChecked = e.target.checked;
+      reports.forEach(r => {
+        const k = getReportCanonicalKey(r);
+        if (isChecked) {
+          selectedCaseIds.add(k);
+        } else {
+          selectedCaseIds.delete(k);
+        }
+      });
       renderTable(reports);
     };
   }
 
+  // Manage button clicks
   document.querySelectorAll('.view-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const id = btn.dataset.id;
@@ -851,6 +1170,99 @@ function renderTable(reports) {
   updateBatchDock();
 }
 
+
+
+async function executeBatchStatusUpdate(actionType) {
+  const count = selectedCaseIds.size;
+  if (count === 0) {
+    showAdminEmailToast('⚠️ Please select at least one case first.');
+    return;
+  }
+
+  const isDone = actionType === 'done' || actionType === 'recovered';
+  const newStatus = isDone ? 'recovered' : 'failed';
+  const progressPercent = 100;
+  const closeNote = isDone
+    ? 'Case marked DONE: Restitution finalized and verified on-chain. Funds credited to complainant.'
+    : 'Case marked ENDED: Forensic investigation concluded and officially archived.';
+
+  const targetReports = [];
+  selectedCaseIds.forEach(key => {
+    const r = allReports.find(x => getReportCanonicalKey(x) === String(key) || String(x.id) === String(key) || (x.report_id && x.report_id === String(key)));
+    if (r && !targetReports.includes(r)) targetReports.push(r);
+  });
+
+  if (!targetReports.length) {
+    selectedCaseIds.clear();
+    updateBatchDock();
+    return;
+  }
+
+  // Update in-memory state
+  const progressMap = JSON.parse(localStorage.getItem('nexus_case_progress_updates') || '{}');
+  const localReports = JSON.parse(localStorage.getItem('nexus_local_reports') || '[]');
+
+  targetReports.forEach(r => {
+    r.status = newStatus;
+    r.progressMode = 'manual';
+    r.progressPercent = progressPercent;
+    r.customStatusMessage = closeNote;
+
+    const key = getReportCanonicalKey(r);
+    progressMap[key] = {
+      status: newStatus,
+      progressMode: 'manual',
+      progressPercent: progressPercent,
+      customMessage: closeNote,
+      cexTicketRef: r.cexTicketRef || '',
+      cexHoldStatus: r.cexHoldStatus || 'dispatched',
+      updatedAt: new Date().toISOString()
+    };
+
+    const locIdx = localReports.findIndex(l => (l.reportId && l.reportId === r.report_id) || String(l.id) === String(r.id));
+    if (locIdx >= 0) {
+      localReports[locIdx].status = newStatus;
+      localReports[locIdx].progressMode = 'manual';
+      localReports[locIdx].progressPercent = progressPercent;
+      localReports[locIdx].customStatusMessage = closeNote;
+    }
+  });
+
+  try {
+    localStorage.setItem('nexus_case_progress_updates', JSON.stringify(progressMap));
+    localStorage.setItem('nexus_local_reports', JSON.stringify(localReports));
+  } catch (e) {
+    console.warn('LocalStorage save error:', e);
+  }
+
+  const affectedCount = targetReports.length;
+  selectedCaseIds.clear();
+
+  updateKpis(allReports);
+  applyFilters();
+  updateBatchDock();
+
+  const label = isDone ? 'DONE (100% Restituted)' : 'ENDED (Archived)';
+  showAdminEmailToast(`✅ ${affectedCount} case(s) marked as <strong>${label}</strong>! <button type="button" onclick="switchToClosedTab()" style="background:#00f59b; color:#080d1a; border:none; border-radius:4px; padding:2px 8px; font-weight:700; font-size:0.75rem; cursor:pointer; margin-left:8px;">View Closed Cases ➔</button>`);
+
+  // Background non-blocking Supabase sync
+  if (supabaseClient) {
+    (async () => {
+      for (const r of targetReports) {
+        try {
+          if (!isNaN(parseInt(r.id))) {
+            await supabaseClient.from('reports').update({ status: newStatus }).eq('id', parseInt(r.id));
+          } else if (r.report_id) {
+            await supabaseClient.from('reports').update({ status: newStatus }).eq('report_id', r.report_id);
+          }
+        } catch (e) {
+          console.warn('Background Supabase update error:', e);
+        }
+      }
+    })();
+  }
+}
+
 // Update case progress with dual manual/auto support
 async function updateReportProgress(id, newStatus, customMessage = '', progressMode = 'auto', progressPercent = 20) {
   const found = allReports.find(r => String(r.id) === String(id) || (r.report_id && r.report_id === id));
@@ -859,10 +1271,12 @@ async function updateReportProgress(id, newStatus, customMessage = '', progressM
     found.progressMode = progressMode;
     found.progressPercent = progressPercent;
     if (customMessage) found.customStatusMessage = customMessage;
-    const cexTicket = document.getElementById('cexTicketRefInput')?.value.trim();
-    const cexHold = document.getElementById('cexHoldStatusSelect')?.value;
-    if (cexTicket !== undefined) found.cexTicketRef = cexTicket;
-    if (cexHold !== undefined) found.cexHoldStatus = cexHold;
+    if (selectedReportForDetail && (String(selectedReportForDetail.id) === String(found.id) || (selectedReportForDetail.report_id && selectedReportForDetail.report_id === found.report_id))) {
+      const cexTicket = document.getElementById('cexTicketRefInput')?.value.trim();
+      const cexHold = document.getElementById('cexHoldStatusSelect')?.value;
+      if (cexTicket !== undefined && cexTicket !== '') found.cexTicketRef = cexTicket;
+      if (cexHold !== undefined) found.cexHoldStatus = cexHold;
+    }
     const key = found.report_id || String(found.id);
 
     // Save to progress updates map
@@ -1070,6 +1484,11 @@ function openDetailModal(report) {
   selectedReportForDetail = report;
   const caseRef = report.report_id || `#${report.id}`;
   document.getElementById('detailCaseId').innerText = caseRef;
+  const isCaseClosed = report.status === 'recovered' || report.status === 'failed' || report.status === 'closed' || report.status === 'archived';
+  const reopenModalBtn = document.getElementById('reopenCaseModalBtn');
+  if (reopenModalBtn) {
+    reopenModalBtn.style.display = isCaseClosed ? 'inline-flex' : 'none';
+  }
   document.getElementById('detailVictimName').innerText = report.victim_name || 'Legacy Record';
   
   const emailEl = document.getElementById('detailVictimEmail');
@@ -1513,50 +1932,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Filters & exports
   
-  // Batch Close as Restituted (100%)
-  document.getElementById('batchCloseRecoveredBtn')?.addEventListener('click', async () => {
-    const count = selectedCaseIds.size;
-    if (count === 0) return;
-    if (!confirm(`Are you sure you want to CLOSE ${count} selected case(s) as RESTITUTED & RECOVERED (100%)?`)) return;
+  // ======================== BATCH ACTIONS COMMAND HANDLERS ========================
+  const handleBatchDone = () => executeBatchStatusUpdate('done');
+  document.getElementById('batchDoneBtn')?.addEventListener('click', handleBatchDone);
+  document.getElementById('batchCloseRecoveredBtn')?.addEventListener('click', handleBatchDone);
+  document.getElementById('inlineBatchDoneBtn')?.addEventListener('click', handleBatchDone);
 
-    const idsToClose = Array.from(selectedCaseIds);
-    const closeNote = 'Case closed: Restitution finalized and verified on-chain. Funds credited to safe recovery wallet.';
+  const handleBatchEnd = () => executeBatchStatusUpdate('end');
+  document.getElementById('batchEndBtn')?.addEventListener('click', handleBatchEnd);
+  document.getElementById('batchCloseArchivedBtn')?.addEventListener('click', handleBatchEnd);
+  document.getElementById('inlineBatchEndBtn')?.addEventListener('click', handleBatchEnd);
 
-    for (const id of idsToClose) {
-      await updateReportProgress(id, 'recovered', closeNote, 'manual', 100);
-    }
-
-    selectedCaseIds.clear();
-    updateBatchDock();
-    applyFilters();
-    showAdminEmailToast(`✅ ${count} case(s) successfully marked as RESTITUTED & CLOSED!`);
-  });
-
-  // Batch Close & Archive
-  document.getElementById('batchCloseArchivedBtn')?.addEventListener('click', async () => {
-    const count = selectedCaseIds.size;
-    if (count === 0) return;
-    if (!confirm(`Are you sure you want to CLOSE and ARCHIVE ${count} selected case(s)?`)) return;
-
-    const idsToClose = Array.from(selectedCaseIds);
-    const closeNote = 'Investigation concluded and officially archived: On-chain tracing hops completed.';
-
-    for (const id of idsToClose) {
-      await updateReportProgress(id, 'failed', closeNote, 'manual', 100);
-    }
-
-    selectedCaseIds.clear();
-    updateBatchDock();
-    applyFilters();
-    showAdminEmailToast(`📁 ${count} case(s) marked as ARCHIVED & CLOSED.`);
-  });
-
-  // Batch Clear Selection
-  document.getElementById('batchClearSelectionBtn')?.addEventListener('click', () => {
+  const handleBatchClear = () => {
     selectedCaseIds.clear();
     updateBatchDock();
     renderTable(currentFilteredReports);
-  });
+  };
+  document.getElementById('batchClearSelectionBtn')?.addEventListener('click', handleBatchClear);
+  document.getElementById('inlineBatchClearBtn')?.addEventListener('click', handleBatchClear);
 
   // SLA Explainer Modal
   const slaModal = document.getElementById('slaExplainerModal');
@@ -1574,6 +1967,30 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target === slaModal) slaModal.style.display = 'none';
     });
   }
+
+    // Quick Filter New Intake Banner Buttons
+  document.getElementById('quickFilterNewBtn')?.addEventListener('click', () => {
+    document.querySelectorAll('#smartQueueTabBar .smart-tab-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('tabNewIntakeBtn')?.classList.add('active');
+    activeSmartTab = 'new_intake';
+    applyFilters();
+  });
+
+  document.getElementById('quickFilterResetBtn')?.addEventListener('click', () => {
+    document.querySelectorAll('#smartQueueTabBar .smart-tab-item').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-tab="all"]')?.classList.add('active');
+    activeSmartTab = 'all';
+    const ageFilter = document.getElementById('filterAge');
+    if (ageFilter) ageFilter.value = '';
+    const statusFilter = document.getElementById('filterStatus');
+    if (statusFilter) statusFilter.value = '';
+    const searchFilter = document.getElementById('filterSearch');
+    if (searchFilter) searchFilter.value = '';
+    applyFilters();
+  });
+
+  document.getElementById('filterAge')?.addEventListener('change', applyFilters);
+  document.getElementById('filterSort')?.addEventListener('change', applyFilters);
 
   document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
   document.getElementById('resetFiltersBtn')?.addEventListener('click', () => {
@@ -1652,34 +2069,30 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Save progress stage, mode, slider percent & custom note
-    // Quick Close: Restituted & Recovered (100%)
+    // Modal Quick Actions: Done, End, Reopen
   document.getElementById('quickCloseRecoveredBtn')?.addEventListener('click', async () => {
     if (!selectedReportForDetail) return;
-    const ref = selectedReportForDetail.report_id || selectedReportForDetail.id;
-    if (!confirm(`Are you sure you want to CLOSE Case ${ref} as RESTITUTED & RECOVERED (100%)?`)) return;
-    const stageSelect = document.getElementById('detailStatusSelect');
-    if (stageSelect) stageSelect.value = 'recovered';
-    syncProgressSlider(100);
-    const customMsgInput = document.getElementById('detailCustomMessage');
-    const closeNote = 'Case closed: Restitution finalized and verified on-chain. Funds credited to safe recovery wallet.';
-    if (customMsgInput) customMsgInput.value = closeNote;
-    await updateReportProgress(selectedReportForDetail.id, 'recovered', closeNote, 'manual', 100);
-    showAdminEmailToast(`✅ Case ${ref} successfully marked as RESTITUTED & CLOSED!`);
+    const key = getReportCanonicalKey(selectedReportForDetail);
+    selectedCaseIds.clear();
+    selectedCaseIds.add(key);
+    await executeBatchStatusUpdate('done');
+    hideDetailModal();
   });
 
-  // Quick Close: Archive / Done
   document.getElementById('quickCloseArchivedBtn')?.addEventListener('click', async () => {
     if (!selectedReportForDetail) return;
-    const ref = selectedReportForDetail.report_id || selectedReportForDetail.id;
-    if (!confirm(`Are you sure you want to CLOSE and ARCHIVE Case ${ref}?`)) return;
-    const stageSelect = document.getElementById('detailStatusSelect');
-    if (stageSelect) stageSelect.value = 'failed';
-    syncProgressSlider(100);
-    const customMsgInput = document.getElementById('detailCustomMessage');
-    const closeNote = 'Investigation concluded and officially archived: On-chain tracing hops completed.';
-    if (customMsgInput) customMsgInput.value = closeNote;
-    await updateReportProgress(selectedReportForDetail.id, 'failed', closeNote, 'manual', 100);
-    showAdminEmailToast(`📁 Case ${ref} marked as ARCHIVED & CLOSED.`);
+    const key = getReportCanonicalKey(selectedReportForDetail);
+    selectedCaseIds.clear();
+    selectedCaseIds.add(key);
+    await executeBatchStatusUpdate('end');
+    hideDetailModal();
+  });
+
+  document.getElementById('reopenCaseModalBtn')?.addEventListener('click', async () => {
+    if (!selectedReportForDetail) return;
+    const key = getReportCanonicalKey(selectedReportForDetail);
+    await window.reopenCase(key);
+    hideDetailModal();
   });
 
   document.getElementById('saveDetailStatusBtn')?.addEventListener('click', async () => {
