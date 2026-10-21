@@ -6649,3 +6649,140 @@ body.nav-drawer-open .header {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+
+/* ========================================================
+   SINGLE FOCUSED PRIMARY ACTION (HERO CTA DOMINANCE)
+   Fix for DesignMeter: Competing CTAs reduction
+   ======================================================== */
+.hero-dominant-cta {
+  background: linear-gradient(135deg, #0500FF 0%, #00d2ff 100%) !important;
+  border: 1px solid rgba(0, 245, 155, 0.6) !important;
+  color: #ffffff !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+  padding: 1.1rem 2rem !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 4px 25px rgba(5, 0, 255, 0.45), 0 0 20px rgba(0, 245, 155, 0.3) !important;
+  cursor: pointer !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-dominant-cta:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 32px rgba(5, 0, 255, 0.6), 0 0 30px rgba(0, 245, 155, 0.45) !important;
+}
+
+.hero-dominant-cta:active {
+  transform: translateY(0) !important;
+}
+
+/* Subtle Secondary Utility Link */
+.link-secondary-subtle {
+  transition: color 0.15s ease;
+}
+.link-secondary-subtle:hover {
+  color: #38bdf8 !important;
+}
+
+/* Header Small Utility Link */
+.nav-utility-link {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #94a3b8 !important;
+  text-decoration: none !important;
+  font-size: 0.78rem !important;
+  font-weight: 500 !important;
+  padding: 0.32rem 0.7rem !important;
+  border-radius: var(--radius-sm) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  transition: all 0.15s ease !important;
+}
+
+.nav-utility-link:hover {
+  color: #f1f5f9 !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Intake Method Accordion Card Below Hero */
+.intake-method-accordion-box {
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.intake-method-accordion-box:hover {
+  border-color: rgba(56, 189, 248, 0.25);
+}
+
+.intake-method-summary {
+  padding: 0.85rem 1.15rem;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+
+.intake-method-summary::-webkit-details-marker {
+  display: none;
+}
+
+.intake-method-summary:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.intake-method-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.intake-method-summary-left i {
+  color: var(--accent-cyan);
+}
+
+.intake-method-summary-arrow {
+  font-size: 0.76rem;
+  color: #38bdf8;
+  transition: transform 0.2s ease;
+}
+
+.intake-method-details[open] .intake-method-summary-arrow {
+  transform: rotate(180deg);
+}
+
+.intake-method-accordion-body {
+  padding: 1.15rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(2, 6, 23, 0.5);
+}
+
+.intake-method-note {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin: 0 0 0.85rem 0;
+  line-height: 1.5;
+}
+
+.samples-overflow-control summary::-webkit-details-marker {
+  display: none;
+}
+.samples-overflow-control summary:hover {
+  color: #94a3b8 !important;
+}

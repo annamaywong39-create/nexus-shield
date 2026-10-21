@@ -2136,6 +2136,7 @@ function initDualIntakeSwitcher() {
   const tabManual = document.getElementById('tabManualBtn');
   const secAuto = document.getElementById('autoIntakeSection');
   const secManual = document.getElementById('manualIntakeSection');
+  const accordion = document.getElementById('intakeMethodAccordion');
 
   if (!tabAuto || !tabManual || !secAuto || !secManual) return;
 
@@ -2145,6 +2146,10 @@ function initDualIntakeSwitcher() {
     tabManual.classList.remove('active');
     secAuto.style.display = 'block';
     secManual.style.display = 'none';
+    const autoBadge = tabAuto.querySelector('.tab-badge');
+    const manualBadge = tabManual.querySelector('.tab-badge');
+    if (autoBadge) autoBadge.innerText = 'Active Flow';
+    if (manualBadge) manualBadge.innerText = 'Comprehensive';
   });
 
   tabManual.addEventListener('click', () => {
@@ -2153,6 +2158,12 @@ function initDualIntakeSwitcher() {
     tabAuto.classList.remove('active');
     secAuto.style.display = 'none';
     secManual.style.display = 'block';
+    if (accordion) accordion.open = true;
+    const autoBadge = tabAuto.querySelector('.tab-badge');
+    const manualBadge = tabManual.querySelector('.tab-badge');
+    if (autoBadge) autoBadge.innerText = 'Fast-Track';
+    if (manualBadge) manualBadge.innerText = 'Active Flow';
+    secManual.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 }
 

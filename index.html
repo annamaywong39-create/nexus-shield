@@ -55,7 +55,7 @@
         <option value="ja">日本語</option>
       </select>
 
-      <a href="#statusReportId" class="nav-track-btn" onclick="document.getElementById('statusReportId').focus()">
+      <a href="#statusReportId" class="nav-utility-link" onclick="document.getElementById('statusReportId').focus()" title="Track an existing case">
         <i class="fas fa-magnifying-glass"></i> Track Case
       </a>
       <button type="button" id="mobileNavToggle" class="mobile-nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
@@ -94,26 +94,6 @@
         </div>
       </div>
 
-      <!-- INTAKE METHOD SWITCHER TABS -->
-      <div class="intake-mode-switcher">
-        <button type="button" class="intake-tab-btn active" id="tabAutoBtn">
-          <i class="fas fa-satellite-dish"></i>
-          <div class="tab-btn-text">
-            <span class="tab-btn-title">Automatic TxID Scanner</span>
-            <span class="tab-btn-sub">Paste hashes &bull; Auto-detect on-chain trail</span>
-          </div>
-          <span class="tab-badge">Fast-Track</span>
-        </button>
-        <button type="button" class="intake-tab-btn" id="tabManualBtn">
-          <i class="fas fa-file-pen"></i>
-          <div class="tab-btn-text">
-            <span class="tab-btn-title">Manual Case Intake</span>
-            <span class="tab-btn-sub">Self-input addresses, amounts &amp; platform</span>
-          </div>
-          <span class="tab-badge" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: #cbd5e1;">Comprehensive</span>
-        </button>
-      </div>
-
       <form id="recoveryForm" novalidate>
         <!-- ========================================================
              METHOD 1: AUTOMATIC TXID SCANNER (WITH MULTI-TRANSACTION +)
@@ -141,8 +121,8 @@
 
             <!-- Controls: Add Another Tx -->
             <div class="multi-tx-controls">
-              <button type="button" id="addTxHashBtn" class="btn-add-tx">
-                <i class="fas fa-plus-circle"></i> Add Another Transaction
+              <button type="button" id="addTxHashBtn" class="link-secondary-subtle" style="background: none; border: none; color: #64748b; font-size: 0.76rem; cursor: pointer; padding: 0.2rem 0; text-decoration: underline; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <i class="fas fa-plus"></i> Add another transaction hash (optional)
               </button>
             </div>
 
@@ -165,29 +145,79 @@
             </div>
 
             <div style="margin-top: 1rem;">
-              <button type="button" id="smartInspectBtn" class="btn-primary" style="width: 100%; padding: 0.95rem; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.55rem;">
+              <button type="button" id="smartInspectBtn" class="btn-primary hero-dominant-cta" style="width: 100%; padding: 1.05rem; font-size: 1.02rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; cursor: pointer;">
                 <i class="fas fa-satellite-dish"></i> Inspect &amp; Decode On-Chain
               </button>
             </div>
 
             <!-- Quick Samples for Testing -->
-            <div class="smart-samples-row">
-              <span class="smart-sample-label">Recent Cases:</span>
-              <button type="button" class="sample-chip" data-type="usdt">45,000 USDT (Binance)</button>
-              <button type="button" class="sample-chip" data-type="btc">1.85 BTC (Bitcoin Peeling)</button>
-              <button type="button" class="sample-chip" data-type="tron">28,400 USDT (OKX TRON)</button>
-              <button type="button" class="sample-chip" data-type="sol">120 SOL (Solana Raydium)</button>
-            </div>
+            <!-- Quick Samples Collapsed in Quiet Overflow (Zero CTA Competition) -->
+            <details class="samples-overflow-control" style="margin-top: 0.85rem; text-align: center;">
+              <summary style="font-size: 0.75rem; color: #64748b; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; list-style: none; user-select: none;">
+                <i class="fas fa-flask"></i> Testing the platform? <u>Click to view sample cases</u> ▾
+              </summary>
+              <div class="smart-samples-row" style="margin-top: 0.6rem; justify-content: center;">
+                <button type="button" class="sample-chip" data-type="usdt">45,000 USDT (Binance)</button>
+                <button type="button" class="sample-chip" data-type="btc">1.85 BTC (Bitcoin Peeling)</button>
+                <button type="button" class="sample-chip" data-type="tron">28,400 USDT (OKX TRON)</button>
+                <button type="button" class="sample-chip" data-type="sol">120 SOL (Solana Raydium)</button>
+              </div>
+            </details>
           </div>
         </div>
 
         <!-- ========================================================
              METHOD 2: MANUAL INTAKE (SELF-INPUT ADDRESSES & AMOUNTS)
              ======================================================== -->
+        
+        <!-- ========================================================
+             ALTERNATIVE INTAKE METHODS: ACCORDION CARD BELOW HERO
+             (Fix for DesignMeter: Removes competing tabs from hero)
+             ======================================================== -->
+        <div class="intake-method-accordion-box">
+          <details class="intake-method-details" id="intakeMethodAccordion">
+            <summary class="intake-method-summary">
+              <div class="intake-method-summary-left">
+                <i class="fas fa-sliders"></i>
+                <span>Alternative Intake: <strong>Manual Case Intake</strong> &amp; <strong>Automatic TxID Scanner</strong></span>
+              </div>
+              <span class="intake-method-summary-arrow"><i class="fas fa-chevron-down"></i></span>
+            </summary>
+            <div class="intake-method-accordion-body">
+              <p class="intake-method-note">
+                The <strong>Automatic TxID Scanner</strong> above is the primary fast-track flow. If you do not have a transaction hash or prefer self-reporting wallet addresses and documented losses, toggle <strong>Manual Case Intake</strong> below:
+              </p>
+              <div class="intake-mode-switcher" style="margin-bottom: 0;">
+                <button type="button" class="intake-tab-btn active" id="tabAutoBtn">
+                  <i class="fas fa-satellite-dish"></i>
+                  <div class="tab-btn-text">
+                    <span class="tab-btn-title">Automatic TxID Scanner</span>
+                    <span class="tab-btn-sub">Auto-detect trail from transaction hash</span>
+                  </div>
+                  <span class="tab-badge">Active Flow</span>
+                </button>
+                <button type="button" class="intake-tab-btn" id="tabManualBtn">
+                  <i class="fas fa-file-pen"></i>
+                  <div class="tab-btn-text">
+                    <span class="tab-btn-title">Manual Case Intake</span>
+                    <span class="tab-btn-sub">Self-input addresses, amounts &amp; platform</span>
+                  </div>
+                  <span class="tab-badge" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: #cbd5e1;">Comprehensive</span>
+                </button>
+              </div>
+            </div>
+          </details>
+        </div>
+
         <div id="manualIntakeSection" style="display: none;">
           <div class="smart-intake-hero-box" style="border-color: rgba(45, 159, 255, 0.35); background: linear-gradient(135deg, rgba(13, 21, 39, 0.95), rgba(5, 0, 255, 0.05));">
             <div class="smart-intake-badge" style="color: var(--primary-light); background: rgba(45, 159, 255, 0.1); border-color: rgba(45, 159, 255, 0.25);">
               <i class="fas fa-file-lines"></i> MANUAL FORENSIC INTAKE
+            </div>
+            <div style="margin-bottom: 0.85rem; display: flex; justify-content: flex-end;">
+              <button type="button" onclick="document.getElementById('tabAutoBtn').click()" class="btn-secondary" style="font-size: 0.76rem; padding: 0.35rem 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; color: #38bdf8; border-color: rgba(56,189,248,0.3); background: rgba(56,189,248,0.06);">
+                <i class="fas fa-satellite-dish"></i> Switch back to Automatic TxID Scanner &rarr;
+              </button>
             </div>
             <h3>Self-Input Wallet Movements</h3>
             <p>
