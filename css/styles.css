@@ -4951,7 +4951,8 @@ body {
     gap: 0.45rem;
   }
 
-  .header-actions .nav-track-btn {
+  .header-actions .nav-track-btn,
+  .header-actions .nav-utility-link {
     display: none;
   }
 
