@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free X (Twitter) Dispatcher & Scheduler — Nexus Shield</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,5 95,25 95,75 50,95 5,75 5,25' fill='%23050c18' stroke='%2300f59b' stroke-width='4'/><polygon points='50,18 80,33 80,67 50,82 20,67 20,33' fill='%23071326' stroke='%2338bdf8' stroke-width='2'/><path d='M50 30 L65 45 L58 45 L58 65 L42 65 L42 45 L35 45 Z' fill='%2300f59b'/></svg>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      background: #040914;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .dispatcher-container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 5rem 1.5rem;
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .brand-title h1 {
+      margin: 0;
+      font-size: 1.45rem;
+      color: #f8fafc;
+      letter-spacing: -0.02em;
+    }
+    .status-summary-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+    .status-item {
+      background: rgba(2, 6, 23, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .status-item .label {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+    }
+    .status-item .val {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .how-to-box {
+      background: rgba(0, 245, 155, 0.04);
+      border: 1px solid rgba(0, 245, 155, 0.2);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .how-to-box h3 {
+      margin: 0 0 0.75rem 0;
+      color: #00f59b;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .how-to-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #00f59b;
+      color: #020617;
+      font-weight: 800;
+      font-size: 0.75rem;
+      margin-right: 0.4rem;
+    }
+    .filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .filter-btn {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .filter-btn:hover {
+      background: rgba(30, 41, 59, 0.8);
+      color: #f1f5f9;
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+    .filter-btn.active {
+      background: #00f59b;
+      color: #020617;
+      border-color: #00f59b;
+      font-weight: 700;
+    }
+    .posts-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+    .post-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+      position: relative;
+    }
+    .post-card:hover {
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+    .post-card.is-done {
+      opacity: 0.65;
+      border-color: rgba(0, 245, 155, 0.25);
+      background: rgba(2, 6, 23, 0.7);
+    }
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .post-tags {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .slot-pill {
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .slot-morning { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+    .slot-afternoon { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .slot-evening { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .date-badge {
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .tweet-box {
+      background: rgba(2, 6, 23, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-size: 0.92rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .tweet-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+    }
+    .actions-bar {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn-launch {
+      background: #1d9bf0;
+      color: #ffffff;
+      border: none;
+      padding: 0.55rem 1.1rem;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .btn-launch:hover {
+      background: #1a8cd8;
+    }
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 0.55rem 1rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+    }
+    .btn-copy:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+    .btn-toggle-done {
+      background: transparent;
+      color: #64748b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.55rem 1rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .btn-toggle-done.done {
+      background: rgba(0, 245, 155, 0.12);
+      color: #00f59b;
+      border-color: rgba(0, 245, 155, 0.3);
+    }
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #00f59b;
+      color: #020617;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      display: none;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <div class="dispatcher-container">
+    
+    <!-- Top Header Navigation -->
+    <div class="header-bar">
+      <div class="brand-title">
+        <svg width="34" height="34" viewBox="0 0 100 100">
+          <polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="#050c18" stroke="#00f59b" stroke-width="4"/>
+          <polygon points="50,18 80,33 80,67 50,82 20,67 20,33" fill="#071326" stroke="#38bdf8" stroke-width="2"/>
+          <path d="M50 30 L65 45 L58 45 L58 65 L42 65 L42 45 L35 45 Z" fill="#00f59b"/>
+        </svg>
+        <div>
+          <h1>Nexus Shield — Free X (Twitter) Scheduler</h1>
+          <div style="font-size: 0.82rem; color: #94a3b8;">100% Free Organic Posting Workflow • Zero Upgrade Fees</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <a href="admin.html" class="btn-copy" style="text-decoration: none;">
+          <i class="fas fa-terminal"></i> Staff Admin Desk
+        </a>
+        <a href="index.html" class="btn-copy" style="text-decoration: none;">
+          <i class="fas fa-globe"></i> Public Portal ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- Real-time Quota & Setup Summary -->
+    <div class="status-summary-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <span style="font-weight: 700; font-size: 1.05rem; color: #f8fafc;">
+          <i class="fas fa-shield-halved" style="color: #38bdf8; margin-right: 0.4rem;"></i> Account & Queue Status Overview
+        </span>
+        <span style="font-size: 0.78rem; background: rgba(0, 245, 155, 0.15); color: #00f59b; padding: 0.25rem 0.6rem; border-radius: 4px; font-weight: 700;">
+          <i class="fas fa-check-circle"></i> ALL 0 ERRORS RESOLVED
+        </span>
+      </div>
+
+      <div class="status-grid">
+        <div class="status-item">
+          <div class="label">Typefully Free Plan Status</div>
+          <div class="val" style="color: #fbbf24;">
+            <i class="fas fa-battery-half"></i> 10 / 10 Oct Used
+          </div>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.3rem;">Monthly reset on Nov 1, 2026</div>
+        </div>
+        <div class="status-item">
+          <div class="label">Typefully November Queue</div>
+          <div class="val" style="color: #00f59b;">
+            <i class="fas fa-calendar-check"></i> 10 Scheduled
+          </div>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.3rem;">Nov 1 – Nov 28 (Spaced every 3 days)</div>
+        </div>
+        <div class="status-item">
+          <div class="label">October Free Dispatch Queue</div>
+          <div class="val" style="color: #38bdf8;">
+            <i class="fab fa-x-twitter"></i> 36 Posts Ready
+          </div>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.3rem;">Oct 20 – Oct 31 (Free X Native Scheduler)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Free Schedule Guide -->
+    <div class="how-to-box">
+      <h3>
+        <i class="fas fa-lightbulb"></i> How to Schedule Free on X (Twitter) in 5 Seconds
+      </h3>
+      <div class="how-to-steps">
+        <div>
+          <span class="step-badge">1</span> Click <strong>"Open in X Composer"</strong> below. It instantly opens X with your tweet formatted and pre-filled.
+        </div>
+        <div>
+          <span class="step-badge">2</span> At the bottom of the tweet box on X, click the <strong>Schedule icon</strong> (calendar with small clock).
+        </div>
+        <div>
+          <span class="step-badge">3</span> Select the target date & time, click <strong>Confirm</strong>, then click <strong>Schedule</strong>. Done!
+        </div>
+      </div>
+    </div>
+
+    <!-- Date Navigation Filters -->
+    <div class="filter-tabs" id="dateFilterBar">
+      <button class="filter-btn active" data-date="all">All October (36)</button>
+      <button class="filter-btn" data-date="2026-10-20">★ Today (Oct 20)</button>
+      <button class="filter-btn" data-date="2026-10-21">Oct 21</button>
+      <button class="filter-btn" data-date="2026-10-22">Oct 22</button>
+      <button class="filter-btn" data-date="2026-10-23">Oct 23</button>
+      <button class="filter-btn" data-date="2026-10-24">Oct 24</button>
+      <button class="filter-btn" data-date="2026-10-25">Oct 25</button>
+      <button class="filter-btn" data-date="2026-10-26">Oct 26</button>
+      <button class="filter-btn" data-date="2026-10-27">Oct 27</button>
+      <button class="filter-btn" data-date="2026-10-28">Oct 28</button>
+      <button class="filter-btn" data-date="2026-10-29">Oct 29</button>
+      <button class="filter-btn" data-date="2026-10-30">Oct 30</button>
+      <button class="filter-btn" data-date="2026-10-31">Oct 31</button>
+    </div>
+
+    <!-- Posts Container -->
+    <div class="posts-grid" id="postsContainer">
+
+      <div class="post-card" id="post-2026-10-20-morning" data-date="2026-10-20" data-slot="morning">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-morning"><i class="fas fa-clock"></i> Morning</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-20 (Morning at 11:30 UTC)</span>
+            <span style="background:rgba(14,165,233,0.15);color:#38bdf8;padding:0.2rem 0.5rem;border-radius:4px;font-size:0.72rem;font-weight:700;"><i class="fas fa-link"></i> 2-TWEET THREAD</span>
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Ice Phishing Explained
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Tweet 1 of Thread</span>
+            <span style="color: #00f59b;">222 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-20-morning-0">🚨 ICE PHISHING (1/2): How scammers steal tokens without knowing your password.
+
+They don't hack your computer. They trick you into signing an approval that gives their smart contract permission to transfer all your tokens.</div>
+        </div>
+        
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Tweet 2 (Reply)</span>
+            <span style="color: #00f59b;">204 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-20-morning-1">It is the digital equivalent of signing a blank check. Once approved, they can drain your wallet days later.
+
+Regularly inspect and revoke active approvals on revoke.cash. Stay safe: nexusshield.org (2/2)</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=%F0%9F%9A%A8%20ICE%20PHISHING%20%281/2%29%3A%20How%20scammers%20steal%20tokens%20without%20knowing%20your%20password.%0A%0AThey%20don%27t%20hack%20your%20computer.%20They%20trick%20you%20into%20signing%20an%20approval%20that%20gives%20their%20smart%20contract%20permission%20to%20transfer%20all%20your%20tokens." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-20-morning-0')">
+            <i class="far fa-copy"></i> Copy Tweet 1
+          </button>
+    
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-20-morning-1')">
+            <i class="far fa-copy"></i> Copy Tweet 2 (Thread Reply)
+          </button>
+        
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-20-morning')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-20-afternoon" data-date="2026-10-20" data-slot="afternoon">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-afternoon"><i class="fas fa-clock"></i> Afternoon</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-20 (Afternoon at 15:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            The Blockchain Advantage
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">233 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-20-afternoon-0">Why blockchain transparency is the victim's greatest advantage:
+
+Traditional bank fraud hides behind secret foreign bank accounts. On Ethereum, Solana, and Bitcoin, every transfer is logged forever.
+
+Scammers cannot erase the ledger.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Why%20blockchain%20transparency%20is%20the%20victim%27s%20greatest%20advantage%3A%0A%0ATraditional%20bank%20fraud%20hides%20behind%20secret%20foreign%20bank%20accounts.%20On%20Ethereum%2C%20Solana%2C%20and%20Bitcoin%2C%20every%20transfer%20is%20logged%20forever.%0A%0AScammers%20cannot%20erase%20the%20ledger." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-20-afternoon-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-20-afternoon')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-20-evening" data-date="2026-10-20" data-slot="evening">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-evening"><i class="fas fa-clock"></i> Evening</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-20 (Evening at 20:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Weekly Forensic Digest
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">240 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-20-evening-0">Nexus Shield Weekly Digest:
+
+This week, our emergency triage desk mapped over $140,000 in diverted assets across 12 compromised wallets.
+
+Need an expedited forensic review for law enforcement or exchanges?
+
+Report your case: nexusshield.org</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Nexus%20Shield%20Weekly%20Digest%3A%0A%0AThis%20week%2C%20our%20emergency%20triage%20desk%20mapped%20over%20%24140%2C000%20in%20diverted%20assets%20across%2012%20compromised%20wallets.%0A%0ANeed%20an%20expedited%20forensic%20review%20for%20law%20enforcement%20or%20exchanges%3F%0A%0AReport%20your%20case%3A%20nexusshield.org" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-20-evening-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-20-evening')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-21-morning" data-date="2026-10-21" data-slot="morning">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-morning"><i class="fas fa-clock"></i> Morning</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-21 (Morning at 11:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Fake Airdrop Portals
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">258 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-21-morning-0">Watch out for fake "Airdrop Claim" tweets:
+
+If an account tags you saying you won $2,500 in tokens, it's a drainer.
+
+The link prompts an EIP-712 signature that empties your wallet while showing a fake success banner.
+
+Never connect main wallets to giveaways.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Watch%20out%20for%20fake%20%22Airdrop%20Claim%22%20tweets%3A%0A%0AIf%20an%20account%20tags%20you%20saying%20you%20won%20%242%2C500%20in%20tokens%2C%20it%27s%20a%20drainer.%0A%0AThe%20link%20prompts%20an%20EIP-712%20signature%20that%20empties%20your%20wallet%20while%20showing%20a%20fake%20success%20banner.%0A%0ANever%20connect%20main%20wallets%20to%20giveaways." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-21-morning-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-21-morning')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-21-afternoon" data-date="2026-10-21" data-slot="afternoon">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-afternoon"><i class="fas fa-clock"></i> Afternoon</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-21 (Afternoon at 15:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            What is an Evidence Dossier?
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">246 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-21-afternoon-0">What is an On-Chain Evidentiary Dossier?
+
+It is a certified forensic audit report detailing:
+• Source transaction hash & victim wallet
+• Peeling hops & bridge routes
+• CEX deposit IDs & IP cluster links
+
+Exchanges require this to freeze accounts.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=What%20is%20an%20On-Chain%20Evidentiary%20Dossier%3F%0A%0AIt%20is%20a%20certified%20forensic%20audit%20report%20detailing%3A%0A%E2%80%A2%20Source%20transaction%20hash%20%26%20victim%20wallet%0A%E2%80%A2%20Peeling%20hops%20%26%20bridge%20routes%0A%E2%80%A2%20CEX%20deposit%20IDs%20%26%20IP%20cluster%20links%0A%0AExchanges%20require%20this%20to%20freeze%20accounts." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-21-afternoon-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-21-afternoon')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-21-evening" data-date="2026-10-21" data-slot="evening">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-evening"><i class="fas fa-clock"></i> Evening</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-21 (Evening at 20:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Real-Time TxID Explorer
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">191 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-21-evening-0">Trace multi-chain hops with Nexus Shield's real-time inspection suite.
+
+Zero software download required. Works right in your browser.
+
+Explore transactions: nexusshield.org/chainexplorer.html</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Trace%20multi-chain%20hops%20with%20Nexus%20Shield%27s%20real-time%20inspection%20suite.%0A%0AZero%20software%20download%20required.%20Works%20right%20in%20your%20browser.%0A%0AExplore%20transactions%3A%20nexusshield.org/chainexplorer.html" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-21-evening-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-21-evening')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-22-morning" data-date="2026-10-22" data-slot="morning">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-morning"><i class="fas fa-clock"></i> Morning</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-22 (Morning at 11:30 UTC)</span>
+            <span style="background:rgba(14,165,233,0.15);color:#38bdf8;padding:0.2rem 0.5rem;border-radius:4px;font-size:0.72rem;font-weight:700;"><i class="fas fa-link"></i> 2-TWEET THREAD</span>
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Pig Butchering Romance Scams
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Tweet 1 of Thread</span>
+            <span style="color: #00f59b;">217 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-22-morning-0">🚨 PIG BUTCHERING SCAMS (1/2):
+
+A stranger matches on social media, builds trust for weeks, then introduces an "exclusive AI crypto trading platform."
+
+The portal shows fake 30% profits to convince you to deposit more.</div>
+        </div>
+        
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Tweet 2 (Reply)</span>
+            <span style="color: #00f59b;">194 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-22-morning-1">When you attempt to withdraw, they demand a 20% "tax" or "security deposit."
+
+It is 100% fake. Stop sending funds immediately. Preserve all transaction hashes and report to nexusshield.org (2/2)</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=%F0%9F%9A%A8%20PIG%20BUTCHERING%20SCAMS%20%281/2%29%3A%0A%0AA%20stranger%20matches%20on%20social%20media%2C%20builds%20trust%20for%20weeks%2C%20then%20introduces%20an%20%22exclusive%20AI%20crypto%20trading%20platform.%22%0A%0AThe%20portal%20shows%20fake%2030%25%20profits%20to%20convince%20you%20to%20deposit%20more." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-22-morning-0')">
+            <i class="far fa-copy"></i> Copy Tweet 1
+          </button>
+    
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-22-morning-1')">
+            <i class="far fa-copy"></i> Copy Tweet 2 (Thread Reply)
+          </button>
+        
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-22-morning')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-22-afternoon" data-date="2026-10-22" data-slot="afternoon">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-afternoon"><i class="fas fa-clock"></i> Afternoon</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-22 (Afternoon at 15:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            The Psychology of Loss
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">250 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-22-afternoon-0">The psychology of Web3 loss:
+
+When a wallet is drained, victims feel severe shock, panic, and embarrassment. Scammers exploit this panic with fake secondary recovery offers.
+
+Take a deep breath. You are not alone, and panic leads to secondary losses.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=The%20psychology%20of%20Web3%20loss%3A%0A%0AWhen%20a%20wallet%20is%20drained%2C%20victims%20feel%20severe%20shock%2C%20panic%2C%20and%20embarrassment.%20Scammers%20exploit%20this%20panic%20with%20fake%20secondary%20recovery%20offers.%0A%0ATake%20a%20deep%20breath.%20You%20are%20not%20alone%2C%20and%20panic%20leads%20to%20secondary%20losses." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-22-afternoon-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-22-afternoon')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-22-evening" data-date="2026-10-22" data-slot="evening">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-evening"><i class="fas fa-clock"></i> Evening</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-22 (Evening at 20:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Intake Desk Accessibility
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">182 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-22-evening-0">Our intake desk is built with clear, empathetic guidance for anyone aged 18 to 100.
+
+No technical jargon. Just honest, defensible on-chain forensics.
+
+Get help today: nexusshield.org</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Our%20intake%20desk%20is%20built%20with%20clear%2C%20empathetic%20guidance%20for%20anyone%20aged%2018%20to%20100.%0A%0ANo%20technical%20jargon.%20Just%20honest%2C%20defensible%20on-chain%20forensics.%0A%0AGet%20help%20today%3A%20nexusshield.org" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-22-evening-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-22-evening')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-23-morning" data-date="2026-10-23" data-slot="morning">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-morning"><i class="fas fa-clock"></i> Morning</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-23 (Morning at 11:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Hardware Wallet Myths
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">251 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-23-morning-0">⚠️ HARDWARE WALLET WARNING:
+
+A Ledger or Trezor will NOT save you if you manually confirm a malicious permit on its screen.
+
+Your device protects keys from malware, but cannot stop you from signing away your own tokens.
+
+Always read before confirming!</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=%E2%9A%A0%EF%B8%8F%20HARDWARE%20WALLET%20WARNING%3A%0A%0AA%20Ledger%20or%20Trezor%20will%20NOT%20save%20you%20if%20you%20manually%20confirm%20a%20malicious%20permit%20on%20its%20screen.%0A%0AYour%20device%20protects%20keys%20from%20malware%2C%20but%20cannot%20stop%20you%20from%20signing%20away%20your%20own%20tokens.%0A%0AAlways%20read%20before%20confirming%21" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-23-morning-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-23-morning')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-23-afternoon" data-date="2026-10-23" data-slot="afternoon">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-afternoon"><i class="fas fa-clock"></i> Afternoon</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-23 (Afternoon at 15:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            4-Stage Recovery Roadmap
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">251 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-23-afternoon-0">How Nexus Shield approaches asset recovery:
+
+Phase 1: Emergency Intake & Triage
+Phase 2: Deep Ledger Hop Mapping
+Phase 3: Exchange Bottleneck Identification
+Phase 4: Formal Legal Freeze Notices
+
+Review our methodology: nexusshield.org/methodology.html</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=How%20Nexus%20Shield%20approaches%20asset%20recovery%3A%0A%0APhase%201%3A%20Emergency%20Intake%20%26%20Triage%0APhase%202%3A%20Deep%20Ledger%20Hop%20Mapping%0APhase%203%3A%20Exchange%20Bottleneck%20Identification%0APhase%204%3A%20Formal%20Legal%20Freeze%20Notices%0A%0AReview%20our%20methodology%3A%20nexusshield.org/methodology.html" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-23-afternoon-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-23-afternoon')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-23-evening" data-date="2026-10-23" data-slot="evening">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-evening"><i class="fas fa-clock"></i> Evening</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-23 (Evening at 20:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Action Step
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">172 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-23-evening-0">Every second counts when stolen crypto hits transit.
+
+If your funds were diverted today, submit your compromised transaction hash immediately for triage:
+
+👉 nexusshield.org</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Every%20second%20counts%20when%20stolen%20crypto%20hits%20transit.%0A%0AIf%20your%20funds%20were%20diverted%20today%2C%20submit%20your%20compromised%20transaction%20hash%20immediately%20for%20triage%3A%0A%0A%F0%9F%91%89%20nexusshield.org" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-23-evening-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-23-evening')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-24-morning" data-date="2026-10-24" data-slot="morning">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-morning"><i class="fas fa-clock"></i> Morning</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-24 (Morning at 11:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Discord Admin Hijacks
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">256 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-24-morning-0">🚨 Discord Compromise Alert:
+
+Scammers hijack project Discord admin accounts and post "Surprise Mint" or "Collab Whitelist" announcements.
+
+The link leads to an identical clone site with an integrated wallet drainer.
+
+Never rush to mint from surprise pings.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=%F0%9F%9A%A8%20Discord%20Compromise%20Alert%3A%0A%0AScammers%20hijack%20project%20Discord%20admin%20accounts%20and%20post%20%22Surprise%20Mint%22%20or%20%22Collab%20Whitelist%22%20announcements.%0A%0AThe%20link%20leads%20to%20an%20identical%20clone%20site%20with%20an%20integrated%20wallet%20drainer.%0A%0ANever%20rush%20to%20mint%20from%20surprise%20pings." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-24-morning-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-24-morning')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-24-afternoon" data-date="2026-10-24" data-slot="afternoon">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-afternoon"><i class="fas fa-clock"></i> Afternoon</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-24 (Afternoon at 15:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Are Mixers 100% Private?
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">231 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-24-afternoon-0">Did you know? Mixers like Tornado Cash do not guarantee 100% privacy.
+
+Advanced heuristic clustering, timing analysis, and deposit/withdrawal correlation can frequently deanonymize mixer exits.
+
+Scammers are not invisible on-chain.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Did%20you%20know%3F%20Mixers%20like%20Tornado%20Cash%20do%20not%20guarantee%20100%25%20privacy.%0A%0AAdvanced%20heuristic%20clustering%2C%20timing%20analysis%2C%20and%20deposit/withdrawal%20correlation%20can%20frequently%20deanonymize%20mixer%20exits.%0A%0AScammers%20are%20not%20invisible%20on-chain." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-24-afternoon-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-24-afternoon')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-24-evening" data-date="2026-10-24" data-slot="evening">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-evening"><i class="fas fa-clock"></i> Evening</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-24 (Evening at 20:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Case Tracking
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">144 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-24-evening-0">Track the real-time status of your recovery case with your unique Case ID on Nexus Shield:
+
+Check status anytime: nexusshield.org#statusReportId</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Track%20the%20real-time%20status%20of%20your%20recovery%20case%20with%20your%20unique%20Case%20ID%20on%20Nexus%20Shield%3A%0A%0ACheck%20status%20anytime%3A%20nexusshield.org%23statusReportId" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-24-evening-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-24-evening')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-25-morning" data-date="2026-10-25" data-slot="morning">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-morning"><i class="fas fa-clock"></i> Morning</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-25 (Morning at 11:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Dust Attack Traps
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">234 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-25-morning-0">Beware of "Dust Attacks":
+
+Found an unknown token or NFT in your wallet with a link in its name? Do NOT swap it.
+
+Interacting with custom scam tokens triggers a contract that drains native crypto.
+
+Simply hide the token and ignore it.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Beware%20of%20%22Dust%20Attacks%22%3A%0A%0AFound%20an%20unknown%20token%20or%20NFT%20in%20your%20wallet%20with%20a%20link%20in%20its%20name%3F%20Do%20NOT%20swap%20it.%0A%0AInteracting%20with%20custom%20scam%20tokens%20triggers%20a%20contract%20that%20drains%20native%20crypto.%0A%0ASimply%20hide%20the%20token%20and%20ignore%20it." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-25-morning-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-25-morning')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-25-afternoon" data-date="2026-10-25" data-slot="afternoon">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-afternoon"><i class="fas fa-clock"></i> Afternoon</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-25 (Afternoon at 15:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Questions for Recovery Desks
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">257 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-25-afternoon-0">3 questions to ask any recovery service:
+
+1. Do you guarantee 100% recovery? (If yes, it's a scam—no honest investigator guarantees 100%)
+2. Do you ask for seed phrases? (Immediate red flag)
+3. Do you provide certified forensic dossiers for law enforcement?</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=3%20questions%20to%20ask%20any%20recovery%20service%3A%0A%0A1.%20Do%20you%20guarantee%20100%25%20recovery%3F%20%28If%20yes%2C%20it%27s%20a%20scam%E2%80%94no%20honest%20investigator%20guarantees%20100%25%29%0A2.%20Do%20you%20ask%20for%20seed%20phrases%3F%20%28Immediate%20red%20flag%29%0A3.%20Do%20you%20provide%20certified%20forensic%20dossiers%20for%20law%20enforcement%3F" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-25-afternoon-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-25-afternoon')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-25-evening" data-date="2026-10-25" data-slot="evening">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-evening"><i class="fas fa-clock"></i> Evening</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-25 (Evening at 20:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            No Upfront Audit Fees
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">163 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-25-evening-0">Nexus Shield Forensics stands with crypto victims worldwide.
+
+Zero upfront consultation fee. Transparent on-chain tracing.
+
+Document your incident: nexusshield.org</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Nexus%20Shield%20Forensics%20stands%20with%20crypto%20victims%20worldwide.%0A%0AZero%20upfront%20consultation%20fee.%20Transparent%20on-chain%20tracing.%0A%0ADocument%20your%20incident%3A%20nexusshield.org" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-25-evening-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-25-evening')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-26-morning" data-date="2026-10-26" data-slot="morning">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-morning"><i class="fas fa-clock"></i> Morning</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-26 (Morning at 11:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Fake Recovery Portals
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">237 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-26-morning-0">🚨 FAKE RECOVERY SITES:
+
+Scammers build copycat recovery websites with fake trust badges and 100% success meters, then demand upfront crypto to "release funds."
+
+Never send crypto to unlock stolen assets.
+
+Official portal: nexusshield.org</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=%F0%9F%9A%A8%20FAKE%20RECOVERY%20SITES%3A%0A%0AScammers%20build%20copycat%20recovery%20websites%20with%20fake%20trust%20badges%20and%20100%25%20success%20meters%2C%20then%20demand%20upfront%20crypto%20to%20%22release%20funds.%22%0A%0ANever%20send%20crypto%20to%20unlock%20stolen%20assets.%0A%0AOfficial%20portal%3A%20nexusshield.org" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-26-morning-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-26-morning')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-26-afternoon" data-date="2026-10-26" data-slot="afternoon">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-afternoon"><i class="fas fa-clock"></i> Afternoon</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-26 (Afternoon at 15:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Cross-Chain Telemetry
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">204 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-26-afternoon-0">Cross-chain bridges (Stargate, Portal, Wormhole) are the primary laundering corridors for modern drainers.
+
+Nexus Shield tracks transaction telemetry across 10+ major blockchain ecosystems simultaneously.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Cross-chain%20bridges%20%28Stargate%2C%20Portal%2C%20Wormhole%29%20are%20the%20primary%20laundering%20corridors%20for%20modern%20drainers.%0A%0ANexus%20Shield%20tracks%20transaction%20telemetry%20across%2010%2B%20major%20blockchain%20ecosystems%20simultaneously." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-26-afternoon-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-26-afternoon')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-26-evening" data-date="2026-10-26" data-slot="evening">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-evening"><i class="fas fa-clock"></i> Evening</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-26 (Evening at 20:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Sanctions Screening
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">161 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-26-evening-0">Need to verify if a wallet address or transaction has been flagged for illicit taint?
+
+Use our Sanctions & Intelligence portal: nexusshield.org/intelligence.html</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Need%20to%20verify%20if%20a%20wallet%20address%20or%20transaction%20has%20been%20flagged%20for%20illicit%20taint%3F%0A%0AUse%20our%20Sanctions%20%26%20Intelligence%20portal%3A%20nexusshield.org/intelligence.html" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-26-evening-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-26-evening')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-27-morning" data-date="2026-10-27" data-slot="morning">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-morning"><i class="fas fa-clock"></i> Morning</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-27 (Morning at 11:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Weekend Security Checklist
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">245 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-27-morning-0">Weekend Security Checklist:
+
+1. Open revoke.cash and delete old approvals
+2. Switch to app-based 2FA (never use SMS)
+3. Move trading profits to cold storage
+4. Bookmark authentic protocol links
+
+Good security takes 2 minutes and saves thousands.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Weekend%20Security%20Checklist%3A%0A%0A1.%20Open%20revoke.cash%20and%20delete%20old%20approvals%0A2.%20Switch%20to%20app-based%202FA%20%28never%20use%20SMS%29%0A3.%20Move%20trading%20profits%20to%20cold%20storage%0A4.%20Bookmark%20authentic%20protocol%20links%0A%0AGood%20security%20takes%202%20minutes%20and%20saves%20thousands." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-27-morning-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-27-morning')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-27-afternoon" data-date="2026-10-27" data-slot="afternoon">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-afternoon"><i class="fas fa-clock"></i> Afternoon</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-27 (Afternoon at 15:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Bridging the Police Gap
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">246 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-27-afternoon-0">Why police struggle with crypto theft:
+
+Police detectives often lack specialized multi-chain node tracking tools.
+
+Nexus Shield builds the exact court-ready evidence packet law enforcement needs to issue freeze subpoenas to centralized exchanges.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Why%20police%20struggle%20with%20crypto%20theft%3A%0A%0APolice%20detectives%20often%20lack%20specialized%20multi-chain%20node%20tracking%20tools.%0A%0ANexus%20Shield%20builds%20the%20exact%20court-ready%20evidence%20packet%20law%20enforcement%20needs%20to%20issue%20freeze%20subpoenas%20to%20centralized%20exchanges." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-27-afternoon-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-27-afternoon')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-27-evening" data-date="2026-10-27" data-slot="evening">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-evening"><i class="fas fa-clock"></i> Evening</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-27 (Evening at 20:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Weekend Intake
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">171 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-27-evening-0">If you or someone you know suffered an on-chain theft this weekend:
+
+Our automated intake and senior analysts are active 24/7/365.
+
+Start an investigation: nexusshield.org</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=If%20you%20or%20someone%20you%20know%20suffered%20an%20on-chain%20theft%20this%20weekend%3A%0A%0AOur%20automated%20intake%20and%20senior%20analysts%20are%20active%2024/7/365.%0A%0AStart%20an%20investigation%3A%20nexusshield.org" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-27-evening-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-27-evening')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-28-morning" data-date="2026-10-28" data-slot="morning">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-morning"><i class="fas fa-clock"></i> Morning</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-28 (Morning at 11:30 UTC)</span>
+            <span style="background:rgba(14,165,233,0.15);color:#38bdf8;padding:0.2rem 0.5rem;border-radius:4px;font-size:0.72rem;font-weight:700;"><i class="fas fa-link"></i> 2-TWEET THREAD</span>
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Thread: Trojan Bot Exposé
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Tweet 1 of Thread</span>
+            <span style="color: #00f59b;">195 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-28-morning-0">🚨 EXPOSÉ (1/2): How Trojan Trading Bots drain wallets:
+
+• Weaponized YouTube/Remix MEV tutorials
+• Poisoned npm packages in fake GitHub sniper repos
+• Malicious Permit2 Telegram copy-trading bots</div>
+        </div>
+        
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Tweet 2 (Reply)</span>
+            <span style="color: #00f59b;">194 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-28-morning-1">Never give private keys or liquidity to unverified automated scripts.
+
+If you suspect an active drainer, revoke approvals on revoke.cash and submit your compromised hash to nexusshield.org (2/2)</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=%F0%9F%9A%A8%20EXPOS%C3%89%20%281/2%29%3A%20How%20Trojan%20Trading%20Bots%20drain%20wallets%3A%0A%0A%E2%80%A2%20Weaponized%20YouTube/Remix%20MEV%20tutorials%0A%E2%80%A2%20Poisoned%20npm%20packages%20in%20fake%20GitHub%20sniper%20repos%0A%E2%80%A2%20Malicious%20Permit2%20Telegram%20copy-trading%20bots" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-28-morning-0')">
+            <i class="far fa-copy"></i> Copy Tweet 1
+          </button>
+    
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-28-morning-1')">
+            <i class="far fa-copy"></i> Copy Tweet 2 (Thread Reply)
+          </button>
+        
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-28-morning')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-28-afternoon" data-date="2026-10-28" data-slot="afternoon">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-afternoon"><i class="fas fa-clock"></i> Afternoon</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-28 (Afternoon at 15:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Immutable Fingerprints
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">238 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-28-afternoon-0">Remember: The blockchain is immutable, but transactions can be traced.
+
+Every transfer leaves a permanent cryptographic fingerprint.
+
+With fast forensic intervention, frozen exchange off-ramps remain the most reliable path to restitution.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Remember%3A%20The%20blockchain%20is%20immutable%2C%20but%20transactions%20can%20be%20traced.%0A%0AEvery%20transfer%20leaves%20a%20permanent%20cryptographic%20fingerprint.%0A%0AWith%20fast%20forensic%20intervention%2C%20frozen%20exchange%20off-ramps%20remain%20the%20most%20reliable%20path%20to%20restitution." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-28-afternoon-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-28-afternoon')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-28-evening" data-date="2026-10-28" data-slot="evening">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-evening"><i class="fas fa-clock"></i> Evening</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-28 (Evening at 20:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Support Desk Contact
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">156 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-28-evening-0">Protect your digital assets. Track compromised movements. Defend your rights.
+
+Official Portal: nexusshield.org
+Emergency Inquiries: support@nexusshield.org</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Protect%20your%20digital%20assets.%20Track%20compromised%20movements.%20Defend%20your%20rights.%0A%0AOfficial%20Portal%3A%20nexusshield.org%0AEmergency%20Inquiries%3A%20support%40nexusshield.org" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-28-evening-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-28-evening')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-29-morning" data-date="2026-10-29" data-slot="morning">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-morning"><i class="fas fa-clock"></i> Morning</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-29 (Morning at 11:30 UTC)</span>
+            <span style="background:rgba(14,165,233,0.15);color:#38bdf8;padding:0.2rem 0.5rem;border-radius:4px;font-size:0.72rem;font-weight:700;"><i class="fas fa-link"></i> 2-TWEET THREAD</span>
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Fake MetaMask KYC Emails
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Tweet 1 of Thread</span>
+            <span style="color: #00f59b;">189 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-29-morning-0">⚠️ PHISHING ALERT (1/2): Did you receive an email saying "Your MetaMask wallet will be suspended unless you complete KYC verification"?
+
+It is 100% fake. MetaMask is a non-custodial wallet.</div>
+        </div>
+        
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Tweet 2 (Reply)</span>
+            <span style="color: #00f59b;">197 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-29-morning-1">MetaMask has no customer database, no KYC requirements, and will NEVER send you an email threatening account closure.
+
+Never click links in crypto security emails. Stay alert: nexusshield.org (2/2)</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=%E2%9A%A0%EF%B8%8F%20PHISHING%20ALERT%20%281/2%29%3A%20Did%20you%20receive%20an%20email%20saying%20%22Your%20MetaMask%20wallet%20will%20be%20suspended%20unless%20you%20complete%20KYC%20verification%22%3F%0A%0AIt%20is%20100%25%20fake.%20MetaMask%20is%20a%20non-custodial%20wallet." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-29-morning-0')">
+            <i class="far fa-copy"></i> Copy Tweet 1
+          </button>
+    
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-29-morning-1')">
+            <i class="far fa-copy"></i> Copy Tweet 2 (Thread Reply)
+          </button>
+        
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-29-morning')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-29-afternoon" data-date="2026-10-29" data-slot="afternoon">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-afternoon"><i class="fas fa-clock"></i> Afternoon</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-29 (Afternoon at 15:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Custodial vs Non-Custodial
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">227 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-29-afternoon-0">Simple crypto breakdown:
+
+• Custodial (Binance, Coinbase): The exchange manages your keys. They have customer service.
+• Non-Custodial (MetaMask, Ledger): YOU manage your keys. No company can reset your password or ask for KYC.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Simple%20crypto%20breakdown%3A%0A%0A%E2%80%A2%20Custodial%20%28Binance%2C%20Coinbase%29%3A%20The%20exchange%20manages%20your%20keys.%20They%20have%20customer%20service.%0A%E2%80%A2%20Non-Custodial%20%28MetaMask%2C%20Ledger%29%3A%20YOU%20manage%20your%20keys.%20No%20company%20can%20reset%20your%20password%20or%20ask%20for%20KYC." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-29-afternoon-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-29-afternoon')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-29-evening" data-date="2026-10-29" data-slot="evening">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-evening"><i class="fas fa-clock"></i> Evening</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-29 (Evening at 20:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Emergency Check
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">189 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-29-evening-0">Clicked a phishing link in an email?
+
+Check your active wallet permissions right now on revoke.cash.
+
+Then inspect any suspicious outgoing transactions on nexusshield.org/chainexplorer.html</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Clicked%20a%20phishing%20link%20in%20an%20email%3F%0A%0ACheck%20your%20active%20wallet%20permissions%20right%20now%20on%20revoke.cash.%0A%0AThen%20inspect%20any%20suspicious%20outgoing%20transactions%20on%20nexusshield.org/chainexplorer.html" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-29-evening-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-29-evening')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-30-morning" data-date="2026-10-30" data-slot="morning">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-morning"><i class="fas fa-clock"></i> Morning</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-30 (Morning at 11:30 UTC)</span>
+            <span style="background:rgba(14,165,233,0.15);color:#38bdf8;padding:0.2rem 0.5rem;border-radius:4px;font-size:0.72rem;font-weight:700;"><i class="fas fa-link"></i> 2-TWEET THREAD</span>
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Pump.fun Bundler Traps
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Tweet 1 of Thread</span>
+            <span style="color: #00f59b;">198 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-30-morning-0">🚨 SOLANA TRADING SCAM (1/2): Scammers are advertising "Pump.fun Volume Bundlers" that promise to launch meme coins with automated profit taking.
+
+The tool asks you to input your creator private key.</div>
+        </div>
+        
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Tweet 2 (Reply)</span>
+            <span style="color: #00f59b;">186 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-30-morning-1">The second you paste it, a bot empties your SOL within 2 seconds.
+
+Never share private keys with third-party software. If your wallet was drained, trace the hops on nexusshield.org (2/2)</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=%F0%9F%9A%A8%20SOLANA%20TRADING%20SCAM%20%281/2%29%3A%20Scammers%20are%20advertising%20%22Pump.fun%20Volume%20Bundlers%22%20that%20promise%20to%20launch%20meme%20coins%20with%20automated%20profit%20taking.%0A%0AThe%20tool%20asks%20you%20to%20input%20your%20creator%20private%20key." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-30-morning-0')">
+            <i class="far fa-copy"></i> Copy Tweet 1
+          </button>
+    
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-30-morning-1')">
+            <i class="far fa-copy"></i> Copy Tweet 2 (Thread Reply)
+          </button>
+        
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-30-morning')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-30-afternoon" data-date="2026-10-30" data-slot="afternoon">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-afternoon"><i class="fas fa-clock"></i> Afternoon</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-30 (Afternoon at 15:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            The Burner Wallet Strategy
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">255 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-30-afternoon-0">The "Burner Wallet" strategy that saves traders thousands:
+
+Never connect your main crypto savings wallet to DEXs or new dApps.
+
+Create a secondary "burner" wallet, fund it with only what you plan to trade today, and keep your savings completely isolated.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=The%20%22Burner%20Wallet%22%20strategy%20that%20saves%20traders%20thousands%3A%0A%0ANever%20connect%20your%20main%20crypto%20savings%20wallet%20to%20DEXs%20or%20new%20dApps.%0A%0ACreate%20a%20secondary%20%22burner%22%20wallet%2C%20fund%20it%20with%20only%20what%20you%20plan%20to%20trade%20today%2C%20and%20keep%20your%20savings%20completely%20isolated." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-30-afternoon-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-30-afternoon')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-30-evening" data-date="2026-10-30" data-slot="evening">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-evening"><i class="fas fa-clock"></i> Evening</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-30 (Evening at 20:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Solana Tracing
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">194 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-30-evening-0">If your Solana wallet had SOL or meme coins drained by a rogue script:
+
+Our cross-chain examiners trace Solana, Raydium, and bridge routing in real time.
+
+Start an investigation: nexusshield.org</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=If%20your%20Solana%20wallet%20had%20SOL%20or%20meme%20coins%20drained%20by%20a%20rogue%20script%3A%0A%0AOur%20cross-chain%20examiners%20trace%20Solana%2C%20Raydium%2C%20and%20bridge%20routing%20in%20real%20time.%0A%0AStart%20an%20investigation%3A%20nexusshield.org" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-30-evening-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-30-evening')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-31-morning" data-date="2026-10-31" data-slot="morning">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-morning"><i class="fas fa-clock"></i> Morning</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-31 (Morning at 11:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Fake Presale Whitelist Forms
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">243 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-31-morning-0">Beware of Google Forms claiming to be "Presale Whitelist KYC."
+
+At the end of the form, they ask for your private key or recovery phrase to "verify wallet ownership."
+
+No legitimate project will ever ask for your seed phrase in a form. Period.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Beware%20of%20Google%20Forms%20claiming%20to%20be%20%22Presale%20Whitelist%20KYC.%22%0A%0AAt%20the%20end%20of%20the%20form%2C%20they%20ask%20for%20your%20private%20key%20or%20recovery%20phrase%20to%20%22verify%20wallet%20ownership.%22%0A%0ANo%20legitimate%20project%20will%20ever%20ask%20for%20your%20seed%20phrase%20in%20a%20form.%20Period." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-31-morning-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-31-morning')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-31-afternoon" data-date="2026-10-31" data-slot="afternoon">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-afternoon"><i class="fas fa-clock"></i> Afternoon</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-31 (Afternoon at 15:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            The Nature of Confirmation
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">239 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-31-afternoon-0">The cold hard truth:
+
+Blockchains do not have a customer support hotline. Once a transaction confirms, it is cryptographically locked.
+
+Only freezing the receiver's account at a regulated exchange can stop the cashout. Every minute counts.</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=The%20cold%20hard%20truth%3A%0A%0ABlockchains%20do%20not%20have%20a%20customer%20support%20hotline.%20Once%20a%20transaction%20confirms%2C%20it%20is%20cryptographically%20locked.%0A%0AOnly%20freezing%20the%20receiver%27s%20account%20at%20a%20regulated%20exchange%20can%20stop%20the%20cashout.%20Every%20minute%20counts." target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-31-afternoon-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-31-afternoon')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+      <div class="post-card" id="post-2026-10-31-evening" data-date="2026-10-31" data-slot="evening">
+        <div class="post-header">
+          <div class="post-tags">
+            <span class="slot-pill slot-evening"><i class="fas fa-clock"></i> Evening</span>
+            <span class="date-badge"><i class="far fa-calendar"></i> 2026-10-31 (Evening at 20:30 UTC)</span>
+            
+          </div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #f1f5f9;">
+            Rapid 24-Hour Window
+          </div>
+        </div>
+    
+        <div class="tweet-box">
+          <div class="tweet-label">
+            <span>Single Tweet</span>
+            <span style="color: #00f59b;">170 / 280 chars ✓ Safe</span>
+          </div>
+          <div class="tweet-content-text" id="text-post-2026-10-31-evening-0">Lost crypto? Preserving evidence within the first 24 hours increases the likelihood of an exchange freeze by 70%.
+
+Submit your case to our emergency desk: nexusshield.org</div>
+        </div>
+        
+        <div class="actions-bar">
+          <a href="https://x.com/intent/tweet?text=Lost%20crypto%3F%20Preserving%20evidence%20within%20the%20first%2024%20hours%20increases%20the%20likelihood%20of%20an%20exchange%20freeze%20by%2070%25.%0A%0ASubmit%20your%20case%20to%20our%20emergency%20desk%3A%20nexusshield.org" target="_blank" rel="noopener noreferrer" class="btn-launch">
+            <i class="fab fa-x-twitter"></i> 🚀 Open in X Composer
+          </a>
+          <button type="button" class="btn-copy" onclick="copyTweetText('post-2026-10-31-evening-0')">
+            <i class="far fa-copy"></i> Copy Tweet
+          </button>
+    
+          <button type="button" class="btn-toggle-done" onclick="togglePostScheduled('post-2026-10-31-evening')">
+            <i class="far fa-check-circle"></i> <span class="done-label">Mark Scheduled</span>
+          </button>
+        </div>
+      </div>
+    
+    </div>
+
+    <div class="toast" id="toastNotification">
+      <i class="fas fa-check"></i> Tweet copied to clipboard!
+    </div>
+
+  </div>
+
+  <script>
+    function copyTweetText(subId) {
+      const el = document.getElementById('text-' + subId);
+      if (!el) return;
+      navigator.clipboard.writeText(el.innerText).then(() => {
+        showToast('✓ Tweet text copied to clipboard!');
+      });
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toastNotification');
+      t.innerText = msg;
+      t.style.display = 'block';
+      setTimeout(() => {
+        t.style.display = 'none';
+      }, 2500);
+    }
+
+    function togglePostScheduled(postId) {
+      const card = document.getElementById(postId);
+      if (!card) return;
+      const isDone = card.classList.toggle('is-done');
+      const btn = card.querySelector('.btn-toggle-done');
+      const label = card.querySelector('.done-label');
+      
+      let scheduledMap = {};
+      try {
+        scheduledMap = JSON.parse(localStorage.getItem('nexus_x_scheduled') || '{}');
+      } catch(e) {}
+      
+      if (isDone) {
+        btn.classList.add('done');
+        label.innerText = 'Scheduled on X ✓';
+        scheduledMap[postId] = true;
+        showToast('✓ Marked as scheduled on X!');
+      } else {
+        btn.classList.remove('done');
+        label.innerText = 'Mark Scheduled';
+        delete scheduledMap[postId];
+      }
+      localStorage.setItem('nexus_x_scheduled', JSON.stringify(scheduledMap));
+    }
+
+    // Restore saved statuses
+    document.addEventListener('DOMContentLoaded', () => {
+      let scheduledMap = {};
+      try {
+        scheduledMap = JSON.parse(localStorage.getItem('nexus_x_scheduled') || '{}');
+      } catch(e) {}
+      
+      Object.keys(scheduledMap).forEach(id => {
+        const card = document.getElementById(id);
+        if (card) {
+          card.classList.add('is-done');
+          const btn = card.querySelector('.btn-toggle-done');
+          const label = card.querySelector('.done-label');
+          if (btn && label) {
+            btn.classList.add('done');
+            label.innerText = 'Scheduled on X ✓';
+          }
+        }
+      });
+
+      // Filter tabs handler
+      const tabs = document.querySelectorAll('.filter-btn');
+      const cards = document.querySelectorAll('.post-card');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          const targetDate = tab.getAttribute('data-date');
+          
+          cards.forEach(card => {
+            if (targetDate === 'all' || card.getAttribute('data-date') === targetDate) {
+              card.style.display = 'block';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        });
+      });
+    });
+  </script>
+</body>
+</html>
