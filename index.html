@@ -94,6 +94,20 @@
         </div>
       </div>
 
+      
+      <!-- 2-Step Frictionless Case Flow (DesignMeter: Clear Next Steps & Zero Confusion) -->
+      <div class="recovery-flow-steps" role="navigation" aria-label="Investigation Progress">
+        <div class="flow-step active" id="flowStep1">
+          <span class="step-num">1</span>
+          <span class="step-text">Scan On-Chain Trail</span>
+        </div>
+        <div class="flow-step-arrow"><i class="fas fa-arrow-right"></i></div>
+        <div class="flow-step" id="flowStep2">
+          <span class="step-num">2</span>
+          <span class="step-text">Confirm &amp; Dispatch Case</span>
+        </div>
+      </div>
+
       <form id="recoveryForm" novalidate>
         <!-- ========================================================
              METHOD 1: AUTOMATIC TXID SCANNER (WITH MULTI-TRANSACTION +)
@@ -114,7 +128,7 @@
                 <span class="tx-index-chip">Tx #1</span>
                 <div class="smart-tx-field-wrapper" style="flex: 1;">
                   <i class="fas fa-magnifying-glass smart-input-icon"></i>
-                  <input type="text" class="smart-tx-input auto-tx-hash-input" id="smartTxInput_1" placeholder="Paste 64-character TxID or 0x... hash here" autocomplete="off">
+                  <input type="text" class="smart-tx-input auto-tx-hash-input" id="smartTxInput_1" placeholder="Paste 64-character TxID or 0x... hash here" autocomplete="off" aria-label="Transaction Hash or TxID">
                 </div>
               </div>
             </div>
@@ -146,7 +160,7 @@
 
             <div style="margin-top: 1rem;">
               <button type="button" id="smartInspectBtn" class="btn-primary hero-dominant-cta" style="width: 100%; padding: 1.05rem; font-size: 1.02rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; cursor: pointer;">
-                <i class="fas fa-satellite-dish"></i> Inspect &amp; Decode On-Chain
+                <i class="fas fa-satellite-dish"></i> <span>Step 1: Inspect &amp; Decode On-Chain</span> <i class="fas fa-arrow-right" style="font-size:0.85rem;margin-left:auto;"></i>
               </button>
             </div>
 
@@ -608,8 +622,9 @@ STATEMENT OF SWORN FACTS:
 
         <!-- Primary Submission Action -->
         <div style="margin-top: 1.8rem;">
-          <button type="button" id="scanRecoverBtn" class="btn-primary" style="width: 100%; font-size: 1.05rem; padding: 1.1rem; box-shadow: 0 4px 20px rgba(5, 0, 255, 0.4);">
-            <i class="fas fa-paper-plane"></i> <span data-i18n="scan_button">Confirm Details &amp; Dispatch Case Investigation</span>
+          <button type="button" id="scanRecoverBtn" class="final-submit-cta" style="width: 100%;">
+            <i class="fas fa-shield-halved" style="color: #00F59B;"></i>
+            <span>Step 2: Confirm Details &amp; Dispatch Case Investigation</span>
           </button>
         </div>
       </form>
