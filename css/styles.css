@@ -86,9 +86,30 @@ body {
   height: 100vh;
   pointer-events: none;
   z-index: 1;
-  backdrop-filter: blur(4.7px);
-  -webkit-backdrop-filter: blur(4.7px);
-  background: radial-gradient(circle at 50% 320px, rgba(4, 8, 18, 0.05) 0%, rgba(4, 8, 18, 0.32) 55%, rgba(4, 8, 18, 0.68) 95%);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  background: radial-gradient(circle at 50% 320px, rgba(4, 8, 18, 0.45) 0%, rgba(4, 8, 18, 0.70) 55%, rgba(4, 8, 18, 0.92) 95%);
+}
+
+/* Hero Header Text Backdrop Protection (Zero Background Logo Clashes) */
+.hero-header-top {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 960px;
+  margin: 0 auto 1.75rem;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-lg);
+  background: radial-gradient(ellipse at center, rgba(4, 8, 18, 0.75) 0%, rgba(4, 8, 18, 0.35) 75%, transparent 100%);
+}
+
+.hero-header-top .hero-main-title {
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.95), 0 4px 40px rgba(0, 0, 0, 0.85);
+}
+
+.hero-header-top .hero-subtext {
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.95);
+  color: #f1f5f9 !important;
 }
 
 /* ========================================================

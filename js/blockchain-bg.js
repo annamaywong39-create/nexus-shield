@@ -622,90 +622,25 @@
     animId = requestAnimationFrame(render);
   }
 
-  // DRAW THE ZOOMED-IN BOLD "N" SUN CORE
+  // DRAW THE AMBIENT GRAVITATIONAL SUN CORE (Clean, Non-Intrusive, Zero Text Clashes)
   function drawCentralSunN(x, y) {
     const sunBaseSize = width < 480 ? 190 : (width < 768 ? 230 : (width < 1200 ? 280 : 340));
     const w = sunBaseSize;
-    const h = sunBaseSize;
 
     ctx.save();
     ctx.translate(x, y);
 
-    // Refined solar corona
-    const haloRadius = w * 0.54;
-    const corona = ctx.createRadialGradient(0, 0, haloRadius * 0.2, 0, 0, haloRadius);
-    corona.addColorStop(0, 'rgba(0, 245, 155, 0.20)');
-    corona.addColorStop(0.5, 'rgba(45, 159, 255, 0.09)');
+    // Soft subtle ambient corona for orbital center (zero opaque logo shapes behind hero text)
+    const haloRadius = w * 0.45;
+    const corona = ctx.createRadialGradient(0, 0, haloRadius * 0.1, 0, 0, haloRadius);
+    corona.addColorStop(0, 'rgba(0, 245, 155, 0.08)');
+    corona.addColorStop(0.5, 'rgba(45, 159, 255, 0.04)');
     corona.addColorStop(1, 'rgba(4, 8, 18, 0)');
 
     ctx.beginPath();
     ctx.arc(0, 0, haloRadius, 0, Math.PI * 2);
     ctx.fillStyle = corona;
     ctx.fill();
-
-    // Shield Contour
-    ctx.beginPath();
-    ctx.moveTo(0, -h * 0.46);
-    ctx.lineTo(w * 0.42, -h * 0.32);
-    ctx.lineTo(w * 0.36, h * 0.18);
-    ctx.lineTo(0, h * 0.46);
-    ctx.lineTo(-w * 0.36, h * 0.18);
-    ctx.lineTo(-w * 0.42, -h * 0.32);
-    ctx.closePath();
-
-    ctx.fillStyle = 'rgba(6, 11, 26, 0.90)';
-    ctx.strokeStyle = 'rgba(0, 245, 155, 0.5)';
-    ctx.lineWidth = 2.4;
-    ctx.fill();
-    ctx.stroke();
-
-    // THE BOLD ZOOMED-IN "N"
-    const nw = w * 0.46;
-    const nh = h * 0.56;
-
-    // Left Pillar of "N"
-    ctx.beginPath();
-    ctx.moveTo(-nw * 0.45, -nh * 0.42);
-    ctx.lineTo(-nw * 0.18, -nh * 0.42);
-    ctx.lineTo(-nw * 0.18, nh * 0.42);
-    ctx.lineTo(-nw * 0.45, nh * 0.42);
-    ctx.closePath();
-    ctx.fillStyle = '#2D9FFF';
-    ctx.fill();
-
-    // Diagonal Slash of "N"
-    ctx.beginPath();
-    ctx.moveTo(-nw * 0.22, -nh * 0.42);
-    ctx.lineTo(nw * 0.22, nh * 0.42);
-    ctx.lineTo(nw * 0.45, nh * 0.42);
-    ctx.lineTo(-nw * 0.05, -nh * 0.42);
-    ctx.closePath();
-    ctx.fillStyle = '#00F59B';
-    ctx.fill();
-
-    // Right Pillar of "N"
-    ctx.beginPath();
-    ctx.moveTo(nw * 0.18, -nh * 0.42);
-    ctx.lineTo(nw * 0.45, -nh * 0.48);
-    ctx.lineTo(nw * 0.45, nh * 0.42);
-    ctx.lineTo(nw * 0.18, nh * 0.42);
-    ctx.closePath();
-    ctx.fillStyle = '#38BDF8';
-    ctx.fill();
-
-    // Diagonal Energy Ridge
-    ctx.beginPath();
-    ctx.moveTo(-nw * 0.18, -nh * 0.42);
-    ctx.lineTo(nw * 0.32, nh * 0.42);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-    ctx.lineWidth = 1.8;
-    ctx.stroke();
-
-    // Draw authentic official texture if loaded
-    if (shieldLoaded) {
-      ctx.globalAlpha = 0.84;
-      ctx.drawImage(shieldImg, -w / 2, -h / 2, w, h);
-    }
 
     ctx.restore();
   }
