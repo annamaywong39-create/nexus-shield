@@ -6450,6 +6450,17 @@ body.nav-drawer-open .header {
   box-shadow: 0 0 14px rgba(192, 132, 252, 0.25);
 }
 
+.admin-view-btn[data-view="intake"].active {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: #38bdf8;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
+  color: #fff;
+}
+.admin-view-btn[data-view="intake"].active .view-tab-count {
+  background: #38bdf8;
+  color: #080d1a;
+}
+
 .admin-view-btn[data-view="wallets"].active {
   background: rgba(56, 189, 248, 0.16);
   border-color: #38bdf8;
@@ -6670,6 +6681,111 @@ body.nav-drawer-open .header {
 @keyframes fadeInBanner {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========================================================
+   ADMIN MANUAL INTAKE & WALLET SCANNER STYLES
+   ======================================================== */
+.intake-subtab-btn {
+  background: transparent;
+  color: #94a3b8;
+  transition: all 0.2s ease;
+}
+.intake-subtab-btn:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.05);
+}
+.intake-subtab-btn.active {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(45, 159, 255, 0.15)) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.15);
+}
+
+.intake-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.intake-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 820px) {
+  .intake-grid-2, .intake-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.forensic-hop-trail {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  overflow-x: auto;
+  padding: 0.85rem 0.5rem;
+}
+.forensic-hop-node {
+  flex: 1;
+  min-width: 175px;
+  background: rgba(13, 21, 39, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 8px;
+  padding: 0.75rem;
+  position: relative;
+}
+.forensic-hop-node.urgent {
+  border-color: rgba(244, 63, 94, 0.4);
+  background: rgba(244, 63, 94, 0.05);
+}
+.forensic-hop-arrow {
+  color: #38bdf8;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.anomaly-tx-card {
+  background: rgba(13, 21, 39, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  margin-bottom: 0.85rem;
+  transition: all 0.2s ease;
+}
+.anomaly-tx-card:hover {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(13, 21, 39, 0.98);
+}
+.anomaly-tx-card.critical-drain {
+  border-left: 4px solid #f43f5e;
+  background: linear-gradient(90deg, rgba(244, 63, 94, 0.08) 0%, rgba(13, 21, 39, 0.9) 100%);
+}
+.anomaly-tx-card.approval-drain {
+  border-left: 4px solid #f59e0b;
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0%, rgba(13, 21, 39, 0.9) 100%);
+}
+.anomaly-tx-card.benign-tx {
+  border-left: 4px solid #00f59b;
+  background: linear-gradient(90deg, rgba(0, 245, 155, 0.04) 0%, rgba(13, 21, 39, 0.9) 100%);
+  opacity: 0.85;
+}
+
+.email-response-container {
+  background: #060b18;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  position: relative;
+}
+.email-response-text {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  max-height: 380px;
+  overflow-y: auto;
 }
 
 

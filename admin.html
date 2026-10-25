@@ -122,6 +122,9 @@
           <i class="fas fa-list-check" style="color: var(--primary-light);"></i> Cases Queue
           <span class="view-tab-count" id="viewCountCases">0</span>
         </button>
+        <button type="button" class="admin-view-btn" data-view="intake" id="viewBtnIntake">
+          <i class="fas fa-microscope" style="color: #38bdf8;"></i> Manual Intake &amp; Wallet Scanner
+        </button>
         <button type="button" class="admin-view-btn" data-view="payments" id="viewBtnPayments">
           <i class="fas fa-file-invoice-dollar" style="color: var(--accent-green);"></i> Payment Audits ($10)
           <span class="view-tab-count" id="viewCountPayments">0</span>
@@ -153,7 +156,10 @@
           <h2><i class="fas fa-list-check" style="color: var(--primary-light);"></i> Case Management &amp; Progress Terminal</h2>
           <div class="card-subtitle">Manage, verify, and update on-chain cases synchronized with Supabase.</div>
         </div>
-        <div style="display: flex; gap: 0.65rem;">
+        <div style="display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="btn-primary" onclick="switchAdminView('intake')" style="padding: 0.45rem 1rem; font-size: 0.82rem; background: linear-gradient(135deg, #00f59b, #38bdf8); color: #040812; font-weight: 700; border: none; cursor: pointer;">
+            <i class="fas fa-plus"></i> Ingest Email / Audit Wallet
+          </button>
           <button id="exportCsvBtn" class="btn-primary" style="padding: 0.45rem 1rem; font-size: 0.82rem;">
             <i class="fas fa-file-csv"></i> Export CSV
           </button>
@@ -343,6 +349,224 @@
           </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- ========================================================
+         WORKSPACE SECTION: MANUAL CASE INTAKE & WALLET FORENSICS
+         ======================================================== -->
+    <div class="portal-card admin-section-pane" id="manualIntakeSection" style="display: none; padding: 1.8rem; margin-bottom: 1.8rem; border-color: rgba(56, 189, 248, 0.4); background: linear-gradient(135deg, rgba(10, 18, 36, 0.98), rgba(6, 11, 24, 0.99)); box-shadow: 0 8px 32px rgba(56, 189, 248, 0.08);">
+      <div class="workspace-badge-strip" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35);">
+        <i class="fas fa-microscope"></i> Workspace: Client Scam Intake &amp; Wallet Anomaly Forensics
+      </div>
+
+      <div class="card-header-row" style="margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div class="card-title-group">
+          <h2><i class="fas fa-microscope" style="color: #38bdf8;"></i> Incident Intake &amp; Wallet Investigator Terminal</h2>
+          <div class="card-subtitle">
+            Ingest client email inquiries, generate official tracking dossiers (NX-XXXXXX), and perform deep anomaly scans on distressed victim wallets.
+          </div>
+        </div>
+
+        <!-- Mode Sub-Tabs (Intake vs. Hopeless Wallet Scanner) -->
+        <div class="intake-mode-switcher" style="display: flex; gap: 0.5rem; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap;">
+          <button type="button" class="intake-subtab-btn active" id="tabBtnEmailIntake" onclick="switchIntakeSubMode('email')" style="padding: 0.45rem 0.9rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.45rem;">
+            <i class="fas fa-envelope-open-text"></i> Email Scam Intake &amp; Case Generator
+          </button>
+          <button type="button" class="intake-subtab-btn" id="tabBtnWalletAudit" onclick="switchIntakeSubMode('wallet')" style="padding: 0.45rem 0.9rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.45rem;">
+            <i class="fas fa-radar"></i> "Hopeless Client" Wallet Anomaly Scanner
+          </button>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           PANEL A: EMAIL SCAM INTAKE & CASE GENERATOR
+           ========================================== -->
+      <div id="intakePanelEmail" class="intake-subpanel">
+        <div style="background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.2); border-left: 4px solid #38bdf8; border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #cbd5e1; line-height: 1.55;">
+          <i class="fas fa-circle-info" style="color: #38bdf8; margin-right: 0.4rem;"></i>
+          <strong>Client Email Ingestion Workflow:</strong> When a victim emails support or reaches out via chat, enter their details below. The system simulates multi-hop on-chain tracing, allocates an official Case Reference ID (<code style="color:#00f59b;">NX-XXXXXX</code>) synchronized with the live tracking portal, and drafts an empathetic, ready-to-send email response pre-loaded with their tracking link and preliminary findings.
+        </div>
+
+        <form id="manualIntakeForm" onsubmit="handleManualIntakeSubmit(event)">
+          <div class="intake-grid-3" style="margin-bottom: 1rem;">
+            <div class="input-group">
+              <label for="intakeClientName"><i class="fas fa-user"></i> Client / Complainant Name</label>
+              <input type="text" id="intakeClientName" placeholder="e.g. David Miller" required>
+            </div>
+            <div class="input-group">
+              <label for="intakeClientContact"><i class="fas fa-envelope"></i> Client Email / Contact Handle</label>
+              <input type="text" id="intakeClientContact" placeholder="e.g. david.miller@gmail.com" required>
+            </div>
+            <div class="input-group">
+              <label for="intakePriority"><i class="fas fa-bolt"></i> Triage Priority / SLA</label>
+              <select id="intakePriority">
+                <option value="urgent" selected>Urgent (Rapid Laundering Window &lt;4h)</option>
+                <option value="high">High Priority (&lt;12h SLA)</option>
+                <option value="standard">Standard Investigation (&lt;24h SLA)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="intake-grid-3" style="margin-bottom: 1rem;">
+            <div class="input-group">
+              <label for="intakeCurrency"><i class="fas fa-coins"></i> Asset Lost</label>
+              <select id="intakeCurrency">
+                <option value="USDT" selected>USDT (Tether USD)</option>
+                <option value="USDC">USDC (USD Coin)</option>
+                <option value="ETH">ETH (Ethereum)</option>
+                <option value="BTC">BTC (Bitcoin)</option>
+                <option value="SOL">SOL (Solana)</option>
+                <option value="BNB">BNB (Binance Coin)</option>
+                <option value="DAI">DAI (Stablecoin)</option>
+                <option value="OTHER">Other Custom Token</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="intakeAmount"><i class="fas fa-dollar-sign"></i> Estimated Amount / Loss Value</label>
+              <input type="number" id="intakeAmount" placeholder="e.g. 35000" step="any" required>
+            </div>
+            <div class="input-group">
+              <label for="intakeChain"><i class="fas fa-link"></i> Blockchain / Network</label>
+              <select id="intakeChain">
+                <option value="TRON (TRC-20)" selected>TRON (TRC-20)</option>
+                <option value="Ethereum (ERC-20)">Ethereum (ERC-20)</option>
+                <option value="Solana (SPL)">Solana (SPL)</option>
+                <option value="Bitcoin (SegWit)">Bitcoin (SegWit/Taproot)</option>
+                <option value="BNB Smart Chain (BEP-20)">BNB Smart Chain (BEP-20)</option>
+                <option value="Polygon (PoS)">Polygon (PoS)</option>
+                <option value="Arbitrum One">Arbitrum One</option>
+                <option value="Multi-Chain">Cross-Chain / Multi-Network</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="intake-grid-2" style="margin-bottom: 1rem;">
+            <div class="input-group">
+              <label for="intakeCategory"><i class="fas fa-tags"></i> Scam Classification / Modus Operandi</label>
+              <select id="intakeCategory">
+                <option value="Phishing Link / Malicious Permit Drainer" selected>Phishing Link / Malicious Permit Drainer</option>
+                <option value="Fake Investment Platform / Pig Butchering">Fake Investment Platform / Pig Butchering (Yield/Mining)</option>
+                <option value="Fake Telegram Trading Bot / Impersonation">Fake Telegram Trading Bot / Impersonation</option>
+                <option value="Compromised Seed Phrase / Sweeper Bot">Compromised Seed Phrase / Sweeper Bot</option>
+                <option value="DEX Honeypot / Token Liquidity Rugpull">DEX Honeypot / Token Liquidity Rugpull</option>
+                <option value="Social Engineering / P2P Impersonation">Social Engineering / P2P Impersonation</option>
+                <option value="Extortion / Blackmail / Ransomware">Extortion / Blackmail / Ransomware</option>
+                <option value="Other / Uncategorized Theft">Other / Uncategorized Theft</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="intakeStatus"><i class="fas fa-sliders"></i> Initial Investigation Status</label>
+              <select id="intakeStatus">
+                <option value="pending" selected>Pending Initial Triage</option>
+                <option value="investigating">Active Forensic Tracing</option>
+                <option value="exchange">Exchange Compliance Freeze Dispatched</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="intake-grid-3" style="margin-bottom: 1rem;">
+            <div class="input-group">
+              <label for="intakeTxHash"><i class="fas fa-receipt"></i> Stolen Transaction Hash (TxID) <span style="color:var(--text-muted); font-size:0.75rem;">(Optional)</span></label>
+              <input type="text" id="intakeTxHash" placeholder="e.g. 0x... or 64-char hex">
+            </div>
+            <div class="input-group">
+              <label for="intakeVictimWallet"><i class="fas fa-wallet"></i> Victim Source Wallet <span style="color:var(--text-muted); font-size:0.75rem;">(Optional)</span></label>
+              <input type="text" id="intakeVictimWallet" placeholder="Address funds left from">
+            </div>
+            <div class="input-group">
+              <label for="intakeScammerWallet"><i class="fas fa-skull-crossbones"></i> Scammer / Transit Wallet <span style="color:var(--text-muted); font-size:0.75rem;">(Optional)</span></label>
+              <input type="text" id="intakeScammerWallet" placeholder="Recipient or peel address">
+            </div>
+          </div>
+
+          <div class="input-group" style="margin-bottom: 1.25rem;">
+            <label for="intakeNotes"><i class="fas fa-comment-dots"></i> Client Email Story / Incident Notes</label>
+            <textarea id="intakeNotes" rows="3" placeholder="Paste the client's email story, incident timeline, or specific details here..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <button type="submit" id="btnRunManualIntake" class="btn-primary" style="padding: 0.75rem 1.6rem; font-size: 0.9rem; font-weight: 700; background: linear-gradient(135deg, #00f59b, #38bdf8); color: #040812; border: none; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.55rem;">
+              <i class="fas fa-shield-halved"></i> Run Forensic Analysis &amp; Generate Case Dossier
+            </button>
+            <button type="button" class="btn-secondary" onclick="resetManualIntakeForm()" style="padding: 0.75rem 1.2rem; font-size: 0.85rem;">
+              <i class="fas fa-rotate-left"></i> Clear Fields
+            </button>
+          </div>
+        </form>
+
+        <!-- Dynamic Output Container for Ingestion Result -->
+        <div id="manualIntakeResultContainer" style="display: none; margin-top: 1.75rem; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 1.5rem;">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+      <!-- ==========================================
+           PANEL B: "HOPELESS CLIENT" WALLET SCANNER
+           ========================================== -->
+      <div id="intakePanelWallet" class="intake-subpanel" style="display: none;">
+        <div style="background: rgba(129, 140, 248, 0.08); border: 1px solid rgba(129, 140, 248, 0.28); border-left: 4px solid #818cf8; border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #cbd5e1; line-height: 1.55;">
+          <i class="fas fa-hand-holding-heart" style="color: #818cf8; margin-right: 0.4rem;"></i>
+          <strong>For Distressed &amp; Hopeless Clients:</strong> Distressed victims often don't know how to inspect a blockchain explorer or find their transaction hash—they simply provide their wallet address and say <em>"everything was stolen, please find out what happened"</em>. Paste the victim's wallet address below. The engine audits recent outflows, identifies abnormal liquidity drains and malicious contract approvals, and lets you convert the detected theft transaction directly into an active case with 1 click.
+        </div>
+
+        <div class="intake-grid-2" style="margin-bottom: 1rem;">
+          <div class="input-group">
+            <label for="hopelessWalletInput"><i class="fas fa-wallet"></i> Distressed Client Wallet Address</label>
+            <input type="text" id="hopelessWalletInput" class="input-mono" placeholder="Enter victim address (0x..., T..., bc1..., or Solana base58)">
+          </div>
+          <div class="input-group">
+            <label for="hopelessNetworkSelect"><i class="fas fa-network-wired"></i> Blockchain Network</label>
+            <select id="hopelessNetworkSelect">
+              <option value="auto" selected>Auto-Detect from Address Format</option>
+              <option value="evm">Ethereum / EVM (ERC-20, BSC, Polygon, Arbitrum)</option>
+              <option value="tron">TRON (TRC-20)</option>
+              <option value="solana">Solana (SPL)</option>
+              <option value="bitcoin">Bitcoin (SegWit / Taproot)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Quick Demo Presets -->
+        <div style="margin-bottom: 1.25rem;">
+          <span style="font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-right: 0.5rem;">Quick Client Samples:</span>
+          <div style="display: inline-flex; gap: 0.45rem; flex-wrap: wrap; margin-top: 0.35rem;">
+            <button type="button" class="btn-secondary" onclick="loadHopelessWalletPreset('evm')" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
+              🧪 EVM Permit Phishing ($42,500 USDT)
+            </button>
+            <button type="button" class="btn-secondary" onclick="loadHopelessWalletPreset('tron')" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
+              🧪 TRON Sweeper Drain ($84,500 USDT)
+            </button>
+            <button type="button" class="btn-secondary" onclick="loadHopelessWalletPreset('solana')" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
+              🧪 Solana SPL Token Siphon (180 SOL)
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <button type="button" id="btnScanHopelessWallet" onclick="executeHopelessWalletScan()" class="btn-primary" style="padding: 0.75rem 1.6rem; font-size: 0.9rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #ffffff; border: none; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.55rem;">
+            <i class="fas fa-radar"></i> Audit Wallet For Anomalies &amp; Drain Patterns
+          </button>
+          <button type="button" class="btn-secondary" onclick="clearHopelessWalletAudit()" style="padding: 0.75rem 1.2rem; font-size: 0.85rem;">
+            <i class="fas fa-rotate-left"></i> Reset Audit
+          </button>
+        </div>
+
+        <!-- Scanning Animation Container -->
+        <div id="hopelessScanLoader" style="display: none; margin-top: 1.5rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 1.25rem; text-align: center;">
+          <div style="display: inline-flex; align-items: center; gap: 0.65rem; color: #38bdf8; font-size: 0.95rem; font-weight: 600; margin-bottom: 0.65rem;">
+            <i class="fas fa-spinner fa-pulse"></i> <span id="hopelessScanStatusText">Scanning transaction history &amp; token transfers...</span>
+          </div>
+          <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden;">
+            <div id="hopelessScanProgressBar" style="width: 30%; height: 100%; background: linear-gradient(90deg, #38bdf8, #00f59b); transition: width 0.3s ease;"></div>
+          </div>
+        </div>
+
+        <!-- Dynamic Output Container for Wallet Audit Findings -->
+        <div id="hopelessAuditResultsContainer" style="display: none; margin-top: 1.75rem; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 1.5rem;">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
     </div>
 
     <div class="portal-card admin-section-pane" id="paymentsSection" style="padding: 1.6rem; margin-bottom: 1.8rem; border-color: rgba(0, 245, 155, 0.4); background: linear-gradient(135deg, rgba(13, 21, 39, 0.96), rgba(7, 11, 22, 0.98)); box-shadow: 0 8px 32px rgba(0, 245, 155, 0.08);">

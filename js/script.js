@@ -3187,6 +3187,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Render any recently queried or generated Case IDs
   renderRecentCases();
 
+  // Handle URL tracking parameters (e.g., ?track=NX-849201 or ?case=NX-849201)
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const trackCode = urlParams.get('track') || urlParams.get('case') || urlParams.get('id');
+    if (trackCode) {
+      const statusInput = document.getElementById('statusReportId');
+      if (statusInput) {
+        statusInput.value = trackCode.trim();
+        setTimeout(() => {
+          if (typeof checkReportStatus === 'function') {
+            checkReportStatus();
+          }
+        }, 450);
+      }
+    }
+  } catch (e) {}
+
   // Check for imported transaction from ChainExplorer
   const importedTxStr = sessionStorage.getItem('imported_tx');
   if (importedTxStr) {
