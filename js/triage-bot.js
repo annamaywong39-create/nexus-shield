@@ -894,6 +894,21 @@ Report Hash: SHA-256 Verified On-Chain
             created_at: new Date().toISOString()
           }]).then(() => {}).catch(() => {});
         }
+
+        // Automated Client Intake Confirmation Email via Serverless Function
+        if (reportObject.victimEmail) {
+          fetch('/api/send-confirmation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reportObject)
+          }).then(res => res.json()).then(data => {
+            if (data && data.success) {
+              console.log('Automated confirmation email successfully dispatched via Resend for bot case:', data.id);
+            }
+          }).catch(err => {
+            console.warn('Bot automated confirmation email notice:', err);
+          });
+        }
       } catch (e) {
         console.warn(e);
       }
@@ -903,6 +918,7 @@ Report Hash: SHA-256 Verified On-Chain
       addBotMessage(
         `✨ <strong>Thank you, ${escapeHtml(triageState.victimName)}! Your case is now registered.</strong><br><br>
         📋 <strong>Your Official Case Reference:</strong> <strong style="color: var(--accent-cyan); font-size: 1.05rem;">${caseRef}</strong><br><br>
+        📧 <strong>Intake Confirmation Dispatched:</strong> An official case confirmation containing your <strong>100,000 AI Tracing Tokens</strong> has been queued to <strong>${escapeHtml(triageState.victimEmail)}</strong>.<br><br>
         Our forensic analysts have received your incident details and initialized on-chain hop analysis to track destination exchanges.<br><br>
         How would you like to proceed?`,
         [
