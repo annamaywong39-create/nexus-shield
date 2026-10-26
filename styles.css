@@ -5941,48 +5941,114 @@ body.nav-drawer-open .header {
 /* ========================================================
    LIVE AI INTAKE TRIAGE BOT & FLOATING LIAISON
    ======================================================== */
-.nexus-triage-launcher {
+/* Floating Live Support Representative Launcher Container */
+.triage-launcher-wrap {
   position: fixed;
   bottom: 24px;
   right: 24px;
   z-index: 9998;
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  background: linear-gradient(135deg, rgba(13, 21, 39, 0.96), rgba(8, 14, 28, 0.98));
-  border: 1px solid rgba(0, 245, 155, 0.45);
-  border-radius: 999px;
-  padding: 0.5rem 1.15rem 0.5rem 0.65rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 245, 155, 0.25);
+  pointer-events: none;
+}
+
+/* Sleek Circular Launcher Button */
+.nexus-triage-launcher {
+  pointer-events: auto;
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(13, 21, 39, 0.98), rgba(8, 14, 28, 0.99));
+  border: 2px solid rgba(0, 245, 155, 0.45);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65), 0 0 18px rgba(0, 245, 155, 0.25);
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  color: #fff;
-  font-family: var(--font-sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 .nexus-triage-launcher:hover {
-  transform: translateY(-3px) scale(1.02);
+  transform: translateY(-2px) scale(1.08);
   border-color: var(--accent-green);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.6), 0 0 28px rgba(0, 245, 155, 0.4);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.75), 0 0 26px rgba(0, 245, 155, 0.45);
 }
+.nexus-triage-launcher:active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* Playful Hop / Jump Keyframe */
+@keyframes botJumpAnimation {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  20% {
+    transform: translateY(-16px) scale(1.08);
+  }
+  40% {
+    transform: translateY(0) scale(0.96);
+  }
+  60% {
+    transform: translateY(-8px) scale(1.03);
+  }
+  80% {
+    transform: translateY(0) scale(1);
+  }
+}
+.nexus-triage-launcher.is-jumping {
+  animation: botJumpAnimation 0.85s cubic-bezier(0.28, 0.84, 0.42, 1);
+}
+
 .launcher-avatar-wrap {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: linear-gradient(135deg, #00f59b, #2d9fff);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #080d1a;
-  font-size: 1.15rem;
+  font-size: 1.18rem;
   flex-shrink: 0;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
+.launcher-icon-chat {
+  display: block;
+}
+.launcher-icon-close {
+  display: none;
+  color: #ffffff;
+  font-size: 1.25rem;
+}
+.nexus-triage-launcher.is-open {
+  border-color: rgba(244, 63, 94, 0.6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(244, 63, 94, 0.35);
+}
+.nexus-triage-launcher.is-open .launcher-avatar-wrap {
+  background: linear-gradient(135deg, #f43f5e, #fb7185);
+}
+.nexus-triage-launcher.is-open .launcher-icon-chat {
+  display: none;
+}
+.nexus-triage-launcher.is-open .launcher-icon-close {
+  display: block;
+}
+.nexus-triage-launcher.is-open .launcher-status-dot {
+  display: none;
+}
+
 .launcher-status-dot {
   position: absolute;
-  bottom: 1px;
-  right: 1px;
-  width: 10px;
-  height: 10px;
+  bottom: 0px;
+  right: 0px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: #00f59b;
   border: 2px solid #080e1c;
@@ -5993,22 +6059,96 @@ body.nav-drawer-open .header {
   70% { box-shadow: 0 0 0 6px rgba(0, 245, 155, 0); }
   100% { box-shadow: 0 0 0 0 rgba(0, 245, 155, 0); }
 }
-.launcher-text-col {
+
+/* Floating Speech Bubble Callout ("I'm here to help you") */
+.triage-bubble-hint {
+  pointer-events: none;
+  position: absolute;
+  right: calc(100% + 14px);
+  bottom: 6px;
+  background: linear-gradient(135deg, rgba(13, 21, 39, 0.98), rgba(8, 14, 28, 0.99));
+  border: 1px solid rgba(0, 245, 155, 0.5);
+  border-radius: 14px;
+  padding: 8px 12px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 245, 155, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(12px) scale(0.92);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  z-index: 9999;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.triage-bubble-hint::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  bottom: 18px;
+  width: 10px;
+  height: 10px;
+  background: #0a1122;
+  border-right: 1px solid rgba(0, 245, 155, 0.5);
+  border-top: 1px solid rgba(0, 245, 155, 0.5);
+  transform: rotate(45deg);
+}
+.triage-bubble-hint.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0) scale(1);
+}
+.triage-bubble-hint-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.triage-bubble-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00f59b, #2d9fff);
+  color: #080d1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+.triage-bubble-text {
   display: flex;
   flex-direction: column;
   line-height: 1.25;
 }
-.launcher-title {
-  font-size: 0.84rem;
+.triage-bubble-msg {
+  font-size: 0.82rem;
   font-weight: 700;
-  color: #fff;
+  color: #ffffff;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 4px;
 }
-.launcher-sub {
-  font-size: 0.68rem;
+.triage-bubble-sub {
+  font-size: 0.65rem;
   color: #94a3b8;
+}
+.triage-bubble-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.05rem;
+  line-height: 1;
+  padding: 2px 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.2s ease, background 0.2s ease;
+  margin-left: 2px;
+}
+.triage-bubble-close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* Chatbot Floating Window */
@@ -6307,26 +6447,63 @@ body.nav-drawer-open .header {
 }
 
 /* Responsive adjustment for Triage window on mobile: NEVER take over whole screen */
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .nexus-triage-window {
-    bottom: 12px;
-    right: 10px;
-    left: 10px;
+    bottom: 74px;
+    right: 12px;
+    left: 12px;
     width: auto;
-    max-width: calc(100vw - 20px);
+    max-width: calc(100vw - 24px);
     height: 72vh;
-    max-height: 490px;
+    max-height: 520px;
     border-radius: 16px;
     border: 1px solid rgba(45, 159, 255, 0.45);
     box-shadow: 0 16px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(45, 159, 255, 0.2);
   }
-  .nexus-triage-launcher {
+  .triage-launcher-wrap {
     bottom: 16px;
     right: 16px;
-    padding: 0.45rem 0.85rem 0.45rem 0.55rem;
   }
-  .nexus-triage-launcher .launcher-sub {
-    display: none;
+  .nexus-triage-launcher {
+    width: 48px;
+    height: 48px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6), 0 0 12px rgba(0, 245, 155, 0.25);
+  }
+  .launcher-avatar-wrap {
+    width: 36px;
+    height: 36px;
+    font-size: 1.05rem;
+  }
+  .launcher-status-dot {
+    width: 9px;
+    height: 9px;
+  }
+  .triage-bubble-hint {
+    right: 0;
+    bottom: calc(100% + 10px);
+    transform: translateY(8px) scale(0.92);
+    max-width: 220px;
+    white-space: normal;
+    padding: 7px 10px;
+    border-radius: 12px;
+  }
+  .triage-bubble-hint::after {
+    right: 16px;
+    bottom: -6px;
+    top: auto;
+    border-right: 1px solid rgba(0, 245, 155, 0.5);
+    border-bottom: 1px solid rgba(0, 245, 155, 0.5);
+    border-top: none;
+    transform: rotate(45deg);
+  }
+  .triage-bubble-hint.visible {
+    transform: translateY(0) scale(1);
+  }
+  .triage-bubble-msg {
+    font-size: 0.76rem;
+  }
+  .triage-bubble-sub {
+    font-size: 0.62rem;
   }
 }
 

@@ -413,22 +413,110 @@ Report Hash: SHA-256 Verified On-Chain
     const waPane = document.getElementById('triageWhatsAppPane');
     const inputForm = document.getElementById('triageInputForm');
     const inputField = document.getElementById('triageMessageInput');
+    const bubbleHint = document.getElementById('triageBubbleHint');
+    const bubbleClose = document.getElementById('triageBubbleClose');
 
     if (!launcher || !windowEl || !chatBody) return;
 
-    // Toggle window
-    launcher.addEventListener('click', () => {
-      windowEl.classList.toggle('active');
+    let hintIntervalTimer = null;
+    let hintHideTimer = null;
+    let isHintDismissed = false;
+
+    function openChatWindow() {
+      windowEl.classList.add('active');
+      launcher.classList.add('is-open');
+      if (bubbleHint) bubbleHint.classList.remove('visible');
+      if (hintHideTimer) clearTimeout(hintHideTimer);
+      if (!chatBody.children.length) {
+        startTriageGreeting();
+      }
+      setTimeout(() => inputField?.focus(), 150);
+    }
+
+    function closeChatWindow() {
+      windowEl.classList.remove('active');
+      launcher.classList.remove('is-open');
+    }
+
+    // Toggle window on circular launcher click
+    launcher.addEventListener('click', (e) => {
+      e.preventDefault();
       if (windowEl.classList.contains('active')) {
-        if (!chatBody.children.length) {
-          startTriageGreeting();
-        }
-        inputField?.focus();
+        closeChatWindow();
+      } else {
+        openChatWindow();
       }
     });
 
-    closeBtn?.addEventListener('click', () => windowEl.classList.remove('active'));
-    minimizeBtn?.addEventListener('click', () => windowEl.classList.remove('active'));
+    closeBtn?.addEventListener('click', () => closeChatWindow());
+    minimizeBtn?.addEventListener('click', () => closeChatWindow());
+
+    // Speech bubble interaction
+    if (bubbleHint) {
+      bubbleHint.addEventListener('click', (e) => {
+        if (e.target.closest('#triageBubbleClose')) return;
+        openChatWindow();
+      });
+
+      bubbleClose?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isHintDismissed = true;
+        bubbleHint.classList.remove('visible');
+        if (hintHideTimer) clearTimeout(hintHideTimer);
+        // Suppress hint for 2 minutes after manual dismiss
+        setTimeout(() => { isHintDismissed = false; }, 120000);
+      });
+
+      // Keep bubble visible while user hovers it
+      bubbleHint.addEventListener('mouseenter', () => {
+        if (hintHideTimer) clearTimeout(hintHideTimer);
+      });
+      bubbleHint.addEventListener('mouseleave', () => {
+        if (bubbleHint.classList.contains('visible') && !windowEl.classList.contains('active')) {
+          hintHideTimer = setTimeout(() => {
+            bubbleHint.classList.remove('visible');
+          }, 2000);
+        }
+      });
+    }
+
+    // Jump & bubble hint trigger: jumps and shows "I'm here to help you", then retreats into corner
+    function triggerJumpAndHint() {
+      if (windowEl.classList.contains('active') || isHintDismissed) return;
+
+      // 1. Playful bounce/jump animation on the circular button
+      launcher.classList.remove('is-jumping');
+      void launcher.offsetWidth; // Force CSS reflow
+      launcher.classList.add('is-jumping');
+      setTimeout(() => {
+        launcher.classList.remove('is-jumping');
+      }, 900);
+
+      // 2. Reveal the speech bubble: "I'm here to help you"
+      if (bubbleHint) {
+        bubbleHint.classList.add('visible');
+
+        if (hintHideTimer) clearTimeout(hintHideTimer);
+        // Stays visible for 4.5 seconds, then smoothly goes back into the corner of the screen
+        hintHideTimer = setTimeout(() => {
+          bubbleHint.classList.remove('visible');
+        }, 4500);
+      }
+    }
+
+    // Schedule regular interval (every 16 seconds)
+    function startHintSchedule() {
+      if (hintIntervalTimer) clearInterval(hintIntervalTimer);
+      hintIntervalTimer = setInterval(() => {
+        triggerJumpAndHint();
+      }, 16000);
+    }
+
+    // Initial polite callout 3.5 seconds after page load
+    setTimeout(() => {
+      triggerJumpAndHint();
+      startHintSchedule();
+    }, 3500);
 
     // Channel tab toggling
     tabBot?.addEventListener('click', () => {

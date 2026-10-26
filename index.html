@@ -1729,19 +1729,28 @@ STATEMENT OF SWORN FACTS:
   </div>
 </div>
 
-<!-- Floating Live Support Representative Launcher Badge -->
-<div class="nexus-triage-launcher" id="triageLauncherBtn" title="Chat with an Online Representative">
-  <div class="launcher-avatar-wrap" style="background: linear-gradient(135deg, #00f59b, #2d9fff);">
-    <i class="fas fa-headset" style="color: #080d1a;"></i>
-    <div class="launcher-status-dot"></div>
-  </div>
-  <div class="launcher-text-col">
-    <div class="launcher-title">
-      <span>Online Support</span>
-      <span style="font-size: 0.62rem; background: rgba(0, 245, 155, 0.2); color: var(--accent-green); padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 700;">LIVE</span>
+<!-- Floating Live Support Representative Launcher (Sleek Circle + Interval Callout) -->
+<div class="triage-launcher-wrap" id="triageLauncherWrap">
+  <!-- Pop-up Helper Speech Bubble: Shows "I'm here to help you" on interval then retracts -->
+  <div class="triage-bubble-hint" id="triageBubbleHint" role="tooltip" aria-live="polite">
+    <div class="triage-bubble-hint-inner">
+      <span class="triage-bubble-avatar"><i class="fas fa-headset"></i></span>
+      <div class="triage-bubble-text">
+        <span class="triage-bubble-msg">👋 I'm here to help you</span>
+        <span class="triage-bubble-sub">Live Online Representative</span>
+      </div>
     </div>
-    <div class="launcher-sub">Chat with representative</div>
+    <button type="button" class="triage-bubble-close" id="triageBubbleClose" title="Dismiss hint" aria-label="Dismiss">&times;</button>
   </div>
+
+  <!-- Sleek Circular Launcher Button -->
+  <button type="button" class="nexus-triage-launcher" id="triageLauncherBtn" title="Chat with an Online Representative" aria-label="Chat with an Online Representative">
+    <div class="launcher-avatar-wrap">
+      <i class="fas fa-headset launcher-icon-chat"></i>
+      <i class="fas fa-xmark launcher-icon-close"></i>
+      <div class="launcher-status-dot"></div>
+    </div>
+  </button>
 </div>
 
 <!-- Floating Live Support Chat Window -->
