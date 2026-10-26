@@ -117,9 +117,9 @@
             <div class="smart-intake-badge">
               <i class="fas fa-bolt"></i> AUTOMATED BLOCKCHAIN INSPECTOR
             </div>
-            <h3>Input Your Transaction Hash (TxID)</h3>
+            <h3>Input Your Transaction Hash (TxID) or Compromised Wallet Address</h3>
             <p>
-              Paste the transaction hash from your wallet. If your funds were drained across multiple transfers, click <strong>+ Add Another Transaction</strong> to trace all movements in one unified forensic case.
+              Paste your transaction hash OR the wallet address your funds were stolen from. If your funds were drained across multiple transfers, click <strong>+ Add Another Transaction</strong> to trace all movements in one unified forensic case.
             </p>
 
             <!-- Dynamic Multi-Transaction Hash Container -->
@@ -128,7 +128,7 @@
                 <span class="tx-index-chip">Tx #1</span>
                 <div class="smart-tx-field-wrapper" style="flex: 1;">
                   <i class="fas fa-magnifying-glass smart-input-icon"></i>
-                  <input type="text" class="smart-tx-input auto-tx-hash-input" id="smartTxInput_1" placeholder="Paste 64-character TxID or 0x... hash here" autocomplete="off" aria-label="Transaction Hash or TxID">
+                  <input type="text" class="smart-tx-input auto-tx-hash-input" id="smartTxInput_1" placeholder="Paste TxID (0x...), transaction hash, or compromised wallet address" autocomplete="off" aria-label="Transaction Hash, TxID or Wallet Address">
                 </div>
               </div>
             </div>
@@ -152,8 +152,9 @@
                 <div style="margin-bottom: 0.35rem;">• <strong>MetaMask / Coinbase Wallet:</strong> Open the app &rarr; tap the sent transaction &rarr; tap <em>"View on Explorer"</em> (or <em>"Transaction Details"</em>) &rarr; copy the Transaction Hash (starts with <code>0x...</code>).</div>
                 <div style="margin-bottom: 0.35rem;">• <strong>Trust Wallet:</strong> Tap the transfer in your history &rarr; tap <em>"More Details"</em> &rarr; copy the <strong>Hash</strong>.</div>
                 <div style="margin-bottom: 0.35rem;">• <strong>Exchanges (Binance, OKX, Coinbase, Kraken):</strong> Go to <em>Wallet &rarr; Spot &rarr; Withdrawal History</em> &rarr; tap the transfer &rarr; copy the <strong>TxID</strong>.</div>
-                <div style="color: #fde68a; font-size: 0.73rem; margin-top: 0.35rem;">
-                  <i class="fas fa-lightbulb"></i> <em>Note: A transaction hash is 64 characters long and identifies that specific transfer, distinct from your wallet address.</em>
+                <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 6px; padding: 0.55rem 0.75rem; margin-top: 0.5rem; color: #e2e8f0;">
+                  <strong style="color: #38bdf8;"><i class="fas fa-hand-holding-heart"></i> Don't know your Transaction Hash?</strong>
+                  <div style="font-size: 0.75rem; margin-top: 0.2rem; color: #cbd5e1;">No problem! Simply enter your <strong>Wallet Address</strong> where the crypto was stolen from. Our on-chain engine will scan your wallet history and decode the fraudulent outflows automatically.</div>
                 </div>
               </div>
             </div>
@@ -605,11 +606,11 @@ STATEMENT OF SWORN FACTS:
       <div class="intel-card">
         <h3><i class="fas fa-magnifying-glass"></i> <span data-i18n="status_title">Track Case Investigation</span></h3>
         <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
-          Check active on-chain tracing, exchange compliance notices, and case restitution status by entering your Case Reference ID:
+          Check active on-chain tracing, exchange compliance notices, and case restitution status by entering your Case Reference ID or reported wallet address:
         </p>
         <div class="tracking-widget">
           <div class="tracking-input-row">
-            <input type="text" id="statusReportId" class="input-mono" placeholder="Enter Case ID (e.g. NX-849201 or 849201)">
+            <input type="text" id="statusReportId" class="input-mono" placeholder="Enter Case ID (NX-XXXXXX) or Wallet Address">
             <button id="checkStatusBtn" class="btn-secondary" style="width: 100%;">
               <i class="fas fa-magnifying-glass"></i> <span data-i18n="check_status_btn">Track Case Status</span>
             </button>
@@ -970,6 +971,80 @@ STATEMENT OF SWORN FACTS:
       <a href="partners.html" class="partner-badge" style="text-decoration: none; color: var(--accent-cyan); font-weight: 600;"><i class="fas fa-arrow-right"></i> All Partners</a>
     </div>
   </div>
+
+  <!-- ========================================================
+       VICTIM INTELLIGENCE & FREQUENTLY ASKED QUESTIONS
+       ======================================================== -->
+  <section class="victim-faq-section">
+    <div style="text-align: center; max-width: 760px; margin: 0 auto 2rem;">
+      <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0.85rem; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 20px; font-size: 0.76rem; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.65rem;">
+        <i class="fas fa-circle-question"></i> Client Guidance &amp; Investigation FAQ
+      </div>
+      <h2 style="font-size: 1.6rem; font-weight: 800; color: #ffffff; margin: 0 0 0.5rem;">
+        Frequently Asked Questions by Distressed Clients
+      </h2>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0; line-height: 1.55;">
+        Clear, transparent answers on blockchain tracing, exchange freeze mechanics, and case tracking.
+      </p>
+    </div>
+
+    <div class="faq-grid">
+      <!-- FAQ 1 -->
+      <div class="faq-card">
+        <div class="faq-question">
+          <i class="fas fa-wallet"></i>
+          <span>I only have my wallet address and don't know the TxID. Can you still help me?</span>
+        </div>
+        <p class="faq-answer">
+          <strong>Yes, absolutely.</strong> Because the blockchain is an immutable public ledger, entering your wallet address is more than enough. Our automated inspector audits your wallet's historical flows, isolates the fraudulent outflow transaction, identifies the thief's address, and clusters the downstream peel chains.
+        </p>
+      </div>
+
+      <!-- FAQ 2 -->
+      <div class="faq-card">
+        <div class="faq-question">
+          <i class="fas fa-snowflake"></i>
+          <span>How does freezing stolen cryptocurrency on an exchange work?</span>
+        </div>
+        <p class="faq-answer">
+          Scammers cannot spend crypto in the real world without off-ramping into fiat currency. When our tracing isolates their deposit into a centralized exchange (e.g. Binance, OKX, Bybit), we deliver formal evidentiary preservation packets and freeze notices directly to the exchange's Financial Crimes Compliance unit before the funds are cashed out.
+        </p>
+      </div>
+
+      <!-- FAQ 3 -->
+      <div class="faq-card">
+        <div class="faq-question">
+          <i class="fas fa-magnifying-glass"></i>
+          <span>How do I track my active case status?</span>
+        </div>
+        <p class="faq-answer">
+          When your case is opened, you receive a unique <strong>Case Reference ID (e.g. NX-849201)</strong>. You can enter this ID or your reported wallet address in the <em>Track Case Investigation</em> box on our homepage anytime, or use your direct tracking link (<code>nexusshield.org/?track=NX-XXXXXX</code>) to view live forensic milestones and exchange notices.
+        </p>
+      </div>
+
+      <!-- FAQ 4 -->
+      <div class="faq-card">
+        <div class="faq-question">
+          <i class="fas fa-shield-halved"></i>
+          <span>Will NexusShield ever ask for my private keys or recovery seed phrase?</span>
+        </div>
+        <p class="faq-answer">
+          <strong>NEVER.</strong> Legitimate blockchain forensics requires only public ledger addresses and transaction hashes. Anyone claiming to represent NexusShield or asking for your 12 or 24-word recovery phrase on Telegram, WhatsApp, or Instagram is an impostor. Protect your keys at all costs.
+        </p>
+      </div>
+    </div>
+
+    <!-- The 3 Golden Rules Banner -->
+    <div style="margin-top: 1.5rem; background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(13, 21, 39, 0.95)); border: 1px solid rgba(239, 68, 68, 0.35); border-left: 4px solid #f43f5e; border-radius: var(--radius-md); padding: 1.1rem 1.35rem;">
+      <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.45rem;">
+        <i class="fas fa-triangle-exclamation" style="color: #fb7185; font-size: 1.1rem;"></i>
+        <strong style="color: #ffffff; font-size: 0.92rem;">Important Notice: Beware of "Hack Back" Recovery Scammers</strong>
+      </div>
+      <p style="font-size: 0.82rem; color: #cbd5e1; margin: 0; line-height: 1.55;">
+        Confirmed blockchain transactions cannot be "magically reversed" by an anonymous Telegram or WhatsApp hacker. Anyone demanding advance cryptocurrency to "hack into the scammer's wallet" is running a secondary recovery scam. Legitimate recovery is achieved strictly through cryptographic clustering, subpoenaed exchange compliance holds, and legal court orders.
+      </p>
+    </div>
+  </section>
 </main>
 
 <!-- ========================================================
@@ -1286,6 +1361,9 @@ STATEMENT OF SWORN FACTS:
     </div>
 
     <div style="display: flex; gap: 0.85rem; justify-content: flex-end; margin-top: 1.5rem; flex-wrap: wrap;">
+      <button type="button" id="copyCaseShareLinkBtn" class="btn-secondary" style="background: rgba(56,189,248,0.12); border-color: rgba(56,189,248,0.35); color: #38bdf8;">
+        <i class="fas fa-link"></i> Copy Tracking Link
+      </button>
       <button type="button" id="printCaseCardProgressBtn" class="btn-secondary" style="background: rgba(0,245,155,0.12); border-color: rgba(0,245,155,0.35); color: #a7f3d0;">
         <i class="fas fa-id-card"></i> Print Official Case Card
       </button>

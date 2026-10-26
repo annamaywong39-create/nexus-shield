@@ -1043,6 +1043,35 @@ async function fetchReportById(reportId) {
     report = JSON.parse(JSON.stringify(VERIFIED_SAMPLE_CASES[cleanedId]));
   }
 
+  // Fallback: Also search by reported wallet address or TxID if user forgot their NX- Case ID
+  if (!report && cleanedId.length >= 15) {
+    try {
+      const localReports = JSON.parse(localStorage.getItem('nexus_local_reports') || '[]');
+      const qLower = cleanedId.toLowerCase();
+      const match = localReports.find(r => 
+        (r.victim_wallet && r.victim_wallet.toLowerCase() === qLower) ||
+        (r.victimWallet && r.victimWallet.toLowerCase() === qLower) ||
+        (r.scammer_wallet && r.scammer_wallet.toLowerCase() === qLower) ||
+        (r.scammerWallet && r.scammerWallet.toLowerCase() === qLower) ||
+        (Array.isArray(r.transaction_hashes) && r.transaction_hashes.some(h => (h || '').toLowerCase() === qLower))
+      );
+      if (match) report = match;
+    } catch (e) {}
+
+    // Check sample cases by wallet
+    if (!report) {
+      const qLower = cleanedId.toLowerCase();
+      for (const k in VERIFIED_SAMPLE_CASES) {
+        const sc = VERIFIED_SAMPLE_CASES[k];
+        if ((sc.scammer_wallet && sc.scammer_wallet.toLowerCase() === qLower) ||
+            (sc.recovery_wallet && sc.recovery_wallet.toLowerCase() === qLower)) {
+          report = JSON.parse(JSON.stringify(sc));
+          break;
+        }
+      }
+    }
+  }
+
   if (report) {
     const key = report.report_id || report.reportId || String(report.id);
     
@@ -2058,6 +2087,15 @@ function bindAppEvents() {
   });
   document.getElementById("printCaseCardProgressBtn")?.addEventListener("click", () => {
     openCaseCardModal(currentActiveReport);
+  });
+
+  document.getElementById("copyCaseShareLinkBtn")?.addEventListener("click", () => {
+    if (!currentActiveReport) return;
+    const ref = currentActiveReport.report_id || currentActiveReport.reportId || `#${currentActiveReport.id}`;
+    const origin = window.location.origin && window.location.origin !== 'null' ? window.location.origin : 'https://nexusshield.org';
+    const link = `${origin}/?track=${ref}`;
+    navigator.clipboard.writeText(link);
+    showEmailToast(`🔗 Tracking link copied: ${link}`);
   });
 
   // Restitution wallet live validator
