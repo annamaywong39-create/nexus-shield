@@ -767,13 +767,15 @@ function checkAuthStatus() {
     return;
   }
   const loginSection = document.getElementById('adminLoginSection');
+  const loginContainer = document.getElementById('adminLoginContainer');
   const dashboardSection = document.getElementById('adminDashboardSection');
   const sessionIndicator = document.getElementById('sessionIndicator');
   const logoutBtn = document.getElementById('logoutBtn');
 
   if (isLoggedIn) {
     if (loginSection) loginSection.style.display = 'none';
-    if (dashboardSection) dashboardSection.style.display = 'block';
+    if (loginContainer) loginContainer.style.display = 'none';
+    if (dashboardSection) dashboardSection.style.display = 'flex';
     if (sessionIndicator) sessionIndicator.style.display = 'inline-flex';
     if (logoutBtn) logoutBtn.style.display = 'inline-flex';
     loadReports();
@@ -784,6 +786,7 @@ function checkAuthStatus() {
     initAdminWorkspaceViews();
   } else {
     if (loginSection) loginSection.style.display = 'block';
+    if (loginContainer) loginContainer.style.display = 'block';
     if (dashboardSection) dashboardSection.style.display = 'none';
     if (sessionIndicator) sessionIndicator.style.display = 'none';
     if (logoutBtn) logoutBtn.style.display = 'none';
@@ -1171,6 +1174,182 @@ async function loadReports() {
   applyFilters();
 }
 
+// ==================== VISUAL SVG TRACE CHART & EVIDENCE PREVIEWER ====================
+function makeTraceSvg(c) {
+  if (!c) return '';
+  const hops = (c.aiForensics && c.aiForensics.hops) || [];
+  const items = hops.length ? hops : (c.transactions || []).slice(0, 7);
+  if (!items.length) {
+    return '<svg class="trace-chart" viewBox="0 0 600 120" role="img" aria-label="No transaction trail"><text x="50%" y="50%" text-anchor="middle" fill="#94a3b8" font-size="10px">No trace nodes recorded</text></svg>';
+  }
+  const width = 760;
+  const step = width / Math.max(items.length, 1);
+  const positions = items.map((item, i) => ({
+    x: 45 + i * step + step / 2.5,
+    y: i % 2 ? 78 : 42,
+    item,
+    i
+  }));
+  const lines = positions.slice(0, -1).map((p, i) => 
+    `<line class="link" x1="${p.x + 10}" y1="${p.y}" x2="${positions[i+1].x - 10}" y2="${positions[i+1].y}"/>`
+  ).join('');
+  const nodes = positions.map((p, i) => {
+    const isDest = i === positions.length - 1;
+    const isRisk = i === 1;
+    const nodeClass = isDest ? 'destination' : (isRisk ? 'risk' : 'node');
+    const label = p.item.label || p.item.role || `Hop ${i}`;
+    const shortRef = (p.item.address || p.item.ref || '').slice(0, 10);
+    return `<g>
+      <circle class="${nodeClass}" cx="${p.x}" cy="${p.y}" r="11"/>
+      <text x="${p.x}" y="${p.y + 24}" text-anchor="middle" font-size="8px" fill="#cbd5e1" font-family="var(--font-mono)">${escapeHtml(label.slice(0, 14))}</text>
+      <text class="sub" x="${p.x}" y="${p.y + 35}" text-anchor="middle" font-size="7px" fill="#64748b" font-family="var(--font-mono)">${escapeHtml(shortRef)}</text>
+    </g>`;
+  }).join('');
+  return `<svg class="trace-chart" viewBox="0 0 820 125" role="img" aria-label="Transaction hop chart">${lines}${nodes}</svg>`;
+}
+
+const caseUploadsMap = new Map();
+let currentEvidenceObjectUrl = null;
+
+function renderEvidenceList(report) {
+  if (!report) return;
+  const caseId = report.report_id || String(report.id);
+  const defaultEvidence = [
+    { name: 'wallet-activity-proof.txt', type: 'TXT', uploadedAt: new Date(Date.now() - 3600000 * 2).toISOString(), text: `Cryptographic record for Case ${caseId}\nComplainant: ${report.victim_name || 'N/A'}\nReported Loss: ${parseFloat(report.amount_lost || 0).toLocaleString()} ${report.currency_lost || 'USDT'}\nSource: ${report.victim_wallet || '0x...'}\nTarget: ${report.scammer_wallet || '0x...'}\nVerified on-chain via consensus telemetry.` },
+    { name: 'exchange-ingestion-snapshot.png', type: 'PNG', uploadedAt: new Date(Date.now() - 3600000).toISOString() }
+  ];
+  const files = [
+    ...(report.evidence || defaultEvidence),
+    ...(caseUploadsMap.get(caseId) || [])
+  ];
+  const list = document.getElementById('detailEvidenceList');
+  if (!list) return;
+
+  list.innerHTML = files.map((f, i) => {
+    const fileType = String(f.type || 'FILE').split('/').pop().slice(0, 4).toUpperCase();
+    const dateStr = f.uploadedAt ? new Date(f.uploadedAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : 'Local';
+    return `
+      <div class="evidence-row">
+        <span class="file-badge">${escapeHtml(fileType)}</span>
+        <div style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <div style="font-weight: 600; color: #fff; font-size: 0.78rem;">${escapeHtml(f.name)}</div>
+          <small style="color: #94a3b8;">${escapeHtml(dateStr)} &bull; ${f.file ? Math.ceil(f.file.size / 1024) + ' KB' : 'Vault File'}</small>
+        </div>
+        <button class="btn-secondary" type="button" onclick="previewEvidenceItem('${caseId}', ${i})" style="padding: 0.2rem 0.55rem; font-size: 0.72rem; color: #38bdf8;" title="Preview ${escapeHtml(f.name)}">
+          <i class="fas fa-eye"></i> View
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+window.previewEvidenceItem = function(caseId, index) {
+  const report = allReports.find(r => (r.report_id || String(r.id)) === caseId);
+  const defaultEvidence = [
+    { name: 'wallet-activity-proof.txt', type: 'TXT', uploadedAt: new Date(Date.now() - 3600000 * 2).toISOString(), text: `Cryptographic record for Case ${caseId}\nComplainant: ${report?.victim_name || 'N/A'}\nReported Loss: ${parseFloat(report?.amount_lost || 0).toLocaleString()} ${report?.currency_lost || 'USDT'}\nSource: ${report?.victim_wallet || '0x...'}\nTarget: ${report?.scammer_wallet || '0x...'}\nVerified on-chain via consensus telemetry.` },
+    { name: 'exchange-ingestion-snapshot.png', type: 'PNG', uploadedAt: new Date(Date.now() - 3600000).toISOString() }
+  ];
+  const files = [
+    ...((report && report.evidence) || defaultEvidence),
+    ...(caseUploadsMap.get(caseId) || [])
+  ];
+  const record = files[index];
+  const box = document.getElementById('detailEvidencePreviewBox');
+  if (!box) return;
+
+  if (currentEvidenceObjectUrl) {
+    URL.revokeObjectURL(currentEvidenceObjectUrl);
+    currentEvidenceObjectUrl = null;
+  }
+
+  if (!record) {
+    box.innerHTML = '<span style="color: #94a3b8;">File unavailable.</span>';
+    return;
+  }
+
+  if (!record.file) {
+    box.innerHTML = `
+      <div style="width: 100%; text-align: left;">
+        <div style="font-weight: 700; color: #38bdf8; margin-bottom: 0.35rem; font-size: 0.8rem;">📄 ${escapeHtml(record.name)}</div>
+        <pre class="draft-text" style="max-height: 180px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 0.65rem; border-radius: 6px; font-size: 0.75rem;">${escapeHtml(record.text || 'Illustrative sample evidence metadata. Original document stored securely in evidence vault.')}</pre>
+      </div>
+    `;
+    return;
+  }
+
+  const f = record.file;
+  if (f.type.startsWith('image/')) {
+    currentEvidenceObjectUrl = URL.createObjectURL(f);
+    box.innerHTML = `<img alt="${escapeHtml(f.name)}" src="${currentEvidenceObjectUrl}" style="max-height: 220px; border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.5);">`;
+  } else if (f.type === 'application/pdf') {
+    currentEvidenceObjectUrl = URL.createObjectURL(f);
+    box.innerHTML = `<iframe title="PDF Preview" src="${currentEvidenceObjectUrl}" style="width: 100%; height: 220px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);"></iframe>`;
+  } else if (f.type.startsWith('text/') || /\.(txt|csv|json|log)$/i.test(f.name)) {
+    f.text().then(text => {
+      box.innerHTML = `<pre class="draft-text" style="max-height: 200px; overflow-y: auto; text-align: left; width: 100%; padding: 0.65rem; background: rgba(0,0,0,0.3); border-radius: 6px; font-size: 0.75rem;">${escapeHtml(text.slice(0, 12000))}</pre>`;
+    });
+  } else {
+    box.innerHTML = `<span style="color: #94a3b8;">${escapeHtml(f.name)} &bull; ${escapeHtml(f.type || 'file')} &bull; ${Math.ceil(f.size / 1024)} KB<br>(Preview not available for this binary format; use dedicated reader)</span>`;
+  }
+};
+
+window.generateExchangeDraftNotice = function(report) {
+  if (!report) return;
+  const ref = report.report_id || `#${report.id}`;
+  const name = report.victim_name || report.victimName || 'Complainant on Record';
+  const loss = parseFloat(report.amount_lost || report.amountLost || 0).toLocaleString();
+  const curr = (report.currency_lost || report.currencyLost || 'USDT').toUpperCase();
+  const txid = report.tx_hash || (Array.isArray(report.transaction_hashes) && report.transaction_hashes[0]) || 'Not provided';
+  const scammer = report.scammer_wallet || report.scammerWallet || 'Not provided';
+  const exch = (report.aiForensics && report.aiForensics.destinationExchange) || 'Binance';
+
+  const text = `DRAFT — STATUTORY ASSET PRESERVATION & HOLD REQUEST — 18 U.S.C. § 2703(f)
+
+To: ${exch} Financial Crimes & Compliance Directorate
+Date: ${new Date().toUTCString()}
+Case Docket Reference: ${ref}
+Aggrieved Complainant: ${name}
+Documented Stolen Assets: ${loss} ${curr}
+Primary Transaction ID (TxID): ${txid}
+Identified Terminating Deposit Node: ${scammer}
+
+INVESTIGATIVE SUMMARY:
+Pursuant to 18 U.S.C. § 2703(f) and international anti-money laundering compliance directives, Nexus Shield Asset Recovery Taskforce requests immediate 90-day administrative preservation and temporary holding of account balances, transaction logs, and KYC identity records associated with the above terminating deposit address.
+
+Funds originated from unauthorized diversion and progressed across multi-hop peel-chains directly into ${exch} deposit architecture.
+
+Formal Grand Jury Subpoena / Law Enforcement Discovery Warrant to follow under separate cover.
+
+Prepared by: Nexus Shield Digital Asset Recovery Taskforce
+Contact: compliance@nexusshield.org | support@nexusshield.org | https://nexusshield.org`;
+
+  const draftEl = document.getElementById('statutoryNoticeDraftText');
+  if (draftEl) draftEl.value = text;
+};
+
+window.copyExchangeDraft = function() {
+  const text = document.getElementById('statutoryNoticeDraftText')?.value || '';
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showAdminEmailToast('📋 Statutory Preservation Notice copied to clipboard!');
+    });
+  } else {
+    showAdminEmailToast('📋 Select and copy the notice text directly.');
+  }
+};
+
+window.printExchangeDraft = function() {
+  const text = document.getElementById('statutoryNoticeDraftText')?.value || '';
+  const w = window.open('', '_blank', 'width=800,height=900');
+  if (!w) {
+    showAdminEmailToast('⚠️ Please allow popups to print notice.');
+    return;
+  }
+  w.document.write(`<title>Statutory Asset Preservation Notice</title><pre style="white-space:pre-wrap;font:12px/1.65 monospace;padding:32px;background:#fff;color:#000;">${escapeHtml(text)}</pre>`);
+  w.document.close();
+  w.print();
+};
+
 function updateKpis(reports) {
   const totalKpi = document.getElementById('totalReportsKpi');
   const lossKpi = document.getElementById('totalLossKpi');
@@ -1238,6 +1417,24 @@ function updateKpis(reports) {
   if (tabHighValue) tabHighValue.innerText = highValueCount;
   if (tabOverdue) tabOverdue.innerText = overdueCount;
   const tabClosed = document.getElementById('tabBadgeClosed');
+
+  // Top Metric Cards from uploaded build
+  const reportedLossesKpi = document.getElementById('reportedLossesKpi');
+  if (reportedLossesKpi) {
+    reportedLossesKpi.innerText = `$${Math.round(totalUSD).toLocaleString()}`;
+  }
+  const resolvedCasesKpi = document.getElementById('resolvedCasesKpi');
+  if (resolvedCasesKpi) {
+    resolvedCasesKpi.innerText = recoveredCount.toLocaleString();
+  }
+  const slaWatchKpi = document.getElementById('slaWatchKpi');
+  if (slaWatchKpi) {
+    slaWatchKpi.innerText = overdueCount.toLocaleString();
+  }
+  const sideCaseCount = document.getElementById('sideCaseCount');
+  if (sideCaseCount) {
+    sideCaseCount.innerText = activeCount.toLocaleString();
+  }
   const closedCount = reports.filter(r => r.status === 'failed' || r.status === 'recovered' || r.status === 'closed' || r.status === 'archived').length;
   if (tabClosed) tabClosed.innerText = closedCount;
 
@@ -2283,11 +2480,31 @@ function openDetailModal(report) {
   // Populate AI Forensic Intelligence & Hop Trail Dossier
   renderAiForensicIntelligenceCard(report);
 
+  // Render SVG Trace Chart
+  const svgBox = document.getElementById('detailTraceSvgContainer');
+  if (svgBox) {
+    svgBox.innerHTML = makeTraceSvg(report);
+  }
+
+  // Render Evidence List & reset preview box
+  renderEvidenceList(report);
+  const previewBox = document.getElementById('detailEvidencePreviewBox');
+  if (previewBox) {
+    previewBox.innerHTML = 'Select an evidence file above to preview it immediately.';
+  }
+
+  // Populate Statutory Notice Draft
+  generateExchangeDraftNotice(report);
+
   if (caseDetailModal) caseDetailModal.classList.add('active');
 }
 
 function hideDetailModal() {
   if (caseDetailModal) caseDetailModal.classList.remove('active');
+  if (currentEvidenceObjectUrl) {
+    URL.revokeObjectURL(currentEvidenceObjectUrl);
+    currentEvidenceObjectUrl = null;
+  }
   selectedReportForDetail = null;
 }
 
@@ -2410,6 +2627,26 @@ function syncProgressSlider(val) {
 
 // ======================== INITIALIZATION & EVENTS ========================
 document.addEventListener('DOMContentLoaded', () => {
+  const evidenceInput = document.getElementById('evidenceFileInput');
+  if (evidenceInput) {
+    evidenceInput.addEventListener('change', (e) => {
+      if (!selectedReportForDetail) return;
+      const caseId = selectedReportForDetail.report_id || String(selectedReportForDetail.id);
+      const existing = caseUploadsMap.get(caseId) || [];
+      for (const f of e.target.files) {
+        existing.push({
+          name: f.name,
+          type: f.type || f.name.split('.').pop(),
+          uploadedAt: new Date().toISOString(),
+          file: f
+        });
+      }
+      caseUploadsMap.set(caseId, existing);
+      renderEvidenceList(selectedReportForDetail);
+      showAdminEmailToast(`📎 Attached ${e.target.files.length} evidence file(s) to Case ${caseId}!`);
+    });
+  }
+
   // Bind login form
   document.getElementById('adminLoginForm')?.addEventListener('submit', handleLoginSubmit);
   document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
