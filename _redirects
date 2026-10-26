@@ -1,3 +1,7 @@
 # Cloudflare Pages Clean Aliases
-/staff      /admin     302
-/portal     /admin     302
+/staff           /admin                         302
+/portal          /admin                         302
+/partners        /about#partners                301
+/partners.html   /about.html#partners           301
+/intelligence    /methodology#sanctions-risk     301
+/compliance      /methodology#sanctions-risk     301
