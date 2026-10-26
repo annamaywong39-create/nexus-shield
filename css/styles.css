@@ -96,9 +96,11 @@ body {
   position: relative;
   z-index: 2;
   text-align: center;
-  max-width: 960px;
-  margin: 0 auto 1.75rem;
-  padding: 1rem 1.5rem;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 0 1.75rem 0 !important;
+  padding: 1.25rem clamp(1rem, 3vw, 2.5rem);
+  box-sizing: border-box;
   border-radius: var(--radius-lg);
   background: radial-gradient(ellipse at center, rgba(4, 8, 18, 0.75) 0%, rgba(4, 8, 18, 0.35) 75%, transparent 100%);
 }
@@ -327,10 +329,11 @@ code, .mono {
 }
 
 .navbar {
-  max-width: 1600px;
-  width: 96%;
-  margin: 0 auto;
-  padding: 0.85rem clamp(0.75rem, 2vw, 2rem);
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0.85rem clamp(1rem, 3.5vw, 3.5rem) !important;
+  box-sizing: border-box !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -499,10 +502,11 @@ code, .mono {
 .container {
   position: relative;
   z-index: 5;
-  max-width: 1560px;
-  width: 95%;
-  margin: 0 auto;
-  padding: 2.2rem clamp(1rem, 2.5vw, 2.5rem) 4rem;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 1.75rem clamp(1rem, 3.5vw, 3.5rem) 4rem !important;
+  box-sizing: border-box !important;
 }
 
 .hero-banner {
@@ -763,9 +767,12 @@ code, .mono {
 
 .workbench-grid {
   display: grid;
-  grid-template-columns: 1fr 380px;
+  grid-template-columns: minmax(0, 1.85fr) minmax(360px, 440px);
   gap: 2rem;
   align-items: start;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
 }
 
 @media (max-width: 1024px) {
@@ -7348,17 +7355,20 @@ summary:focus-visible {
 }
 
 .admin-app-layout {
-  display: flex;
-  width: 100%;
-  max-width: 100%;
+  display: flex !important;
+  width: 100vw !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
   min-height: calc(100vh - 66px);
-  margin: 0;
+  margin: 0 !important;
+  padding: 0 !important;
   background: var(--bg-body, #050814);
+  box-sizing: border-box;
 }
 
 .admin-sidebar {
-  width: 250px;
-  flex: 0 0 250px;
+  width: 260px !important;
+  flex: 0 0 260px !important;
   background: rgba(8, 13, 25, 0.95);
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   padding: 1.5rem 0.9rem;
@@ -7370,6 +7380,7 @@ summary:focus-visible {
   top: 66px;
   height: calc(100vh - 66px);
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .sidebar-brand-strip {
@@ -7498,10 +7509,12 @@ summary:focus-visible {
 }
 
 .admin-main-pane {
-  flex: 1;
-  min-width: 0;
-  width: 100%;
-  padding: 1.8rem clamp(1rem, 2.5vw, 2.75rem) 4rem;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  width: calc(100% - 260px) !important;
+  max-width: calc(100% - 260px) !important;
+  padding: 1.5rem clamp(1.2rem, 2.5vw, 3rem) 4rem !important;
+  box-sizing: border-box !important;
   overflow-x: hidden;
 }
 
@@ -7644,5 +7657,96 @@ summary:focus-visible {
   }
   .sidebar-security-card {
     display: none;
+  }
+}
+
+
+/* ========================================================
+   FULL SCREEN EDGE-TO-EDGE WIDESCREEN & LAPTOP RESPONSIVENESS
+   Eliminates all narrow center cropping and fixed max-width traps
+   ======================================================== */
+@media (min-width: 1024px) {
+  html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 1.75rem clamp(1.2rem, 3.5vw, 3.5rem) 4rem !important;
+    box-sizing: border-box !important;
+  }
+
+  .navbar {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0.85rem clamp(1.2rem, 3.5vw, 3.5rem) !important;
+    box-sizing: border-box !important;
+  }
+
+  .hero-header-top {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 1.75rem 0 !important;
+  }
+
+  .workbench-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.85fr) minmax(360px, 440px) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 2rem !important;
+  }
+
+  .hero-banner {
+    width: 100% !important;
+    max-width: 100% !important;
+    grid-template-columns: 1.25fr 1fr !important;
+  }
+
+  .portal-card {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .methodology-hero-container,
+  .live-proof-section,
+  .victim-faq-section,
+  .recovery-compact-strip {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  footer > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 clamp(1.2rem, 3.5vw, 3.5rem) !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-app-layout {
+    display: flex !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+  }
+
+  .admin-main-pane {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    width: calc(100% - 260px) !important;
+    max-width: calc(100% - 260px) !important;
+    padding: 1.5rem clamp(1.2rem, 2.5vw, 3rem) 4rem !important;
+  }
+
+  .admin-section-pane {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
