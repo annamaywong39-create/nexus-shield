@@ -194,7 +194,8 @@
   }
 
   function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const isMobile = window.innerWidth < 768;
+    dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.2 : 1.75);
     width = window.innerWidth;
     height = window.innerHeight;
     canvas.width = Math.floor(width * dpr);

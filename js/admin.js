@@ -2962,7 +2962,8 @@ function initAdminWorkspaceViews() {
     payments: document.getElementById('paymentsSection'),
     security: document.getElementById('securityChannelsSection'),
     wallets: document.getElementById('treasuryWalletsSection'),
-    metrics: document.getElementById('metricsWorkspaceWrapper')
+    metrics: document.getElementById('metricsWorkspaceWrapper'),
+    xdispatcher: document.getElementById('xdispatcherSection')
   };
 
   const navLinks = {
@@ -2974,7 +2975,7 @@ function initAdminWorkspaceViews() {
   };
 
   window.switchAdminView = function(viewName, updateHash = true) {
-    const validViews = ['cases', 'intake', 'payments', 'security', 'wallets', 'metrics', 'all'];
+    const validViews = ['cases', 'intake', 'payments', 'security', 'wallets', 'metrics', 'xdispatcher', 'all'];
     if (!validViews.includes(viewName)) viewName = 'cases';
 
     // Store active view in session
@@ -3014,6 +3015,7 @@ function initAdminWorkspaceViews() {
       if (sections.security) sections.security.style.display = 'block';
       if (sections.wallets) sections.wallets.style.display = 'block';
       if (sections.metrics) sections.metrics.style.display = 'block';
+      if (sections.xdispatcher) sections.xdispatcher.style.display = 'block';
     } else {
       // Hide all first
       if (sections.cases) sections.cases.style.display = 'none';
@@ -3022,6 +3024,7 @@ function initAdminWorkspaceViews() {
       if (sections.security) sections.security.style.display = 'none';
       if (sections.wallets) sections.wallets.style.display = 'none';
       if (sections.metrics) sections.metrics.style.display = 'none';
+      if (sections.xdispatcher) sections.xdispatcher.style.display = 'none';
 
       // Show selected only
       if (viewName === 'cases' && sections.cases) {
@@ -3036,6 +3039,8 @@ function initAdminWorkspaceViews() {
         sections.wallets.style.display = 'block';
       } else if (viewName === 'metrics' && sections.metrics) {
         sections.metrics.style.display = 'block';
+      } else if (viewName === 'xdispatcher' && sections.xdispatcher) {
+        sections.xdispatcher.style.display = 'block';
       }
     }
 
@@ -3097,8 +3102,9 @@ function initAdminWorkspaceViews() {
     let targetView = rawHash;
     if (targetView === 'treasury') targetView = 'wallets';
     else if (targetView === 'kpis' || targetView === 'kpi') targetView = 'metrics';
+    else if (targetView === 'x' || targetView === 'twitter' || targetView === 'tweet') targetView = 'xdispatcher';
 
-    if (['cases', 'intake', 'payments', 'security', 'wallets', 'metrics', 'all'].includes(targetView)) {
+    if (['cases', 'intake', 'payments', 'security', 'wallets', 'metrics', 'xdispatcher', 'all'].includes(targetView)) {
       window.switchAdminView(targetView, false);
       return true;
     }
@@ -3775,3 +3781,194 @@ window.clearHopelessWalletAudit = function() {
   const resContainer = document.getElementById('hopelessAuditResultsContainer');
   if (resContainer) resContainer.style.display = 'none';
 };
+
+// ========================================================
+// LIVE X (TWITTER) POST DISPATCHER & THREAT INTELLIGENCE
+// ========================================================
+
+const X_TWEET_TEMPLATES = {
+  drainer: `🚨 URGENT WALLET ADVISORY: New permit signature drainer campaigns active across DeFi protocols. If you signed an unknown approval or connected to an unverified dApp, revoke approvals immediately at revoke.cash and submit your TxID for tracing:
+👉 nexusshield.org`,
+
+  antiscam: `⚠️ SECONDARY SCAM ADVISORY: Legitimate blockchain investigators will NEVER DM you first on Telegram/X, never ask for your seed phrase, and never charge upfront recovery fees.
+Verify accredited taskforce agents at:
+👉 nexusshield.org`,
+
+  velocity: `⏱️ The Rapid Laundering Window: 84.6% of stolen cryptocurrency moves through peel chains and decentralized mixers within 6 hours of theft.
+Submitting your compromised TxID immediately allows forensic holds before exchange off-ramps:
+👉 nexusshield.org`,
+
+  sniperbot: `⚠️ DEV ADVISORY: Malicious GitHub trading and Solana sniper bots have been identified containing hidden npm scripts harvesting browser wallet vaults upon install. Always audit contract source code.
+Scan your compromised wallet:
+👉 nexusshield.org`,
+
+  success: `💼 FORENSIC RECOVERY UPDATE: Diverted cryptocurrency mapped across multiple cross-chain bridge hops directly to centralized exchange deposit infrastructure. Evidence dossiers dispatched to compliance desks.
+Report unauthorized crypto transfers:
+👉 nexusshield.org`,
+
+  verify: `🛡️ SECURITY POLICY: Nexus Shield operations staff only communicate through official verified channels (@NEXUSSHIELDhq, official portal).
+Verify an agent ID or report suspicious impersonators:
+👉 nexusshield.org`
+};
+
+window.applyXTweetTemplate = function(type, isModal = false) {
+  const text = X_TWEET_TEMPLATES[type] || '';
+  const textarea = document.getElementById(isModal ? 'xModalTweetTextarea' : 'xTweetTextarea');
+  if (textarea) {
+    textarea.value = text;
+    updateXTweetCharCount(isModal);
+    textarea.focus();
+  }
+};
+
+window.updateXTweetCharCount = function(isModal = false) {
+  const textarea = document.getElementById(isModal ? 'xModalTweetTextarea' : 'xTweetTextarea');
+  const countEl = document.getElementById(isModal ? 'xModalCharNum' : 'xCharNum');
+  const counterWrap = document.getElementById(isModal ? 'xModalCharCounter' : 'xCharCounter');
+  if (!textarea || !countEl) return;
+
+  const len = textarea.value.length;
+  countEl.innerText = len;
+
+  if (len > 280) {
+    countEl.style.color = '#f43f5e';
+    if (counterWrap) counterWrap.style.color = '#f43f5e';
+  } else if (len > 250) {
+    countEl.style.color = '#fbbf24';
+    if (counterWrap) counterWrap.style.color = '#fbbf24';
+  } else {
+    countEl.style.color = '#00f59b';
+    if (counterWrap) counterWrap.style.color = '#00f59b';
+  }
+};
+
+window.addHashTagToTweet = function(tag, isModal = false) {
+  const textarea = document.getElementById(isModal ? 'xModalTweetTextarea' : 'xTweetTextarea');
+  if (!textarea) return;
+  if (!textarea.value.includes(tag)) {
+    textarea.value = textarea.value.trim() + ' ' + tag;
+    updateXTweetCharCount(isModal);
+  }
+};
+
+window.clearXTweet = function(isModal = false) {
+  const textarea = document.getElementById(isModal ? 'xModalTweetTextarea' : 'xTweetTextarea');
+  if (textarea) {
+    textarea.value = '';
+    updateXTweetCharCount(isModal);
+    textarea.focus();
+  }
+};
+
+window.copyXTweet = function(isModal = false) {
+  const textarea = document.getElementById(isModal ? 'xModalTweetTextarea' : 'xTweetTextarea');
+  if (!textarea || !textarea.value.trim()) {
+    showAdminEmailToast('⚠️ Please write or select a tweet first.');
+    return;
+  }
+  const text = textarea.value.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    showAdminEmailToast('📋 Tweet copied to clipboard! Ready to paste into X.');
+  }).catch(() => {
+    textarea.select();
+    document.execCommand('copy');
+    showAdminEmailToast('📋 Tweet copied to clipboard!');
+  });
+};
+
+window.dispatchTweetToX = function(isModal = false) {
+  const textarea = document.getElementById(isModal ? 'xModalTweetTextarea' : 'xTweetTextarea');
+  if (!textarea || !textarea.value.trim()) {
+    showAdminEmailToast('⚠️ Please enter or select a tweet before posting.');
+    return;
+  }
+  const text = textarea.value.trim();
+  const url = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank', 'noopener,noreferrer');
+  showAdminEmailToast('🚀 Opening official X composer with your prepared tweet!');
+  if (isModal) {
+    closeXPostModal();
+  }
+};
+
+window.openXPostModal = function(initialText = '') {
+  const modal = document.getElementById('quickXPostModal');
+  const textarea = document.getElementById('xModalTweetTextarea');
+  if (modal) {
+    modal.style.display = 'flex';
+    if (textarea) {
+      if (initialText) {
+        textarea.value = initialText;
+      } else if (!textarea.value.trim()) {
+        textarea.value = X_TWEET_TEMPLATES['drainer'];
+      }
+      updateXTweetCharCount(true);
+      setTimeout(() => textarea.focus(), 100);
+    }
+  }
+};
+
+window.closeXPostModal = function() {
+  const modal = document.getElementById('quickXPostModal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.dispatchModalTweetToX = function() {
+  dispatchTweetToX(true);
+};
+
+window.copyXModalTweet = function() {
+  copyXTweet(true);
+};
+
+window.tweetCurrentCaseFromModal = function() {
+  const caseIdEl = document.getElementById('detailCaseId');
+  const amountEl = document.getElementById('detailAmount');
+  const chainEl = document.getElementById('detailChain');
+
+  const caseId = (caseIdEl && caseIdEl.innerText) ? caseIdEl.innerText.trim() : 'NX-712894';
+  const amountText = (amountEl && amountEl.innerText) ? amountEl.innerText.trim() : '$15,000 USDT';
+  const chain = (chainEl && chainEl.innerText) ? chainEl.innerText.trim() : 'Ethereum (ERC-20)';
+
+  const text = `🔍 FORENSIC MILESTONE: Stolen crypto (${amountText}, ${chain}) from Case ${caseId} mapped through decentralized bridge hops to recipient exchange clusters. Evidence hold notices dispatched.
+
+Report unauthorized transfers:
+👉 nexusshield.org`;
+
+  openXPostModal(text);
+};
+
+// Bind real-time input listeners on X textareas
+document.addEventListener('DOMContentLoaded', () => {
+  const mainTextarea = document.getElementById('xTweetTextarea');
+  if (mainTextarea) {
+    mainTextarea.addEventListener('input', () => updateXTweetCharCount(false));
+    // Default initial template
+    if (!mainTextarea.value.trim()) {
+      mainTextarea.value = X_TWEET_TEMPLATES['drainer'];
+      updateXTweetCharCount(false);
+    }
+  }
+
+  const modalTextarea = document.getElementById('xModalTweetTextarea');
+  if (modalTextarea) {
+    modalTextarea.addEventListener('input', () => updateXTweetCharCount(true));
+  }
+
+  // Close modal on Escape key
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeXPostModal();
+    }
+  });
+
+  // Close modal on outside click
+  const modal = document.getElementById('quickXPostModal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeXPostModal();
+      }
+    });
+  }
+});
