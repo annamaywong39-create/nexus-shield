@@ -1,4 +1,15 @@
 
+// Defensive HTML Entity Encoder to prevent Stored & Reflected XSS
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function generateFbiPacketText(report) {
   const ref = report.report_id || report.reportId || `#${report.id}`;
   const name = report.victim_name || report.victimName || 'Complainant on Record';
