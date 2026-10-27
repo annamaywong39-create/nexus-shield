@@ -143,11 +143,11 @@ export async function onRequestPost(context) {
           Hello ${victimName},
         </h2>
         <p style="font-size: 14.5px; color: #334155; line-height: 1.6; margin: 0 0 18px 0;">
-          Your case has been officially logged with the Nexus Shield Digital Asset Recovery Desk. Our blockchain tracing nodes and investigators have initiated immediate on-chain tracking to trace outgoing transaction hops toward recipient exchange clusters.
+          Your case has been officially logged with the Nexus Shield Digital Asset Recovery Desk. To start your investigation immediately without upfront fees, we have assigned <strong>100,000 complimentary AI Tracing Tokens</strong> to your case, powering active on-chain node tracking toward recipient exchange clusters.
         </p>
 
         <!-- Concise Case Summary Card -->
-        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; margin-bottom: 22px;">
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; margin-bottom: 18px;">
           <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px;">
             Official Case Dossier Summary
           </div>
@@ -155,6 +155,10 @@ export async function onRequestPost(context) {
             <tr>
               <td style="padding: 6px 0; color: #64748b;">Case Reference ID:</td>
               <td align="right" style="padding: 6px 0; font-weight: 800; color: #0052FF; font-family: monospace; font-size: 14.5px;">${caseId}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #64748b; border-top: 1px solid #edf2f7;">AI Compute Granted:</td>
+              <td align="right" style="padding: 6px 0; font-weight: 800; color: #16a34a; font-family: monospace; font-size: 13.5px; border-top: 1px solid #edf2f7;">100,000 Tokens (Active)</td>
             </tr>
             <tr>
               <td style="padding: 6px 0; color: #64748b; border-top: 1px solid #edf2f7;">Documented Loss:</td>
@@ -175,10 +179,35 @@ export async function onRequestPost(context) {
           </table>
         </div>
 
+        <!-- 100,000 AI Tracing Tokens Highlight Card -->
+        <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 14px 18px; margin-bottom: 22px;">
+          <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+              <td valign="top" width="32" style="font-size: 22px; line-height: 1;">⚡</td>
+              <td valign="top">
+                <div style="font-size: 13.5px; font-weight: 800; color: #15803d; letter-spacing: 0.2px;">
+                  100,000 AI Tracing Tokens Assigned
+                </div>
+                <div style="font-size: 12.5px; color: #166534; margin: 4px 0 8px 0; line-height: 1.5;">
+                  These computational credits are actively running multi-hop heuristic scans and cluster analysis on your stolen transaction hashes to locate custodial exchange deposit points.
+                </div>
+                <div style="background: #dcfce7; border-radius: 5px; padding: 5px 10px; border: 1px solid #bbf7d0;">
+                  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-size: 11px; font-family: monospace;">
+                    <tr>
+                      <td style="color: #166534; font-weight: 700;">Active Compute Balance:</td>
+                      <td align="right" style="color: #15803d; font-weight: 800;">100,000 / 100,000 (100% Unlocked)</td>
+                    </tr>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+
         <!-- Primary Action Button -->
         <div style="text-align: center; margin-bottom: 24px;">
           <a href="https://nexusshield.org/?track=${encodeURIComponent(caseId)}" target="_blank" style="display: inline-block; background: #0052FF; color: #ffffff; text-decoration: none; padding: 13px 30px; border-radius: 6px; font-size: 14px; font-weight: 700; letter-spacing: 0.3px;">
-            Track Your Case Live On-Chain &rarr;
+            Track Your Case &amp; Token Balance Live &rarr;
           </a>
         </div>
 
@@ -213,7 +242,7 @@ export async function onRequestPost(context) {
     const resendPayload = {
       from: 'Nexus Shield Case Desk <no-reply@nexusshield.org>',
       to: [report.victimEmail],
-      subject: `[Nexus Shield] Case #${caseId}: Active On-Chain Tracing Initiated`,
+      subject: `[Nexus Shield] Case #${caseId}: 100,000 AI Tracing Tokens Assigned & Active Tracing Initiated`,
       html: htmlContent
     };
 
