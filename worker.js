@@ -461,9 +461,10 @@ async function handleSendConfirmation(request, env) {
 
     const report = await request.json();
 
-    // 3. Email Format Validation
+    // 3. Email Format Validation (supports victimEmail, email, or victim_email)
+    const targetEmail = String(report.victimEmail || report.email || report.victim_email || '').trim();
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!report || !report.victimEmail || !emailRegex.test(report.victimEmail)) {
+    if (!targetEmail || !emailRegex.test(targetEmail)) {
       return new Response(JSON.stringify({ error: 'Valid complainant email address required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -487,7 +488,7 @@ async function handleSendConfirmation(request, env) {
 
     const resendPayload = {
       from: 'Nexus Shield Case Desk <no-reply@nexusshield.org>',
-      to: [report.victimEmail],
+      to: [targetEmail],
       subject: subject,
       html: html
     };

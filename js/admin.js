@@ -4090,6 +4090,32 @@ window.handleManualIntakeSubmit = async function(event) {
   // 3. Reload reports table and update KPI metrics
   await loadReports();
 
+  // Dispatch automated Resend confirmation email immediately
+  if (clientContact && clientContact.includes('@')) {
+    try {
+      fetch('/api/send-confirmation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reportId: reportId,
+          victimName: clientName,
+          victimEmail: clientContact,
+          amountLost: amountVal,
+          currencyLost: currency,
+          chain: chain,
+          recoveryWallet: victimWallet,
+          locale: (navigator.language || 'en').split('-')[0].toLowerCase()
+        })
+      }).then(res => res.json()).then(data => {
+        if (data && data.success) {
+          showAdminEmailToast(`✅ Automated confirmation email dispatched to ${clientContact}!`);
+        }
+      }).catch(err => {
+        console.warn('Manual case intake email notice:', err);
+      });
+    } catch (e) {}
+  }
+
   // 4. Construct Public Tracking URL & Client Email Template
   const originUrl = window.location.origin && window.location.origin !== 'null' ? window.location.origin : 'https://nexusshield.org';
   const trackingUrl = `${originUrl}/?track=${reportId}`;

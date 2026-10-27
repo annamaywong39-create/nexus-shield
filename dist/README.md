@@ -1,0 +1,1 @@
+This folder contains the built output assets for the worker "nexus-shield" generated at 2026-10-27T14:07:55.375Z.

@@ -855,6 +855,7 @@ async function storeReport(reportData) {
       // First attempt: Clean sanitized payload with textual report_id
       const payloadTextId = {
         victim_name: reportData.victimName || 'Complainant',
+        victim_email: reportData.victimEmail || reportData.email || null,
         victim_wallet: reportData.victimWallet || 'Not provided',
         scammer_wallet: reportData.scammerWallet || 'Pending identification',
         recovery_wallet: reportData.recoveryWallet || 'Not provided',
@@ -1208,7 +1209,6 @@ function hideConfirmModal() {
     warningConfirmModal.classList.remove("active");
     warningConfirmModal.style.display = "none";
   }
-  pendingSubmissionCallback = null;
 }
 window.hideConfirmModal = hideConfirmModal;
 window.showConfirmModal = showConfirmModal;
@@ -1858,17 +1858,15 @@ async function onScanAndRecover() {
       const count = await getTotalReportCount();
       const countSpan = document.getElementById("reportCount");
       if (countSpan) countSpan.innerText = count.toLocaleString();
-
-      // Show success modal (which triggers immediate confirmation email dispatch)
-      showSuccessModal(reportObject);
     } catch (err) {
-      console.error(err);
-      setFormError(typeof t === 'function' ? t('error_database') : 'Database connection error. Report saved locally.');
+      console.warn('Database note (proceeding with local & email dispatch):', err);
     } finally {
       if (btn) {
         btn.disabled = false;
         btn.innerHTML = originalText;
       }
+      // Always show success modal (which triggers immediate confirmation email dispatch via Resend)
+      showSuccessModal(reportObject);
     }
   });
 }
@@ -2084,12 +2082,20 @@ window.hideCaseCardModal = hideCaseCardModal;
 // ======================== EVENT BINDINGS ========================
 function bindAppEvents() {
   // Confirm modal buttons
-  document.getElementById("confirmCancelBtn")?.addEventListener("click", hideConfirmModal);
-  document.getElementById("confirmContinueBtn")?.addEventListener("click", async () => {
+  document.getElementById("confirmCancelBtn")?.addEventListener("click", () => {
+    pendingSubmissionCallback = null;
     hideConfirmModal();
-    if (pendingSubmissionCallback) {
-      await pendingSubmissionCallback();
-      pendingSubmissionCallback = null;
+  });
+  document.getElementById("confirmContinueBtn")?.addEventListener("click", async () => {
+    const cb = pendingSubmissionCallback;
+    pendingSubmissionCallback = null;
+    hideConfirmModal();
+    if (typeof cb === 'function') {
+      try {
+        await cb();
+      } catch (err) {
+        console.error('Submission callback error:', err);
+      }
     }
   });
 
