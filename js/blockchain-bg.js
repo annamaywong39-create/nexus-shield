@@ -32,6 +32,14 @@
     return;
   }
 
+  // Never run 3D background canvas on admin/desk/analyst consoles
+  if (window.location.pathname.includes('admin') || 
+      window.location.pathname.includes('desk') || 
+      window.location.pathname.includes('scheduler') ||
+      document.getElementById('adminDashboardSection')) {
+    return;
+  }
+
   // Ensure canvas exists
   let canvas = document.getElementById('crypto3dCanvas');
   if (!canvas) {
@@ -44,7 +52,7 @@
     canvas.style.width = '100vw';
     canvas.style.height = '100vh';
     canvas.style.pointerEvents = 'none';
-    canvas.style.zIndex = '0';
+    canvas.style.zIndex = '-2';
     canvas.style.display = 'block';
     document.body.prepend(canvas);
   }
@@ -54,7 +62,7 @@
   if (!veil) {
     veil = document.createElement('div');
     veil.id = 'cosmicVeil';
-    veil.className = 'cosmic-gaussian-veil';
+    veil.className = 'cosmic-gaussian-veil'; veil.style.zIndex = '-1';
     veil.setAttribute('aria-hidden', 'true');
     canvas.after(veil);
   }

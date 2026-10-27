@@ -87,6 +87,8 @@
       box-sizing: border-box !important;
     }
         .admin-app-layout {
+      position: relative !important;
+      z-index: 10 !important;
       display: flex !important;
       width: 100% !important;
       max-width: 100% !important;
@@ -96,6 +98,8 @@
       box-sizing: border-box !important;
     }
     .admin-sidebar {
+      position: relative !important;
+      z-index: 10 !important;
       width: 260px !important;
       flex: 0 0 260px !important;
       min-width: 260px !important;
@@ -103,6 +107,8 @@
       box-sizing: border-box !important;
     }
     .admin-main-pane {
+      position: relative !important;
+      z-index: 10 !important;
       flex: 1 1 0 !important;
       min-width: 0 !important;
       width: auto !important;
@@ -123,20 +129,36 @@
     }
     @media (max-width: 860px) {
       .admin-app-layout {
-        flex-direction: column !important;
-      }
-      .admin-sidebar {
-        width: 100% !important;
-        flex: none !important;
-        min-width: 100% !important;
-        max-width: 100% !important;
-        position: static !important;
-        height: auto !important;
-      }
-      .admin-main-pane {
-        width: 100% !important;
-        padding: 1rem 0.85rem 4rem !important;
-      }
+      position: relative !important;
+      z-index: 10 !important;
+      display: flex !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      min-height: calc(100vh - 66px);
+      box-sizing: border-box !important;
+    }
+    .admin-sidebar {
+      position: relative !important;
+      z-index: 10 !important;
+      width: 260px !important;
+      flex: 0 0 260px !important;
+      min-width: 260px !important;
+      max-width: 260px !important;
+      box-sizing: border-box !important;
+    }
+    .admin-main-pane {
+      position: relative !important;
+      z-index: 10 !important;
+      flex: 1 1 0 !important;
+      min-width: 0 !important;
+      width: auto !important;
+      max-width: 100% !important;
+      padding: 1.5rem clamp(1.2rem, 2.5vw, 3rem) 4rem !important;
+      box-sizing: border-box !important;
+      overflow-x: hidden !important;
+    }
     }
   </style>
 </head>
@@ -1152,7 +1174,7 @@
 </div>
 
 <!-- Case Detail Modal -->
-<div id="caseDetailModal" class="modal-overlay">
+<div id="caseDetailModal" class="modal-overlay" style="display: none;">
   <div class="modal-card modal-lg">
     <div class="modal-header-strip">
       <div>
@@ -1669,7 +1691,7 @@
 </div>
 
 <!-- Alert Email Preview Modal -->
-<div id="alertEmailPreviewModal" class="modal-overlay">
+<div id="alertEmailPreviewModal" class="modal-overlay" style="display: none;">
   <div class="modal-card" style="max-width: 720px;">
     <div class="modal-header-strip">
       <div>
@@ -1707,7 +1729,7 @@
 </div>
 
 <!-- Receipt Image Preview Lightbox Modal -->
-<div id="receiptPreviewModal" class="modal-overlay">
+<div id="receiptPreviewModal" class="modal-overlay" style="display: none;">
   <div class="modal-card" style="max-width: 640px; text-align: center;">
     <div class="modal-header-strip">
       <div>
@@ -1727,7 +1749,7 @@
 </div>
 
 <!-- CEX Emergency Freeze Notice Modal -->
-<div id="cexFreezeModal" class="modal-overlay">
+<div id="cexFreezeModal" class="modal-overlay" style="display: none;">
   <div class="modal-card modal-lg" style="max-width: 780px;">
     <div class="modal-header-strip">
       <div>
@@ -1903,6 +1925,6 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/admin.js?v=20261026-widescreen-v4"></script>
-<script src="js/blockchain-bg.js" defer></script>
+
 </body>
 </html>

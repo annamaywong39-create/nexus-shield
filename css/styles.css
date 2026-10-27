@@ -74,7 +74,7 @@ body {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 0;
+  z-index: -2;
   display: block;
 }
 
@@ -85,7 +85,7 @@ body {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 1;
+  z-index: -1;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   background: radial-gradient(circle at 50% 320px, rgba(4, 8, 18, 0.45) 0%, rgba(4, 8, 18, 0.70) 55%, rgba(4, 8, 18, 0.92) 95%);
@@ -1343,19 +1343,22 @@ textarea.input-error {
   background: rgba(3, 5, 12, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  display: flex;
+  display: none !important;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 1.5rem;
   visibility: hidden;
   opacity: 0;
+  pointer-events: none;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-overlay.active {
+  display: flex !important;
   visibility: visible;
   opacity: 1;
+  pointer-events: auto;
 }
 
 .modal-card {
