@@ -1,3 +1,12 @@
+// Idempotent DOM Ready helper: runs immediately if DOM is already parsed/interactive, or binds to DOMContentLoaded
+function onReady(fn) {
+  if (document.readyState !== 'loading') {
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
 
 // Defensive HTML Entity Encoder to prevent Stored & Reflected XSS
 function escapeHtml(str) {
@@ -410,7 +419,7 @@ function renderAiForensicIntelligenceCard(report) {
 
   // 8. Auto-populate CEX Target Select with detected exchange
   const cexTargetSelect = document.getElementById('cexSelectTarget');
-  if (cexTargetSelect && ai.destinationExchange) {
+  if (cexTargetSelect && cexTargetSelect.options && cexTargetSelect.options.length && ai.destinationExchange) {
     const exchangeKey = ai.destinationExchange.toLowerCase();
     for (let i = 0; i < cexTargetSelect.options.length; i++) {
       if (cexTargetSelect.options[i].value === exchangeKey) {
@@ -496,7 +505,7 @@ window.reAnalyzeCurrentCaseAi = function() {
 window.jumpToCexFreezeBuilder = function() {
   const cexSection = document.getElementById('cexFreezeSection') || document.getElementById('cexSelectTarget')?.closest('.form-row')?.parentElement;
   if (cexSection) {
-    cexSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (typeof cexSection.scrollIntoView === 'function') { cexSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
     cexSection.style.transition = 'box-shadow 0.4s ease, border-color 0.4s ease';
     cexSection.style.borderColor = 'var(--accent-cyan)';
     cexSection.style.boxShadow = '0 0 25px rgba(56, 189, 248, 0.4)';
@@ -1272,7 +1281,7 @@ window.previewEvidenceItem = function(caseId, index) {
   }
 };
 
-window.generateExchangeDraftNotice = function(report) {
+function generateExchangeDraftNotice(report) {
   if (!report) return;
   const ref = report.report_id || `#${report.id}`;
   const name = report.victim_name || report.victimName || 'Complainant on Record';
@@ -1304,7 +1313,9 @@ Contact: compliance@nexusshield.org | support@nexusshield.org | https://nexusshi
 
   const draftEl = document.getElementById('statutoryNoticeDraftText');
   if (draftEl) draftEl.value = text;
-};
+}
+window.generateExchangeDraftNotice = generateExchangeDraftNotice;
+
 
 window.copyExchangeDraft = function() {
   const text = document.getElementById('statutoryNoticeDraftText')?.value || '';
@@ -1467,7 +1478,7 @@ window.switchToClosedTab = function() {
     closedTabBtn.classList.add('active');
     activeSmartTab = 'closed';
     applyFilters();
-    document.getElementById('reportsTableWrapper')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const rtw = document.getElementById('reportsTableWrapper'); if (rtw && typeof rtw.scrollIntoView === 'function') { rtw.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   }
 };
 
@@ -1825,6 +1836,56 @@ function renderTable(reports) {
       if (report) openDetailModal(report);
     });
   });
+
+  // Table-level robust event delegation for buttons and checkboxes
+  const tableBody = document.getElementById('reportsTableBody');
+  if (tableBody && !tableBody.dataset.delegationBound) {
+    tableBody.dataset.delegationBound = 'true';
+    tableBody.addEventListener('click', (e) => {
+      const viewBtn = e.target.closest('.view-btn');
+      if (viewBtn) {
+        e.preventDefault();
+        const id = viewBtn.dataset.id;
+        const ref = viewBtn.dataset.ref;
+        const report = (allReports || []).find(r => (r.report_id && r.report_id === ref) || String(r.id) === String(id));
+        if (report) openDetailModal(report);
+        return;
+      }
+
+      const doneBtn = e.target.closest('.quick-row-done-btn');
+      if (doneBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const key = doneBtn.dataset.key;
+        selectedCaseIds.clear();
+        selectedCaseIds.add(key);
+        executeBatchStatusUpdate('done');
+        return;
+      }
+
+      const endBtn = e.target.closest('.quick-row-end-btn');
+      if (endBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const key = endBtn.dataset.key;
+        selectedCaseIds.clear();
+        selectedCaseIds.add(key);
+        executeBatchStatusUpdate('end');
+        return;
+      }
+
+      const reopenBtn = e.target.closest('.quick-row-reopen-btn');
+      if (reopenBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const key = reopenBtn.dataset.key;
+        if (typeof window.reopenCase === 'function') {
+          window.reopenCase(key);
+        }
+        return;
+      }
+    });
+  }
 
   updateBatchDock();
 }
@@ -2475,19 +2536,31 @@ function openDetailModal(report) {
   }
 
   // Populate Statutory Notice Draft
-  generateExchangeDraftNotice(report);
+  if (typeof window.generateExchangeDraftNotice === 'function') {
+    window.generateExchangeDraftNotice(report);
+  } else if (typeof generateExchangeDraftNotice === 'function') {
+    generateExchangeDraftNotice(report);
+  }
 
-  if (caseDetailModal) caseDetailModal.classList.add('active');
+  if (caseDetailModal) {
+    caseDetailModal.style.display = 'flex';
+    caseDetailModal.classList.add('active');
+  }
 }
 
 function hideDetailModal() {
-  if (caseDetailModal) caseDetailModal.classList.remove('active');
+  if (caseDetailModal) {
+    caseDetailModal.classList.remove('active');
+    caseDetailModal.style.display = 'none';
+  }
   if (currentEvidenceObjectUrl) {
     URL.revokeObjectURL(currentEvidenceObjectUrl);
     currentEvidenceObjectUrl = null;
   }
   selectedReportForDetail = null;
 }
+window.hideDetailModal = hideDetailModal;
+window.openDetailModal = openDetailModal;
 
 // ======================== CSV & JSON EXPORT ========================
 function exportCsv() {
@@ -2607,7 +2680,7 @@ function syncProgressSlider(val) {
 }
 
 // ======================== INITIALIZATION & EVENTS ========================
-document.addEventListener('DOMContentLoaded', () => {
+onReady(() => {
   const evidenceInput = document.getElementById('evidenceFileInput');
   if (evidenceInput) {
     evidenceInput.addEventListener('change', (e) => {
@@ -2655,18 +2728,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // SLA Explainer Modal
   const slaModal = document.getElementById('slaExplainerModal');
-  document.getElementById('openSlaExplainerBtn')?.addEventListener('click', () => {
-    if (slaModal) slaModal.style.display = 'flex';
-  });
-  document.getElementById('closeSlaExplainerBtn')?.addEventListener('click', () => {
-    if (slaModal) slaModal.style.display = 'none';
-  });
-  document.getElementById('dismissSlaExplainerBtn')?.addEventListener('click', () => {
-    if (slaModal) slaModal.style.display = 'none';
-  });
+  const showSlaModal = () => {
+    if (slaModal) {
+      slaModal.style.display = 'flex';
+      slaModal.classList.add('active');
+    }
+  };
+  const hideSlaModal = () => {
+    if (slaModal) {
+      slaModal.classList.remove('active');
+      slaModal.style.display = 'none';
+    }
+  };
+  document.getElementById('openSlaExplainerBtn')?.addEventListener('click', showSlaModal);
+  document.getElementById('closeSlaExplainerBtn')?.addEventListener('click', hideSlaModal);
+  document.getElementById('dismissSlaExplainerBtn')?.addEventListener('click', hideSlaModal);
   if (slaModal) {
     slaModal.addEventListener('click', (e) => {
-      if (e.target === slaModal) slaModal.style.display = 'none';
+      if (e.target === slaModal) hideSlaModal();
     });
   }
 
@@ -2955,7 +3034,7 @@ document.addEventListener('DOMContentLoaded', () => {
       mailBtn.style.display = 'none';
     }
 
-    if (modal) modal.classList.add('active');
+    if (modal) { modal.style.display = 'flex'; modal.classList.add('active'); }
   });
 
   document.getElementById('copyAlertEmailBtn')?.addEventListener('click', () => {
@@ -2970,7 +3049,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   window.hideAlertEmailPreviewModal = function() {
-    document.getElementById('alertEmailPreviewModal')?.classList.remove('active');
+    const modal = document.getElementById('alertEmailPreviewModal');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
   };
 
   // Deactivate client advisory popup
@@ -3033,7 +3116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mailBtn) {
       mailBtn.href = `mailto:${encodeURIComponent(cex.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`;
     }
-    if (modal) modal.classList.add('active');
+    if (modal) { modal.style.display = 'flex'; modal.classList.add('active'); }
   });
 
   const copyCexFn = () => {
@@ -3062,7 +3145,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   window.hideCexFreezeModal = function() {
-    document.getElementById('cexFreezeModal')?.classList.remove('active');
+    const modal = document.getElementById('cexFreezeModal');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
   };
 
   // Mark Stage 4: Hold Served
@@ -3142,12 +3229,17 @@ window.viewReceiptModal = function(receiptUrl, fileName) {
       fallback.innerText = `No image preview available for: ${fileName || "Proof Document"}`;
     }
   }
+  modal.style.display = "flex";
   modal.classList.add("active");
 };
+window.viewReceipt = window.viewReceiptModal;
 
 window.hideReceiptModal = function() {
   const modal = document.getElementById("receiptPreviewModal");
-  if (modal) modal.classList.remove("active");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.style.display = "none";
+  }
 };
 
 window.simulateTestPayment = function() {
@@ -4134,7 +4226,7 @@ Email: support@nexusshield.org | Website: https://nexusshield.org`;
       </div>
     `;
 
-    resContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (typeof resContainer.scrollIntoView === 'function') { resContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
   }
 
   if (submitBtn) {
@@ -4410,7 +4502,7 @@ window.executeHopelessWalletScan = async function() {
       </div>
     `;
 
-    resContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (typeof resContainer.scrollIntoView === 'function') { resContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
   }
 
   showAdminEmailToast('🔍 Wallet audit complete! Suspicious outflow identified.');
@@ -4596,6 +4688,7 @@ window.openXPostModal = function(initialText = '') {
   const textarea = document.getElementById('xModalTweetTextarea');
   if (modal) {
     modal.style.display = 'flex';
+    modal.classList.add('active');
     if (textarea) {
       if (initialText) {
         textarea.value = initialText;
@@ -4610,7 +4703,10 @@ window.openXPostModal = function(initialText = '') {
 
 window.closeXPostModal = function() {
   const modal = document.getElementById('quickXPostModal');
-  if (modal) modal.style.display = 'none';
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
 };
 
 window.dispatchModalTweetToX = function() {
@@ -4639,7 +4735,7 @@ Report unauthorized transfers:
 };
 
 // Bind real-time input listeners on X textareas
-document.addEventListener('DOMContentLoaded', () => {
+onReady(() => {
   const mainTextarea = document.getElementById('xTweetTextarea');
   if (mainTextarea) {
     mainTextarea.addEventListener('input', () => updateXTweetCharCount(false));
@@ -4672,3 +4768,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+// Global window bindings for admin utilities
+window.executeBatchStatusUpdate = executeBatchStatusUpdate;
+window.applyFilters = applyFilters;
+window.loadReports = loadReports;
+window.renderTable = renderTable;
+window.checkAuthStatus = checkAuthStatus;

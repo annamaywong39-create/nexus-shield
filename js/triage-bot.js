@@ -1,3 +1,12 @@
+// Idempotent DOM Ready helper: runs immediately if DOM is already parsed/interactive, or binds to DOMContentLoaded
+function onReady(fn) {
+  if (document.readyState !== 'loading') {
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
 // ========================================================
 // NEXUS SHIELD — AI Forensic Triage Bot & Incident Liaison
 // Interactive Case Intake, Agent Verification & FBI IC3 Engine
@@ -918,7 +927,7 @@ Report Hash: SHA-256 Verified On-Chain
     });
   }
   // ======================== INITIALIZATION ========================
-  document.addEventListener('DOMContentLoaded', () => {
+  onReady(() => {
     initDynamicPaymentQr();
     initAgentVerification();
     initTriageBot();

@@ -1,3 +1,22 @@
+// Idempotent DOM Ready helper: runs immediately if DOM is already parsed/interactive, or binds to DOMContentLoaded
+function onReady(fn) {
+  if (document.readyState !== 'loading') {
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
+function safeScrollIntoView(el, options) {
+  if (el && typeof el.scrollIntoView === 'function') {
+    try {
+      el.scrollIntoView(options || { behavior: 'smooth', block: 'center' });
+    } catch (e) {
+      try { el.scrollIntoView(); } catch (err) {}
+    }
+  }
+}
+
 // ========================================================
 // NEXUS SHIELD — Autonomous Crypto Crime Intelligence
 // Multi-Wallet Forensic Intake & Rapid Asset Recovery Portal
@@ -1182,9 +1201,14 @@ function showConfirmModal(reportData, onConfirm) {
 }
 
 function hideConfirmModal() {
-  if (warningConfirmModal) warningConfirmModal.classList.remove("active");
+  if (warningConfirmModal) {
+    warningConfirmModal.classList.remove("active");
+    warningConfirmModal.style.display = "none";
+  }
   pendingSubmissionCallback = null;
 }
+window.hideConfirmModal = hideConfirmModal;
+window.showConfirmModal = showConfirmModal;
 
 function showSuccessModal(reportData) {
   currentActiveReport = reportData;
@@ -1216,8 +1240,13 @@ function showSuccessModal(reportData) {
 }
 
 function hideSuccessModal() {
-  if (caseSuccessModal) caseSuccessModal.classList.remove("active");
+  if (caseSuccessModal) {
+    caseSuccessModal.classList.remove("active");
+    caseSuccessModal.style.display = "none";
+  }
 }
+window.hideSuccessModal = hideSuccessModal;
+window.showSuccessModal = showSuccessModal;
 
 function updateProgressBar(reportOrStatus) {
   const progressBarFill = document.getElementById('progressBarFill');
@@ -1416,8 +1445,14 @@ async function renderCaseProgress(data) {
 }
 
 function hideProgressModal() {
-  if (progressModal) progressModal.classList.remove('active');
+  if (progressModal) {
+    progressModal.classList.remove('active');
+    progressModal.style.display = 'none';
+  }
 }
+window.hideProgressModal = hideProgressModal;
+window.showProgressModal = renderCaseProgress;
+window.renderCaseProgress = renderCaseProgress;
 
 // ======================== CASE DOSSIER EXPORT ========================
 function generateDossierText(report) {
@@ -1516,7 +1551,7 @@ function clearFormValidationErrors() {
 function flagFieldInvalid(inputEl, errorMessage) {
   if (!inputEl) return;
   inputEl.classList.add('input-error');
-  inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  safeScrollIntoView(inputEl, { behavior: 'smooth', block: 'center' });
   inputEl.focus();
 
   const errDiv = document.getElementById("formError");
@@ -1543,7 +1578,7 @@ function setFormError(msg) {
   if (!errDiv) return;
   errDiv.innerHTML = `<i class="fas fa-triangle-exclamation"></i> <div><strong>Notice:</strong> ${msg}</div>`;
   errDiv.style.display = "flex";
-  errDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  safeScrollIntoView(errDiv, { behavior: 'smooth', block: 'center' });
   setTimeout(() => {
     if (errDiv) {
       errDiv.innerHTML = "";
@@ -1851,7 +1886,7 @@ window.loadSampleCase = function(caseId) {
   const input = document.getElementById('statusReportId');
   if (input) {
     input.value = caseId;
-    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    safeScrollIntoView(input, { behavior: 'smooth', block: 'center' });
     setTimeout(() => {
       checkReportStatus();
     }, 150);
@@ -2201,7 +2236,7 @@ function initDualIntakeSwitcher() {
     const manualBadge = tabManual.querySelector('.tab-badge');
     if (autoBadge) autoBadge.innerText = 'Fast-Track';
     if (manualBadge) manualBadge.innerText = 'Active Flow';
-    secManual.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    safeScrollIntoView(secManual, { behavior: 'smooth', block: 'start' });
   });
 }
 
@@ -2555,7 +2590,7 @@ STATEMENT OF SWORN FACTS:
     }
 
     // Scroll to verified card
-    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    safeScrollIntoView(card, { behavior: 'smooth', block: 'nearest' });
   }
 
   if (btn) {
@@ -2740,7 +2775,7 @@ function initPaymentAndPdfUnlockController() {
   modalGoToRecoveryBtn?.addEventListener('click', () => {
     closeDossierLockedModal();
     const contactTitle = document.getElementById('contactSectionTitle');
-    contactTitle?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    safeScrollIntoView(contactTitle, { behavior: 'smooth', block: 'start' });
     document.getElementById('victimName')?.focus();
     showEmailToast('🛡️ Proceeding with recovery investigation intake. Please confirm complainant details below.');
   });
@@ -2784,7 +2819,7 @@ function initPaymentAndPdfUnlockController() {
   if (skipToRecoveryBtn) {
     skipToRecoveryBtn.addEventListener('click', () => {
       const contactTitle = document.getElementById('contactSectionTitle');
-      contactTitle?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      safeScrollIntoView(contactTitle, { behavior: 'smooth', block: 'start' });
       document.getElementById('victimName')?.focus();
       showEmailToast('🛡️ Proceeding to full case recovery investigation.');
     });
@@ -2974,7 +3009,7 @@ function initPaymentAndPdfUnlockController() {
     if (postRow) postRow.style.display = 'flex';
 
     showEmailToast(`✅ Payment Verified by ${reviewerName}! Full 5-section dossier and subpoena packet unlocked.`);
-    redBox?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    safeScrollIntoView(redBox, { behavior: 'smooth', block: 'nearest' });
   }
 
   // Submit Payment Proof
@@ -3040,7 +3075,7 @@ function initPaymentAndPdfUnlockController() {
         waitingCard.style.display = 'block';
         const refText = document.getElementById('waitingPaymentRef');
         if (refText) refText.innerText = activePaymentId;
-        waitingCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        safeScrollIntoView(waitingCard, { behavior: 'smooth', block: 'nearest' });
       }
 
       showEmailToast('📤 Proof submitted! Awaiting Senior Forensic Desk verification.');
@@ -3133,7 +3168,7 @@ ${document.getElementById('subpoenaNoticeLetter')?.innerText || ''}
   if (continueBtn) {
     continueBtn.addEventListener('click', () => {
       const contactTitle = document.getElementById('contactSectionTitle');
-      contactTitle?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      safeScrollIntoView(contactTitle, { behavior: 'smooth', block: 'start' });
       document.getElementById('victimName')?.focus();
     });
   }
@@ -3209,7 +3244,7 @@ function initMobileNavigation() {
 window.initMobileNavigation = initMobileNavigation;
 
 // ======================== INIT ========================
-document.addEventListener("DOMContentLoaded", async () => {
+onReady(async () => {
   initMobileNavigation();
   initPageTransitions();
   initTicker();
