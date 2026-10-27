@@ -6028,26 +6028,15 @@ body.nav-drawer-open .header {
   transform: translateY(0) scale(0.95);
 }
 
-/* Playful Hop / Jump Keyframe */
-@keyframes botJumpAnimation {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-  }
-  20% {
-    transform: translateY(-16px) scale(1.08);
-  }
-  40% {
-    transform: translateY(0) scale(0.96);
-  }
-  60% {
-    transform: translateY(-8px) scale(1.03);
-  }
-  80% {
-    transform: translateY(0) scale(1);
-  }
-}
+/* Static Quiet Circular Bot Launcher (No jumping, no popping out) */
 .nexus-triage-launcher.is-jumping {
-  animation: botJumpAnimation 0.85s cubic-bezier(0.28, 0.84, 0.42, 1);
+  animation: none !important;
+}
+.triage-bubble-hint {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .launcher-avatar-wrap {

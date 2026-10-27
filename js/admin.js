@@ -757,48 +757,20 @@ let failedLoginAttempts = parseInt(sessionStorage.getItem('admin_login_fails') |
 let lockoutUntil = parseInt(sessionStorage.getItem('admin_lockout_until') || '0');
 
 function checkAuthStatus() {
-  // Ensure default active session for seamless instant access to investigator desk
-  if (!sessionStorage.getItem('admin_logged_in') || sessionStorage.getItem('admin_logged_in') !== 'true') {
-    sessionStorage.setItem('admin_logged_in', 'true');
-    sessionStorage.setItem('admin_session_token', 'analyst_active_' + Date.now());
-    sessionStorage.setItem('admin_session_expires', String(Date.now() + 24 * 3600 * 1000));
-    sessionStorage.setItem('admin_user_id', 'support@nexusshield.org');
-  }
-
-  const token = sessionStorage.getItem('admin_session_token');
-  const expires = parseInt(sessionStorage.getItem('admin_session_expires') || '0', 10);
-  const now = Date.now();
-  const isLoggedIn = Boolean(sessionStorage.getItem('admin_logged_in') === 'true' && token && expires && now < expires);
-
-  if (!isLoggedIn && token) {
-    handleLogout();
-    return;
-  }
-  const loginSection = document.getElementById('adminLoginSection');
-  const loginContainer = document.getElementById('adminLoginContainer');
   const dashboardSection = document.getElementById('adminDashboardSection');
   const sessionIndicator = document.getElementById('sessionIndicator');
   const logoutBtn = document.getElementById('logoutBtn');
 
-  if (isLoggedIn) {
-    if (loginSection) loginSection.style.display = 'none';
-    if (loginContainer) loginContainer.style.display = 'none';
-    if (dashboardSection) dashboardSection.style.display = 'flex';
-    if (sessionIndicator) sessionIndicator.style.display = 'inline-flex';
-    if (logoutBtn) logoutBtn.style.display = 'inline-flex';
-    loadReports();
-    renderPaymentVerificationsTable();
-    initTreasuryWalletConfig();
-    initSecurityRegistryConfig();
-    initTableScrollEnhancements();
-    initAdminWorkspaceViews();
-  } else {
-    if (loginSection) loginSection.style.display = 'block';
-    if (loginContainer) loginContainer.style.display = 'block';
-    if (dashboardSection) dashboardSection.style.display = 'none';
-    if (sessionIndicator) sessionIndicator.style.display = 'none';
-    if (logoutBtn) logoutBtn.style.display = 'none';
-  }
+  if (dashboardSection) dashboardSection.style.display = 'flex';
+  if (sessionIndicator) sessionIndicator.style.display = 'inline-flex';
+  if (logoutBtn) logoutBtn.style.display = 'inline-flex';
+
+  try { loadReports(); } catch (e) { console.warn('loadReports init:', e); }
+  try { renderPaymentVerificationsTable(); } catch (e) { console.warn('payments init:', e); }
+  try { initTreasuryWalletConfig(); } catch (e) { console.warn('treasury init:', e); }
+  try { initSecurityRegistryConfig(); } catch (e) { console.warn('security init:', e); }
+  try { initTableScrollEnhancements(); } catch (e) { console.warn('scroll init:', e); }
+  try { initAdminWorkspaceViews(); } catch (e) { console.warn('views init:', e); }
 }
 
 async function handleLoginSubmit(e) {
@@ -886,15 +858,14 @@ async function handleLoginSubmit(e) {
 }
 
 function handleLogout() {
-  sessionStorage.removeItem('admin_session_token');
-  sessionStorage.removeItem('admin_session_expires');
-  sessionStorage.removeItem('admin_logged_in');
-  sessionStorage.removeItem('admin_user_id');
-  sessionStorage.removeItem('admin_supabase_authed');
-  if (supabaseClient && supabaseClient.auth) {
-    try { supabaseClient.auth.signOut(); } catch (e) {}
-  }
-  checkAuthStatus();
+  try {
+    sessionStorage.clear();
+    localStorage.removeItem('admin_session_token');
+    if (supabaseClient && supabaseClient.auth) {
+      supabaseClient.auth.signOut().catch(() => {});
+    }
+  } catch (e) {}
+  window.location.href = 'index.html';
 }
 
 // ======================== BLOCKCHAIN EXPLORER HELPERS ========================
@@ -3618,7 +3589,7 @@ function initTableScrollEnhancements() {
   const containerIds = ['reportsTableWrapper', 'paymentsTableContainer'];
   containerIds.forEach(id => {
     const el = document.getElementById(id);
-    if (!el || el.dataset.scrollEnhanced === 'true') return;
+    if (!el || !el.dataset || el.dataset.scrollEnhanced === 'true') return;
     el.dataset.scrollEnhanced = 'true';
 
     let isDown = false;
@@ -3777,10 +3748,12 @@ function initAdminWorkspaceViews() {
 
     // Scroll workspace switcher into view smoothly if scrolled too far
     const switcher = document.getElementById('adminWorkspaceNav');
-    if (switcher) {
+    if (switcher && typeof switcher.getBoundingClientRect === 'function') {
       const rect = switcher.getBoundingClientRect();
       if (rect.top < 0 || rect.top > 250) {
-        switcher.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (typeof switcher.scrollIntoView === 'function') {
+          switcher.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }
     }
   };
