@@ -480,43 +480,9 @@ Report Hash: SHA-256 Verified On-Chain
       });
     }
 
-    // Jump & bubble hint trigger: jumps and shows "I'm here to help you", then retreats into corner
-    function triggerJumpAndHint() {
-      if (windowEl.classList.contains('active') || isHintDismissed) return;
-
-      // 1. Playful bounce/jump animation on the circular button
-      launcher.classList.remove('is-jumping');
-      void launcher.offsetWidth; // Force CSS reflow
-      launcher.classList.add('is-jumping');
-      setTimeout(() => {
-        launcher.classList.remove('is-jumping');
-      }, 900);
-
-      // 2. Reveal the speech bubble: "I'm here to help you"
-      if (bubbleHint) {
-        bubbleHint.classList.add('visible');
-
-        if (hintHideTimer) clearTimeout(hintHideTimer);
-        // Stays visible for 4.5 seconds, then smoothly goes back into the corner of the screen
-        hintHideTimer = setTimeout(() => {
-          bubbleHint.classList.remove('visible');
-        }, 4500);
-      }
-    }
-
-    // Schedule regular interval (every 16 seconds)
-    function startHintSchedule() {
-      if (hintIntervalTimer) clearInterval(hintIntervalTimer);
-      hintIntervalTimer = setInterval(() => {
-        triggerJumpAndHint();
-      }, 16000);
-    }
-
-    // Initial polite callout 3.5 seconds after page load
-    setTimeout(() => {
-      triggerJumpAndHint();
-      startHintSchedule();
-    }, 3500);
+    // Bot sits quietly and statically in corner - no jumping, no speech bubbles popping out
+    function triggerJumpAndHint() {}
+    function startHintSchedule() {}
 
     // Channel tab toggling
     tabBot?.addEventListener('click', () => {

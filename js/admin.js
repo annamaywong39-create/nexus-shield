@@ -1399,6 +1399,8 @@ function updateKpis(reports) {
   }
 
   if (activeKpi) activeKpi.innerText = activeCount.toLocaleString();
+  const activeWorkspaceKpi = document.getElementById('activeCasesWorkspaceKpi');
+  if (activeWorkspaceKpi) activeWorkspaceKpi.innerText = activeCount.toLocaleString();
   if (scammersKpi) scammersKpi.innerText = uniqueScammers.size.toLocaleString();
 
   // Smart Queue Tab Badges
