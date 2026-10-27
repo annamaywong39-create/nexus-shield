@@ -833,6 +833,7 @@ Report Hash: SHA-256 Verified On-Chain
         chainType: isEvm ? 'evm' : 'btc',
         scamCategory: triageState.scamType,
         totalUsdLoss: cleanAmt,
+        locale: (navigator.language || navigator.userLanguage || 'en').split('-')[0].toLowerCase(),
         timestamp: new Date().toISOString(),
         status: 'pending',
         stage: 1

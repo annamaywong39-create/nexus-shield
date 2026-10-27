@@ -461,7 +461,8 @@ window.dispatchIntakeConfirmationEmail = async function() {
         amountLost: amount,
         currencyLost: curr,
         recoveryWallet: recWallet,
-        chain: chain
+        chain: chain,
+        locale: r.locale || (navigator.language || 'en').split('-')[0].toLowerCase()
       })
     }).then(res => res.json()).then(data => {
       if (data && data.success) {

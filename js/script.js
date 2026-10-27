@@ -769,10 +769,13 @@ function sendCaseInitiationEmail(reportData) {
 
   // Trigger background automated email dispatch via Cloudflare Pages Function (Resend)
   try {
+    const payload = Object.assign({}, reportData, {
+      locale: (navigator.language || navigator.userLanguage || 'en').split('-')[0].toLowerCase()
+    });
     fetch('/api/send-confirmation', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(reportData)
+      body: JSON.stringify(payload)
     }).then(res => res.json()).then(data => {
       if (data && data.success) {
         console.log('Automated confirmation email dispatched successfully via Resend:', data.id);
