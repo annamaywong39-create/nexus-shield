@@ -2528,6 +2528,12 @@ function openDetailModal(report) {
   if (caseDetailModal) {
     caseDetailModal.style.display = 'flex';
     caseDetailModal.classList.add('active');
+    // Restore user preferred view size (defaults to small window)
+    var pref = 'small';
+    try { pref = localStorage.getItem('nexus_admin_modal_size') || 'small'; } catch(e){}
+    if (typeof window.setCaseModalView === 'function') {
+      window.setCaseModalView(pref);
+    }
   }
 }
 

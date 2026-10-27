@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=20261027-fs-fix-v6">
+  <link rel="stylesheet" href="css/styles.css?v=20261027-dual-size-v7">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png">
@@ -1136,36 +1136,64 @@
 </div>
 
 <script>
-function toggleCaseDetailFullscreen(e) {
-  if (e && e.preventDefault) e.preventDefault();
+window.setCaseModalView = function(mode) {
   var overlay = document.getElementById('caseDetailModal');
   var card = document.querySelector('#caseDetailModal .modal-card');
-  var btn = document.getElementById('btnToggleCaseDetailFullscreen');
-  var label = document.getElementById('btnFullscreenLabel');
+  var btnSmall = document.getElementById('btnCaseModalSmall');
+  var btnFull = document.getElementById('btnCaseModalFull');
   if (!overlay || !card) return;
 
-  var isFull = !overlay.classList.contains('is-fullscreen');
-  overlay.classList.toggle('is-fullscreen', isFull);
-  card.classList.toggle('is-fullscreen', isFull);
-
-  if (btn) {
-    var icon = btn.querySelector('i');
-    if (icon) {
-      icon.className = isFull ? 'fas fa-compress' : 'fas fa-expand';
+  var isFull = (mode === 'full');
+  if (isFull) {
+    overlay.classList.add('is-fullscreen');
+    card.classList.add('is-fullscreen');
+    if (btnFull) {
+      btnFull.style.background = 'rgba(56, 189, 248, 0.28)';
+      btnFull.style.color = '#ffffff';
+      btnFull.style.fontWeight = '700';
     }
+    if (btnSmall) {
+      btnSmall.style.background = 'transparent';
+      btnSmall.style.color = '#94a3b8';
+      btnSmall.style.fontWeight = '600';
+    }
+    try { localStorage.setItem('nexus_admin_modal_size', 'full'); } catch(e){}
+  } else {
+    overlay.classList.remove('is-fullscreen');
+    card.classList.remove('is-fullscreen');
+    if (btnSmall) {
+      btnSmall.style.background = 'rgba(56, 189, 248, 0.28)';
+      btnSmall.style.color = '#ffffff';
+      btnSmall.style.fontWeight = '700';
+    }
+    if (btnFull) {
+      btnFull.style.background = 'transparent';
+      btnFull.style.color = '#94a3b8';
+      btnFull.style.fontWeight = '600';
+    }
+    try { localStorage.setItem('nexus_admin_modal_size', 'small'); } catch(e){}
   }
-  if (label) {
-    label.innerText = isFull ? 'Small Screen' : 'Fullscreen';
-  }
-}
-window.toggleCaseDetailFullscreen = toggleCaseDetailFullscreen;
+};
+
+window.toggleCaseDetailFullscreen = function(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  var overlay = document.getElementById('caseDetailModal');
+  var isFull = overlay && overlay.classList.contains('is-fullscreen');
+  window.setCaseModalView(isFull ? 'small' : 'full');
+};
 
 document.addEventListener('click', function(evt) {
-  var t = evt.target && evt.target.closest('#btnToggleCaseDetailFullscreen');
-  if (t) {
+  var bFull = evt.target && evt.target.closest('#btnCaseModalFull');
+  if (bFull) {
     evt.preventDefault();
-    evt.stopPropagation();
-    toggleCaseDetailFullscreen(evt);
+    window.setCaseModalView('full');
+    return;
+  }
+  var bSmall = evt.target && evt.target.closest('#btnCaseModalSmall');
+  if (bSmall) {
+    evt.preventDefault();
+    window.setCaseModalView('small');
+    return;
   }
 });
 </script>
@@ -1178,10 +1206,15 @@ document.addEventListener('click', function(evt) {
         <h3><i class="fas fa-folder-open" style="color: var(--primary-light);"></i> Case: <span id="detailCaseId" class="mono" style="color: var(--accent-cyan);">-</span></h3>
       </div>
       <div style="display: flex; align-items: center; gap: 0.65rem;">
-        <button type="button" id="btnToggleCaseDetailFullscreen" class="btn-fullscreen-toggle" onclick="toggleCaseDetailFullscreen(event)" title="Toggle Fullscreen / Small Screen">
-          <i class="fas fa-expand"></i> <span id="btnFullscreenLabel">Fullscreen</span>
-        </button>
-        <button class="modal-close-icon" onclick="hideDetailModal()"><i class="fas fa-xmark"></i></button>
+        <div class="modal-size-controls" style="display: flex; align-items: center; gap: 0.35rem; background: rgba(0,0,0,0.4); padding: 0.25rem 0.35rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);">
+          <button type="button" id="btnCaseModalSmall" onclick="setCaseModalView('small')" class="modal-size-btn" title="Small / Windowed Box View" style="padding: 0.3rem 0.75rem; font-size: 0.76rem; border-radius: 5px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(56,189,248,0.28); color: #ffffff; font-weight: 700;">
+            <i class="fas fa-window-restore"></i> Small Screen
+          </button>
+          <button type="button" id="btnCaseModalFull" onclick="setCaseModalView('full')" class="modal-size-btn" title="Full Screen Expanded View" style="padding: 0.3rem 0.75rem; font-size: 0.76rem; border-radius: 5px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; background: transparent; color: #94a3b8; font-weight: 600;">
+            <i class="fas fa-expand"></i> Full Screen
+          </button>
+        </div>
+        <button class="modal-close-icon" onclick="hideDetailModal()" title="Close Dossier"><i class="fas fa-xmark"></i></button>
       </div>
     </div>
 
@@ -1940,7 +1973,7 @@ document.addEventListener('click', function(evt) {
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/admin.js?v=20261027-fs-fix-v6"></script>
+<script src="js/admin.js?v=20261027-dual-size-v7"></script>
 
 </body>
 </html>
