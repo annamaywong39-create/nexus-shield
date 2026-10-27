@@ -209,7 +209,7 @@ const LOCALIZED_TEMPLATES = {
     tokenBalanceVal: '100,000 / 100,000 (100% 利用可能)',
     ctaBtn: '事件の進捗とトークン残高をライブ確認 &rarr;',
     antiScamTitle: '🛡️ 詐欺防止・セキュリティ保証:',
-    antiScamDesc: 'Nexus Shieldが12単語のシードフレーズや秘密鍵、または「出金手数料」の前払いを求めることは<strong>一切ありません</strong>。公式連絡は必ず <code>${supportEmail}</code> より行われます。',
+    antiScamDesc: 'Nexus Shieldが12単語のシードフレーズや秘密鍵、または「出金手数料」の前払いを求めることは<strong>一切ありません</strong>。公式連絡は必ず <code>support@nexusshield.org</code> より行われます。',
     contactTitle: '追加のトランザクションハッシュやご質問はありますか？',
     getContactDesc: (id) => `担当チーム <a href="mailto:support@nexusshield.org?subject=%E6%A1%88%E4%BB%B6%E9%80%A3%E7%B5%A1%20${encodeURIComponent(id)}" style="color: #0052FF; font-weight: 600; text-decoration: underline;">support@nexusshield.org</a> まで、案件ID <strong>${id}</strong> を明記の上ご連絡ください。`,
     footerRights: '&copy; ' + new Date().getFullYear() + ' Nexus Shield デジタル資産フォレンジック。公式ポータル: <a href="https://nexusshield.org" style="color: #64748b; text-decoration: none;">nexusshield.org</a>',
