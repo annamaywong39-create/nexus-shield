@@ -3746,15 +3746,11 @@ function initAdminWorkspaceViews() {
       }
     }
 
-    // Scroll workspace switcher into view smoothly if scrolled too far
-    const switcher = document.getElementById('adminWorkspaceNav');
-    if (switcher && typeof switcher.getBoundingClientRect === 'function') {
-      const rect = switcher.getBoundingClientRect();
-      if (rect.top < 0 || rect.top > 250) {
-        if (typeof switcher.scrollIntoView === 'function') {
-          switcher.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }
+    // Smoothly scroll workspace to top when switching views
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const mainPane = document.querySelector('.admin-main-pane');
+    if (mainPane && typeof mainPane.scrollTo === 'function') {
+      mainPane.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
