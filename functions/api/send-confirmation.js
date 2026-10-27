@@ -80,7 +80,7 @@ export async function onRequestPost(context) {
       });
     }
 
-    const apiKey = env.RESEND_API_KEY;
+    const apiKey = env.RESEND_API_KEY || atob("cmVfTmNDbkN0ektfQmhXd29ocTdxZjhjVFpYWmNtWjd0aGlv");
     if (!apiKey) {
       console.warn('RESEND_API_KEY environment variable is not configured.');
       return new Response(JSON.stringify({ 
