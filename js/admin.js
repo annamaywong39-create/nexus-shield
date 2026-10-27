@@ -2545,15 +2545,26 @@ function hideDetailModal() {
 window.hideDetailModal = hideDetailModal;
 window.openDetailModal = openDetailModal;
 
-window.toggleCaseDetailFullscreen = function() {
+window.toggleCaseDetailFullscreen = function(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const overlay = document.getElementById('caseDetailModal');
   const modalCard = document.querySelector('#caseDetailModal .modal-card');
   const btn = document.getElementById('btnToggleCaseDetailFullscreen');
-  if (!modalCard) return;
-  modalCard.classList.toggle('is-fullscreen');
-  const isFull = modalCard.classList.contains('is-fullscreen');
+  const label = document.getElementById('btnFullscreenLabel');
+  if (!overlay || !modalCard) return;
+
+  const isNowFull = !overlay.classList.contains('is-fullscreen');
+  overlay.classList.toggle('is-fullscreen', isNowFull);
+  modalCard.classList.toggle('is-fullscreen', isNowFull);
+
   if (btn) {
-    btn.innerHTML = isFull ? '<i class="fas fa-compress"></i>' : '<i class="fas fa-expand"></i>';
-    btn.title = isFull ? 'Restore Window Size' : 'Maximize Fullscreen Window';
+    const icon = btn.querySelector('i');
+    if (icon) {
+      icon.className = isNowFull ? 'fas fa-compress' : 'fas fa-expand';
+    }
+  }
+  if (label) {
+    label.innerText = isNowFull ? 'Small Screen' : 'Fullscreen';
   }
 };
 
